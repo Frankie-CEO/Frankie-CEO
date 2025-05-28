@@ -12,11 +12,32 @@ from datetime import datetime, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
 from agora_token_builder import RtcTokenBuilder
 from b2sdk.v1 import B2Api, InMemoryAccountInfo
+from bson import ObjectId
 import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def serialize_doc(doc):
+    """Convert MongoDB document to JSON serializable format"""
+    if doc is None:
+        return None
+    if isinstance(doc, list):
+        return [serialize_doc(item) for item in doc]
+    if isinstance(doc, dict):
+        serialized = {}
+        for key, value in doc.items():
+            if isinstance(value, ObjectId):
+                serialized[key] = str(value)
+            elif isinstance(value, dict):
+                serialized[key] = serialize_doc(value)
+            elif isinstance(value, list):
+                serialized[key] = serialize_doc(value)
+            else:
+                serialized[key] = value
+        return serialized
+    return doc
 
 app = FastAPI()
 
