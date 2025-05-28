@@ -414,9 +414,10 @@ async def start_live_stream(stream_data: dict):
         await db.live_streams.insert_one(stream)
         live_streams[stream_id] = stream
         
-        return {"success": True, "stream": stream}
+        return {"success": True, "stream": serialize_doc(stream)}
         
     except Exception as e:
+        logger.error(f"Error starting live stream: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/live-streams/{stream_id}/end")
