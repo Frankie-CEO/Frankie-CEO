@@ -345,9 +345,10 @@ async def get_user_profile(user_id: str):
             }
             await db.users.insert_one(user)
         
-        return {"user": user}
+        return {"user": serialize_doc(user)}
         
     except Exception as e:
+        logger.error(f"Error getting user profile: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/leaderboard")
