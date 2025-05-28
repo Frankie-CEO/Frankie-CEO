@@ -392,6 +392,7 @@ async def generate_agora_token(token_request: TokenRequest):
         }
         
     except Exception as e:
+        logger.error(f"Error generating Agora token: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/live-streams/start")
