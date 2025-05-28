@@ -23,3 +23,15 @@ numpy>=1.26.0
 python-multipart>=0.0.9
 jq>=1.6.0
 typer>=0.9.0
+
+# Agora.io token generation
+agora-token-builder>=1.0.0
+
+# Backblaze B2 cloud storage
+b2sdk>=1.25.0
+
+# WebSocket support for real-time features
+websockets>=12.0
+
+# Video processing
+opencv-python>=4.9.0
