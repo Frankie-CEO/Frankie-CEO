@@ -450,8 +450,9 @@ async def get_live_streams():
     """Get all active live streams"""
     try:
         streams = await db.live_streams.find({"is_active": True}).to_list(length=None)
-        return {"streams": streams}
+        return {"streams": serialize_doc(streams)}
     except Exception as e:
+        logger.error(f"Error getting live streams: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/ads")
