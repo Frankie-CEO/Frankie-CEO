@@ -356,8 +356,9 @@ async def get_leaderboard():
     """Get top users by tokens"""
     try:
         users = await db.users.find({}).sort("tokens", -1).limit(10).to_list(length=None)
-        return {"leaderboard": users}
+        return {"leaderboard": serialize_doc(users)}
     except Exception as e:
+        logger.error(f"Error getting leaderboard: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/agora/token")
