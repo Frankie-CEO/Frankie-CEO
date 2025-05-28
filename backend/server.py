@@ -246,11 +246,7 @@ async def get_videos():
     """Get all available videos"""
     try:
         videos = await db.videos.find({}).to_list(length=None)
-        # Convert ObjectId to string for JSON serialization
-        for video in videos:
-            if '_id' in video:
-                video['_id'] = str(video['_id'])
-        return {"videos": videos}
+        return {"videos": serialize_doc(videos)}
     except Exception as e:
         logger.error(f"Error getting videos: {e}")
         raise HTTPException(status_code=500, detail=str(e))
