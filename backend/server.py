@@ -96,11 +96,17 @@ async def startup_event():
         db = mongo_client[DB_NAME]
         logger.info("Connected to MongoDB")
         
-        # Initialize B2
-        info = InMemoryAccountInfo()
-        b2_api = B2Api(info)
-        b2_api.authorize_account("production", B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY)
-        logger.info("Connected to Backblaze B2")
+        # Initialize B2 (skip if credentials not available)
+        try:
+            if B2_APPLICATION_KEY_ID and B2_APPLICATION_KEY:
+                info = InMemoryAccountInfo()
+                b2_api = B2Api(info)
+                b2_api.authorize_account("production", B2_APPLICATION_KEY_ID, B2_APPLICATION_KEY)
+                logger.info("Connected to Backblaze B2")
+            else:
+                logger.warning("B2 credentials not provided, skipping B2 initialization")
+        except Exception as b2_error:
+            logger.warning(f"B2 initialization failed: {b2_error}. Continuing without B2.")
         
         # Initialize collections with sample data
         await initialize_sample_data()
