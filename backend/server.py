@@ -460,8 +460,9 @@ async def get_ads():
     """Get advertisement content"""
     try:
         ads = await db.ads.find({}).to_list(length=None)
-        return {"ads": ads}
+        return {"ads": serialize_doc(ads)}
     except Exception as e:
+        logger.error(f"Error getting ads: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/creator/{creator_id}/stats")
