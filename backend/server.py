@@ -151,30 +151,30 @@ async def shutdown_event():
 async def initialize_sample_data():
     """Initialize sample videos and users"""
     try:
-        # Sample videos with working URLs
+        # Sample videos with reliable URLs that support CORS
         sample_videos = [
             {
                 "video_id": "vid_001",
                 "title": "Amazing Nature Documentary",
                 "duration": 1800,  # 30 minutes
-                "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                "thumbnail": "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
+                "url": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4",
+                "thumbnail": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.jpg",
                 "size_mb": 30
             },
             {
                 "video_id": "vid_002", 
                 "title": "Tech Innovation 2025",
                 "duration": 1200,  # 20 minutes
-                "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-                "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/ElephantsDreamPoster.jpg/220px-ElephantsDreamPoster.jpg",
+                "url": "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
+                "thumbnail": "https://sample-videos.com/image/tech1.jpg",
                 "size_mb": 28
             },
             {
                 "video_id": "vid_003",
                 "title": "Creative Art Showcase", 
                 "duration": 900,   # 15 minutes
-                "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                "thumbnail": "https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
+                "url": "https://file-examples.com/storage/fe9c56149bae29351b144c3/2017/10/file_example_MP4_1920_18MG.mp4",
+                "thumbnail": "https://file-examples.com/storage/fe9c56149bae29351b144c3/2017/10/file_example_JPG_500kB.jpg",
                 "size_mb": 25
             }
         ]
