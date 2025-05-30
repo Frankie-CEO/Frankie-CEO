@@ -50,6 +50,7 @@ const App = () => {
   const videoRef = useRef(null);
   const wsRef = useRef(null);
   const watchTimeRef = useRef(0);
+  const intervalRef = useRef(null);  // Separate ref for interval
   const colorPulseIntervalRef = useRef(null);
 
   // Color options for Color Pulse
