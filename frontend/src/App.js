@@ -46,6 +46,7 @@ const App = () => {
   const [remoteUsers, setRemoteUsers] = useState([]);
   const [agoraClient, setAgoraClient] = useState(null);
   const [creatorStats, setCreatorStats] = useState(null);
+  const [demoMode, setDemoMode] = useState(true); // Demo mode for testing
   
   const videoRef = useRef(null);
   const wsRef = useRef(null);
