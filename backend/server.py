@@ -151,30 +151,30 @@ async def shutdown_event():
 async def initialize_sample_data():
     """Initialize sample videos and users"""
     try:
-        # Sample videos
+        # Sample videos with working URLs
         sample_videos = [
             {
                 "video_id": "vid_001",
                 "title": "Amazing Nature Documentary",
                 "duration": 1800,  # 30 minutes
-                "url": "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-                "thumbnail": "https://sample-videos.com/image/nature1.jpg",
+                "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "thumbnail": "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
                 "size_mb": 30
             },
             {
                 "video_id": "vid_002", 
                 "title": "Tech Innovation 2025",
                 "duration": 1200,  # 20 minutes
-                "url": "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-                "thumbnail": "https://sample-videos.com/image/tech1.jpg",
+                "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/ElephantsDreamPoster.jpg/220px-ElephantsDreamPoster.jpg",
                 "size_mb": 28
             },
             {
                 "video_id": "vid_003",
                 "title": "Creative Art Showcase", 
                 "duration": 900,   # 15 minutes
-                "url": "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_3mb.mp4",
-                "thumbnail": "https://sample-videos.com/image/art1.jpg",
+                "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                "thumbnail": "https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg",
                 "size_mb": 25
             }
         ]
