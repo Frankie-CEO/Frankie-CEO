@@ -334,8 +334,18 @@ const App = () => {
             ref={videoRef}
             src={currentVideo.url}
             className="w-full h-64 object-cover"
-            controls={false}
+            controls={true}
+            muted={true}
             autoPlay={isPlaying}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onTimeUpdate={(e) => {
+              const currentTime = Math.floor(e.target.currentTime);
+              if (currentTime !== watchTimeRef.current) {
+                watchTimeRef.current = currentTime;
+                setWatchTime(currentTime);
+              }
+            }}
           />
         )}
         
@@ -348,6 +358,24 @@ const App = () => {
             }} className="w-full h-full" />
           </div>
         )}
+        
+        {/* Video info overlay */}
+        <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4">
+          <h3 className="text-white font-bold text-lg">
+            {currentVideo ? currentVideo.title : currentStream?.title}
+          </h3>
+          {user && (
+            <div className="flex items-center space-x-4 mt-2">
+              <div className="flex items-center space-x-2">
+                <Zap className="text-yellow-500" size={16} />
+                <span className="text-yellow-500 font-semibold">{user.tokens} tokens</span>
+              </div>
+              <div className="text-neon-purple text-sm">
+                {user.neurodiversity_class}
+              </div>
+            </div>
+          )}
+        </div>
         
         {/* Video controls */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
