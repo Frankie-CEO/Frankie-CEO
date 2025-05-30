@@ -166,13 +166,14 @@ const App = () => {
       }
     }, 1000);
     
-    // Store interval for cleanup
-    watchTimeRef.current.interval = interval;
+    // Store interval for cleanup in separate ref
+    intervalRef.current = interval;
   };
 
   const stopWatchTimer = () => {
-    if (watchTimeRef.current.interval) {
-      clearInterval(watchTimeRef.current.interval);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
     submitWatchTime();
   };
