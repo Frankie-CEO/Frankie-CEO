@@ -197,10 +197,12 @@ const App = () => {
   };
 
   const startColorPulseTimer = () => {
-    // Show Color Pulse prompt every 9 minutes (540 seconds)
+    // Show Color Pulse prompt every 30 seconds for testing (normally 9 minutes)
     colorPulseIntervalRef.current = setInterval(() => {
-      setShowColorPulse(true);
-    }, 540000);
+      if (isPlaying) {
+        setShowColorPulse(true);
+      }
+    }, 30000); // 30 seconds for testing - change to 540000 for production
   };
 
   const submitColorPulse = async (color, mood, memory, context) => {
