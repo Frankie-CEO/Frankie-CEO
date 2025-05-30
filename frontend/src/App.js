@@ -335,7 +335,29 @@ const App = () => {
 
     return (
       <div className="relative bg-black rounded-lg overflow-hidden">
-        {currentVideo && (
+        {currentVideo && demoMode && (
+          <div className="w-full h-64 bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center">
+            <div className="text-center mb-4">
+              <h3 className="text-white text-xl font-bold mb-2">{currentVideo.title}</h3>
+              <p className="text-gray-300 text-sm mb-4">🎬 Demo Mode - Simulating Video Playback</p>
+              <div className="flex items-center justify-center space-x-4">
+                <div className={`w-4 h-4 rounded-full ${isPlaying ? 'bg-red-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                <span className="text-white">{isPlaying ? 'Playing' : 'Paused'}</span>
+              </div>
+            </div>
+            <div className="w-full max-w-md bg-gray-700 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-neon-orange to-neon-green h-2 rounded-full transition-all duration-1000"
+                style={{ width: `${Math.min((watchTime / currentVideo.duration) * 100, 100)}%` }}
+              ></div>
+            </div>
+            <p className="text-gray-400 text-xs mt-2">
+              Token Earning Demo: +1 token every 10 seconds
+            </p>
+          </div>
+        )}
+        
+        {currentVideo && !demoMode && (
           <video
             ref={videoRef}
             src={currentVideo.url}
@@ -381,6 +403,12 @@ const App = () => {
               </div>
             </div>
           )}
+          {demoMode && (
+            <div className="text-green-400 text-xs mt-1 flex items-center">
+              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+              Demo Mode Active
+            </div>
+          )}
         </div>
         
         {/* Video controls */}
@@ -397,6 +425,14 @@ const App = () => {
                 <Volume2 size={16} />
                 <span className="text-sm">{Math.floor(watchTime / 60)}:{String(watchTime % 60).padStart(2, '0')}</span>
               </div>
+              {demoMode && (
+                <button
+                  onClick={() => setDemoMode(false)}
+                  className="text-xs bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded"
+                >
+                  Try Real Video
+                </button>
+              )}
             </div>
             
             {currentStream && (
