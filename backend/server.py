@@ -14,6 +14,10 @@ from agora_token_builder import RtcTokenBuilder
 from b2sdk.v1 import B2Api, InMemoryAccountInfo
 from bson import ObjectId
 import logging
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
