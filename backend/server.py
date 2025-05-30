@@ -62,6 +62,10 @@ DB_NAME = os.getenv("DB_NAME", "test_database")
 AGORA_APP_ID = os.getenv("AGORA_APP_ID")
 AGORA_APP_CERTIFICATE = os.getenv("AGORA_APP_CERTIFICATE")
 
+# Debug logging
+logger.info(f"AGORA_APP_ID loaded: {'***' + AGORA_APP_ID[-4:] if AGORA_APP_ID else 'None'}")
+logger.info(f"AGORA_APP_CERTIFICATE loaded: {'***' + AGORA_APP_CERTIFICATE[-4:] if AGORA_APP_CERTIFICATE else 'None'}")
+
 # Backblaze B2 setup
 B2_APPLICATION_KEY_ID = os.getenv("B2_APPLICATION_KEY_ID")
 B2_APPLICATION_KEY = os.getenv("B2_APPLICATION_KEY")
