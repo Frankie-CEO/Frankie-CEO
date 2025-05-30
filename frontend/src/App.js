@@ -80,6 +80,9 @@ const App = () => {
       if (colorPulseIntervalRef.current) {
         clearInterval(colorPulseIntervalRef.current);
       }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
   }, []);
 
