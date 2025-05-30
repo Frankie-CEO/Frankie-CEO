@@ -141,6 +141,8 @@ const App = () => {
     setCurrentVideo(video);
     setCurrentStream(null);
     setIsPlaying(true);
+    watchTimeRef.current = 0;
+    setWatchTime(0);
     startWatchTimer();
     startColorPulseTimer();
   };
@@ -152,14 +154,29 @@ const App = () => {
 
   const startWatchTimer = () => {
     const interval = setInterval(() => {
-      watchTimeRef.current += 1;
-      setWatchTime(watchTimeRef.current);
+      if (isPlaying) {
+        watchTimeRef.current += 1;
+        setWatchTime(watchTimeRef.current);
+        
+        // Submit watch time every 10 seconds to ensure token tracking
+        if (watchTimeRef.current % 10 === 0) {
+          submitWatchTime();
+        }
+      }
     }, 1000);
     
-    return interval;
+    // Store interval for cleanup
+    watchTimeRef.current.interval = interval;
   };
 
-  const stopWatchTimer = async () => {
+  const stopWatchTimer = () => {
+    if (watchTimeRef.current.interval) {
+      clearInterval(watchTimeRef.current.interval);
+    }
+    submitWatchTime();
+  };
+
+  const submitWatchTime = async () => {
     if (watchTimeRef.current > 0 && currentVideo) {
       try {
         await axios.post(`${BACKEND_URL}/api/videos/watch`, {
