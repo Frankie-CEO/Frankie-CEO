@@ -609,6 +609,13 @@ const App = () => {
               Demo Mode Active
             </div>
           )}
+          
+          {/* Full screen keyboard hint */}
+          {isFullScreen && (
+            <div className="absolute top-4 right-4 text-white/60 text-sm bg-black/50 px-3 py-1 rounded-lg backdrop-blur-sm">
+              Press <kbd className="bg-white/20 px-1 rounded">F</kbd> or <kbd className="bg-white/20 px-1 rounded">ESC</kbd> to exit
+            </div>
+          )}
         </div>
         
         {/* Video controls */}
