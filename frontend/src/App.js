@@ -1187,26 +1187,111 @@ const App = () => {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-white">Creator Dashboard</h2>
             
-            <div className="flex justify-center">
-              {!isCreatorLive ? (
-                <button
-                  onClick={startLiveStream}
-                  className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 flex items-center space-x-2"
-                >
-                  <Camera size={24} />
-                  <span>Go Live</span>
-                </button>
+            {/* Live Stream Controls */}
+            <div className="bg-gray-800 rounded-lg p-6 border border-neon-purple/30">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                <Radio className="mr-2 text-red-500" size={24} />
+                Live Streaming
+              </h3>
+              
+              {isCreatorLive ? (
+                <div className="space-y-4">
+                  {/* Live Stream Status */}
+                  <div className="bg-red-600 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        <span className="text-white font-semibold">You're Live!</span>
+                        <span className="text-red-200 text-sm">
+                          {currentStream?.title || 'Live Stream'}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-4 text-white">
+                        <div className="flex items-center space-x-2">
+                          <Users size={16} />
+                          <span>{currentStream?.viewer_count || 0}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Eye size={16} />
+                          <span>Live</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Live Video Preview */}
+                  <div className="bg-black rounded-lg overflow-hidden">
+                    <div 
+                      id="local-video-container" 
+                      className="w-full h-48 bg-gray-900 flex items-center justify-center"
+                    >
+                      {!localTracks.video && (
+                        <div className="text-center text-white">
+                          <Camera size={32} className="mx-auto mb-2 text-neon-orange" />
+                          <p>Camera loading...</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Live Stream Controls */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          if (localTracks.audio) {
+                            const enabled = localTracks.audio.enabled;
+                            localTracks.audio.setEnabled(!enabled);
+                          }
+                        }}
+                        className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-colors"
+                      >
+                        <Mic size={20} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (localTracks.video) {
+                            const enabled = localTracks.video.enabled;
+                            localTracks.video.setEnabled(!enabled);
+                          }
+                        }}
+                        className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-colors"
+                      >
+                        <Camera size={20} />
+                      </button>
+                    </div>
+                    
+                    <button
+                      onClick={endLiveStream}
+                      className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-lg font-bold hover:from-red-700 hover:to-red-800 transition-all flex items-center space-x-2"
+                    >
+                      <PhoneOff size={20} />
+                      <span>End Stream</span>
+                    </button>
+                  </div>
+                </div>
               ) : (
-                <button
-                  onClick={endLiveStream}
-                  className="bg-gradient-to-r from-gray-600 to-gray-700 text-white px-8 py-4 rounded-lg font-bold text-lg hover:from-gray-700 hover:to-gray-800 transition-all flex items-center space-x-2"
-                >
-                  <PhoneOff size={24} />
-                  <span>End Stream</span>
-                </button>
+                <div className="text-center space-y-4">
+                  <p className="text-gray-300 mb-4">
+                    Start your live stream and connect with your audience in real-time!
+                  </p>
+                  <button
+                    onClick={startLiveStream}
+                    className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 flex items-center space-x-2 mx-auto"
+                  >
+                    <Camera size={24} />
+                    <span>Go Live</span>
+                  </button>
+                  <div className="text-sm text-gray-400">
+                    <p>✓ HD 720p streaming</p>
+                    <p>✓ Real-time audience interaction</p>
+                    <p>✓ Token earnings from viewers</p>
+                  </div>
+                </div>
               )}
             </div>
             
+            {/* Creator Stats */}
             {creatorStats && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-gray-800 rounded-lg p-4 border border-neon-orange/30">
@@ -1224,6 +1309,33 @@ const App = () => {
                 <div className="bg-gray-800 rounded-lg p-4 border border-yellow-500/30">
                   <div className="text-2xl font-bold text-yellow-500">${creatorStats.ad_revenue_share?.toFixed(2) || '0.00'}</div>
                   <div className="text-gray-400">Ad Revenue</div>
+                </div>
+              </div>
+            )}
+            
+            {/* Recent Streams */}
+            {liveStreams.length > 0 && (
+              <div className="bg-gray-800 rounded-lg p-6 border border-neon-green/30">
+                <h3 className="text-xl font-bold text-white mb-4">Your Recent Streams</h3>
+                <div className="space-y-3">
+                  {liveStreams.filter(stream => stream.creator_id === USER_ID).slice(0, 3).map((stream) => (
+                    <div key={stream.stream_id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                      <div>
+                        <div className="text-white font-semibold">{stream.title}</div>
+                        <div className="text-gray-400 text-sm">
+                          {new Date(stream.start_time).toLocaleDateString()} • 
+                          {stream.is_active ? (
+                            <span className="text-red-500 ml-1">● Live</span>
+                          ) : (
+                            <span className="text-gray-500 ml-1">Ended</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-neon-green font-semibold">{stream.viewer_count || 0} viewers</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
