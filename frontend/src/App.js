@@ -153,10 +153,25 @@ const App = () => {
 
   const [colorOptions, setColorOptions] = useState(generateInfiniteColors());
 
-  // Mood, memory, and context options
-  const moodOptions = ['Happy', 'Excited', 'Calm', 'Focused', 'Creative'];
-  const memoryOptions = ['Strong', 'Moderate', 'Weak', 'Nostalgic', 'Fresh'];
-  const contextOptions = ['Work', 'Leisure', 'Learning', 'Social', 'Personal'];
+  // Baseline assessment options
+  const moodOptions = [
+    'Energetic & Excited', 'Happy & Content', 'Calm & Peaceful', 'Focused & Determined', 
+    'Creative & Inspired', 'Tired & Relaxed', 'Curious & Wondering', 'Nostalgic & Reflective',
+    'Anxious & Worried', 'Sad & Melancholy', 'Angry & Frustrated', 'Neutral & Balanced'
+  ];
+  
+  const weatherOptions = [
+    'Sunny & Bright', 'Partly Cloudy', 'Overcast & Gray', 'Rainy & Wet', 
+    'Stormy & Windy', 'Snowy & Cold', 'Foggy & Misty', 'Hot & Humid',
+    'Cool & Crisp', 'Warm & Pleasant', 'Dry & Arid', 'Don\'t Know/Indoor'
+  ];
+  
+  const memoryOptions = [
+    'A childhood adventure', 'Time with family', 'Achievement or success', 'First love or friendship',
+    'Travel or new place', 'Learning something new', 'Creative moment', 'Peaceful quiet time',
+    'Helping someone else', 'Overcoming a challenge', 'Celebration or party', 'Nature experience',
+    'Musical or artistic moment', 'Sports or physical activity', 'Random happy moment', 'Prefer not to share'
+  ];
 
   // Initialize app
   useEffect(() => {
