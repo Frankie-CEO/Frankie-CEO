@@ -217,29 +217,103 @@ async def initialize_sample_data():
         logger.error(f"Error initializing sample data: {e}")
 
 def calculate_neurodiversity_class(color_choices: List[str]) -> str:
-    """Calculate neurodiversity classification based on color choices"""
+    """Calculate neurodiversity classification based on color choices with infinite color support"""
     if not color_choices:
         return "Unclassified"
     
-    warm_colors = ["#FF5733"]  # Orange
-    cool_colors = ["#33FF57"]  # Green  
-    neutral_colors = ["#C733FF"]  # Purple
+    # Define color categories with expanded ranges
+    def categorize_color(color):
+        # Handle HSL colors
+        if color.startswith('hsl'):
+            # Extract hue from HSL
+            hue_match = color.split('(')[1].split(',')[0]
+            try:
+                hue = float(hue_match)
+                if 0 <= hue <= 60 or 300 <= hue <= 360:  # Reds, oranges, yellows
+                    return "warm"
+                elif 60 < hue <= 180:  # Yellows, greens, cyans  
+                    return "cool"
+                elif 180 < hue < 300:  # Blues, purples, magentas
+                    return "neutral"
+            except:
+                pass
+        
+        # Handle hex colors - convert to RGB and determine category
+        if color.startswith('#'):
+            try:
+                # Remove # and convert to RGB
+                hex_color = color.lstrip('#')
+                r = int(hex_color[0:2], 16)
+                g = int(hex_color[2:4], 16) 
+                b = int(hex_color[4:6], 16)
+                
+                # Simple RGB to HSL approximation for categorization
+                max_val = max(r, g, b)
+                min_val = min(r, g, b)
+                
+                if r > g and r > b:  # Red dominant
+                    return "warm"
+                elif g > r and g > b:  # Green dominant
+                    return "cool"
+                elif b > r and b > g:  # Blue dominant
+                    return "neutral"
+                else:
+                    # Mixed colors - categorize based on intensity
+                    if r + g > b * 1.5:  # Warm tendency
+                        return "warm"
+                    elif g + b > r * 1.5:  # Cool tendency
+                        return "cool"
+                    else:
+                        return "neutral"
+            except:
+                pass
+        
+        # Fallback categorization for known colors
+        warm_colors = ['#FF5733', '#FF6B47', '#FF4500', '#FF7F50', '#FFB347', '#FFA500', '#FF8C69', '#FF6347']
+        cool_colors = ['#33FF57', '#00FF7F', '#40E0D0', '#00CED1', '#1E90FF', '#6495ED', '#7FFFD4', '#98FB98']
+        neutral_colors = ['#C733FF', '#9966CC', '#8A2BE2', '#DA70D6', '#DDA0DD', '#EE82EE', '#FF69B4', '#FFB6C1']
+        
+        if color in warm_colors:
+            return "warm"
+        elif color in cool_colors:
+            return "cool"
+        elif color in neutral_colors:
+            return "neutral"
+        
+        return "neutral"  # Default fallback
+    
+    # Categorize all color choices
+    categories = {"warm": 0, "cool": 0, "neutral": 0}
+    
+    for color in color_choices:
+        category = categorize_color(color)
+        categories[category] += 1
     
     total = len(color_choices)
-    warm_count = sum(1 for color in color_choices if color in warm_colors)
-    cool_count = sum(1 for color in color_choices if color in cool_colors)
-    neutral_count = sum(1 for color in color_choices if color in neutral_colors)
+    if total == 0:
+        return "Unclassified"
     
-    warm_pct = warm_count / total
-    cool_pct = cool_count / total
-    neutral_pct = neutral_count / total
+    warm_pct = categories["warm"] / total
+    cool_pct = categories["cool"] / total
+    neutral_pct = categories["neutral"] / total
     
-    if warm_pct > 0.6:
+    # Enhanced classification with more nuanced categories
+    if warm_pct > 0.7:
+        return "Intense Warm Seeker"
+    elif warm_pct > 0.5:
         return "Warm Seeker"
-    elif cool_pct > 0.6:
+    elif cool_pct > 0.7:
+        return "Deep Cool Lover"
+    elif cool_pct > 0.5:
         return "Cool Lover"
+    elif neutral_pct > 0.6:
+        return "Mystical Mind"
     elif neutral_pct > 0.4:
         return "Balanced Mind"
+    elif abs(warm_pct - cool_pct) < 0.2 and abs(warm_pct - neutral_pct) < 0.2:
+        return "Rainbow Spirit"
+    elif warm_pct > 0.3 and cool_pct > 0.3:
+        return "Dynamic Explorer"
     else:
         return "Eclectic Thinker"
 
