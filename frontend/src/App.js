@@ -538,33 +538,73 @@ const App = () => {
     if (!showColorPulse) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full border border-neon-purple">
-          <h3 className="text-xl font-bold text-white mb-4 text-center">Color Pulse</h3>
-          <p className="text-gray-300 text-center mb-6">Choose a color that resonates with you right now:</p>
+      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 rounded-xl p-6 max-w-lg w-full border-2 border-neon-purple shadow-2xl">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold text-white mb-2 bg-gradient-to-r from-neon-orange to-neon-purple bg-clip-text text-transparent">
+              ✨ Color Pulse ✨
+            </h3>
+            <p className="text-gray-300 text-sm">
+              Feel the energy of these infinite colors and choose what resonates with your soul right now
+            </p>
+          </div>
           
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            {colorOptions.map((option) => (
+          <div className="grid grid-cols-1 gap-4 mb-6">
+            {colorOptions.map((option, index) => (
               <button
-                key={option.color}
+                key={`${option.color}-${index}`}
                 onClick={() => {
-                  // Simple implementation - just submit the color
                   submitColorPulse(option.color, 'Happy', 'Strong', 'Leisure');
                 }}
-                className="p-4 rounded-lg border-2 border-transparent hover:border-white transition-all"
-                style={{ backgroundColor: option.color }}
+                className="group relative overflow-hidden rounded-xl border-2 border-transparent hover:border-white/50 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
+                style={{ 
+                  background: option.gradient || option.color,
+                  minHeight: '80px'
+                }}
               >
-                <div className="text-white font-semibold text-sm">{option.name}</div>
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
+                <div className="relative p-4 text-center">
+                  <div className="text-white font-bold text-lg mb-1 drop-shadow-lg">
+                    {option.name}
+                  </div>
+                  <div className="text-white/80 text-sm drop-shadow-md">
+                    {option.category} energy • {option.energy}% intensity
+                  </div>
+                  <div className="absolute top-2 right-2 text-white/60 text-xs">
+                    +2 tokens
+                  </div>
+                </div>
+                
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
               </button>
             ))}
           </div>
           
-          <button
-            onClick={() => setShowColorPulse(false)}
-            className="w-full py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Skip
-          </button>
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => {
+                // Generate new colors and refresh the options
+                setColorOptions(generateInfiniteColors());
+              }}
+              className="px-4 py-2 bg-gradient-to-r from-neon-green to-neon-purple text-white rounded-lg hover:from-neon-purple hover:to-neon-orange transition-all duration-300 text-sm font-semibold"
+            >
+              🔄 Refresh Colors
+            </button>
+            
+            <button
+              onClick={() => setShowColorPulse(false)}
+              className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+            >
+              Skip for now
+            </button>
+          </div>
+          
+          <div className="mt-4 text-center">
+            <p className="text-gray-500 text-xs">
+              🌈 Each color is unique and generated just for you • Infinite possibilities
+            </p>
+          </div>
         </div>
       </div>
     );
