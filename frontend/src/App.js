@@ -252,9 +252,25 @@ const App = () => {
   const playVideo = (video) => {
     setCurrentVideo(video);
     setCurrentStream(null);
-    setIsPlaying(true);
     watchTimeRef.current = 0;
     setWatchTime(0);
+    setHasCompletedBaseline(false);
+    
+    // Reset baseline data and show mandatory Color Pulse assessment
+    setBaselineData({
+      mood: '',
+      weather: '',
+      favoriteMemory: ''
+    });
+    setColorPulseStep('baseline');
+    setShowColorPulse(true);
+    
+    // Don't start playing until baseline is completed
+    setIsPlaying(false);
+  };
+
+  const startVideoAfterBaseline = () => {
+    setIsPlaying(true);
     startWatchTimer();
     startColorPulseTimer();
   };
