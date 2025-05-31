@@ -139,44 +139,207 @@ code {
   animation: pulse 1s infinite;
 }
 
-/* Color Pulse Modal */
+/* Color Pulse Modal with Infinite Color Support */
 .color-pulse-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.95));
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  backdrop-filter: blur(10px);
 }
 
 .color-pulse-content {
-  background: #1f2937;
-  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%);
+  border-radius: 1rem;
   padding: 2rem;
-  max-width: 28rem;
+  max-width: 32rem;
   width: 100%;
   border: 2px solid var(--neon-purple);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8),
+              0 0 30px rgba(199, 51, 255, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
-.color-option {
-  padding: 1rem;
-  border-radius: 0.5rem;
+.color-pulse-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 87, 51, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(51, 255, 87, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(199, 51, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  animation: colorPulseGlow 3s ease-in-out infinite alternate;
+}
+
+.infinite-color-option {
+  padding: 1.5rem;
+  border-radius: 1rem;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   color: white;
   font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.color-option:hover {
-  border-color: white;
-  transform: scale(1.05);
+.infinite-color-option:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+              0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.infinite-color-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.infinite-color-option:hover::before {
+  left: 100%;
+}
+
+.infinite-color-option .color-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+.infinite-color-option .color-details {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+.infinite-color-option .token-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(5px);
+}
+
+.color-refresh-btn {
+  background: linear-gradient(135deg, var(--neon-green), var(--neon-purple));
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.color-refresh-btn:hover {
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-orange));
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.color-refresh-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.color-refresh-btn:hover::before {
+  left: 100%;
+}
+
+/* Particle animation effects */
+@keyframes colorPulseGlow {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.floating-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  animation: float 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.floating-particle:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+.floating-particle:nth-child(2) { top: 20%; left: 80%; animation-delay: 0.5s; }
+.floating-particle:nth-child(3) { top: 60%; left: 20%; animation-delay: 1s; }
+.floating-particle:nth-child(4) { top: 80%; left: 70%; animation-delay: 1.5s; }
+.floating-particle:nth-child(5) { top: 40%; left: 90%; animation-delay: 2s; }
+
+/* Enhanced shimmer effect */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-12deg);
+  }
+}
+
+.shimmer-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: shimmer 2s ease-in-out infinite;
+  pointer-events: none;
 }
 
 /* Advertisement Styles */
