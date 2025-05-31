@@ -582,74 +582,194 @@ const App = () => {
   const renderColorPulse = () => {
     if (!showColorPulse) return null;
 
+    const isBaseline = colorPulseStep === 'baseline';
+    const isComplete = baselineData.mood && baselineData.weather && baselineData.favoriteMemory;
+
     return (
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-900 rounded-xl p-6 max-w-lg w-full border-2 border-neon-purple shadow-2xl">
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-white mb-2 bg-gradient-to-r from-neon-orange to-neon-purple bg-clip-text text-transparent">
-              ✨ Color Pulse ✨
-            </h3>
-            <p className="text-gray-300 text-sm">
-              Feel the energy of these infinite colors and choose what resonates with your soul right now
-            </p>
-          </div>
+      <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 rounded-xl p-6 max-w-2xl w-full border-2 border-neon-purple shadow-2xl max-h-[90vh] overflow-y-auto">
           
-          <div className="grid grid-cols-1 gap-4 mb-6">
-            {colorOptions.map((option, index) => (
-              <button
-                key={`${option.color}-${index}`}
-                onClick={() => {
-                  submitColorPulse(option.color, 'Happy', 'Strong', 'Leisure');
-                }}
-                className="group relative overflow-hidden rounded-xl border-2 border-transparent hover:border-white/50 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
-                style={{ 
-                  background: option.gradient || option.color,
-                  minHeight: '80px'
-                }}
-              >
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
-                <div className="relative p-4 text-center">
-                  <div className="text-white font-bold text-lg mb-1 drop-shadow-lg">
-                    {option.name}
-                  </div>
-                  <div className="text-white/80 text-sm drop-shadow-md">
-                    {option.category} energy • {option.energy}% intensity
-                  </div>
-                  <div className="absolute top-2 right-2 text-white/60 text-xs">
-                    +2 tokens
-                  </div>
+          {isBaseline ? (
+            // Baseline Assessment Questions
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-2 bg-gradient-to-r from-neon-orange to-neon-purple bg-clip-text text-transparent">
+                🧠 Welcome to Your Viewing Experience
+              </h2>
+              <p className="text-gray-300 text-sm mb-6">
+                Before we begin, help us understand your current state for better personalization
+              </p>
+
+              {/* Step Progress */}
+              <div className="flex justify-center mb-8">
+                <div className="flex space-x-2">
+                  {[1, 2, 3].map((step) => (
+                    <div
+                      key={step}
+                      className={`w-3 h-3 rounded-full ${
+                        (step === 1 && baselineData.mood) ||
+                        (step === 2 && baselineData.weather) ||
+                        (step === 3 && baselineData.favoriteMemory)
+                          ? 'bg-neon-green'
+                          : 'bg-gray-600'
+                      }`}
+                    ></div>
+                  ))}
                 </div>
+              </div>
+
+              {/* Question 1: Mood */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center justify-center">
+                  <span className="mr-2">😊</span> How are you feeling right now?
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {moodOptions.map((mood) => (
+                    <button
+                      key={mood}
+                      onClick={() => setBaselineData(prev => ({ ...prev, mood }))}
+                      className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                        baselineData.mood === mood
+                          ? 'border-neon-green bg-neon-green/20 text-white'
+                          : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-neon-green/50'
+                      }`}
+                    >
+                      {mood}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Question 2: Weather */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center justify-center">
+                  <span className="mr-2">🌤️</span> What's the weather like around you?
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {weatherOptions.map((weather) => (
+                    <button
+                      key={weather}
+                      onClick={() => setBaselineData(prev => ({ ...prev, weather }))}
+                      className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                        baselineData.weather === weather
+                          ? 'border-neon-green bg-neon-green/20 text-white'
+                          : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-neon-green/50'
+                      }`}
+                    >
+                      {weather}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Question 3: Favorite Memory */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-white mb-4 flex items-center justify-center">
+                  <span className="mr-2">💭</span> What type of memory makes you happiest?
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {memoryOptions.map((memory) => (
+                    <button
+                      key={memory}
+                      onClick={() => setBaselineData(prev => ({ ...prev, favoriteMemory: memory }))}
+                      className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                        baselineData.favoriteMemory === memory
+                          ? 'border-neon-green bg-neon-green/20 text-white'
+                          : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-neon-green/50'
+                      }`}
+                    >
+                      {memory}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Proceed Button */}
+              {isComplete && (
+                <button
+                  onClick={() => {
+                    setColorOptions(generateInfiniteColors());
+                    setColorPulseStep('colors');
+                  }}
+                  className="w-full py-4 bg-gradient-to-r from-neon-green to-neon-purple text-white rounded-lg font-bold text-lg hover:from-neon-purple hover:to-neon-orange transition-all duration-300 transform hover:scale-[1.02]"
+                >
+                  Continue to Color Selection ✨
+                </button>
+              )}
+
+              <p className="text-gray-500 text-xs mt-4">
+                📊 This data helps us personalize your experience and contributes to neurodiversity research
+              </p>
+            </div>
+          ) : (
+            // Color Selection (after baseline)
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-white mb-2 bg-gradient-to-r from-neon-orange to-neon-purple bg-clip-text text-transparent">
+                ✨ Color Pulse {hasCompletedBaseline ? '' : '- Baseline'} ✨
+              </h3>
+              <p className="text-gray-300 text-sm mb-6">
+                {hasCompletedBaseline 
+                  ? 'Feel the energy of these infinite colors and choose what resonates with your soul right now'
+                  : 'Now, choose a color that represents your current state based on your answers'
+                }
+              </p>
+              
+              <div className="grid grid-cols-1 gap-4 mb-6">
+                {colorOptions.map((option, index) => (
+                  <button
+                    key={`${option.color}-${index}`}
+                    onClick={() => submitColorPulse(option.color)}
+                    className="group relative overflow-hidden rounded-xl border-2 border-transparent hover:border-white/50 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
+                    style={{ 
+                      background: option.gradient || option.color,
+                      minHeight: '80px'
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300"></div>
+                    <div className="relative p-4 text-center">
+                      <div className="text-white font-bold text-lg mb-1 drop-shadow-lg">
+                        {option.name}
+                      </div>
+                      <div className="text-white/80 text-sm drop-shadow-md">
+                        {option.category} energy • {option.energy}% intensity
+                      </div>
+                      <div className="absolute top-2 right-2 text-white/60 text-xs">
+                        +2 tokens
+                      </div>
+                    </div>
+                    
+                    {/* Shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                  </button>
+                ))}
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <button
+                  onClick={() => {
+                    setColorOptions(generateInfiniteColors());
+                  }}
+                  className="px-4 py-2 bg-gradient-to-r from-neon-green to-neon-purple text-white rounded-lg hover:from-neon-purple hover:to-neon-orange transition-all duration-300 text-sm font-semibold"
+                >
+                  🔄 Refresh Colors
+                </button>
                 
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              </button>
-            ))}
-          </div>
-          
-          <div className="flex justify-between items-center">
-            <button
-              onClick={() => {
-                // Generate new colors and refresh the options
-                setColorOptions(generateInfiniteColors());
-              }}
-              className="px-4 py-2 bg-gradient-to-r from-neon-green to-neon-purple text-white rounded-lg hover:from-neon-purple hover:to-neon-orange transition-all duration-300 text-sm font-semibold"
-            >
-              🔄 Refresh Colors
-            </button>
-            
-            <button
-              onClick={() => setShowColorPulse(false)}
-              className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
-            >
-              Skip for now
-            </button>
-          </div>
-          
-          <div className="mt-4 text-center">
-            <p className="text-gray-500 text-xs">
-              🌈 Each color is unique and generated just for you • Infinite possibilities
-            </p>
-          </div>
+                {hasCompletedBaseline && (
+                  <button
+                    onClick={() => setShowColorPulse(false)}
+                    className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
+                  >
+                    Skip for now
+                  </button>
+                )}
+              </div>
+              
+              <div className="mt-4 text-center">
+                <p className="text-gray-500 text-xs">
+                  🌈 Each color is unique and generated just for you • Infinite possibilities
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
