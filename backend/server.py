@@ -98,9 +98,10 @@ class ColorPulse(BaseModel):
     video_id: str
     color_choice: str
     mood: Optional[str] = None
-    memory: Optional[str] = None
-    context: Optional[str] = None
+    weather: Optional[str] = None
+    favorite_memory: Optional[str] = None
     timestamp: str
+    is_baseline: bool = False
 
 class LiveStream(BaseModel):
     stream_id: str
