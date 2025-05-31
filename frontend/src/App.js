@@ -39,6 +39,13 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [watchTime, setWatchTime] = useState(0);
   const [showColorPulse, setShowColorPulse] = useState(false);
+  const [colorPulseStep, setColorPulseStep] = useState('baseline'); // 'baseline', 'colors'
+  const [baselineData, setBaselineData] = useState({
+    mood: '',
+    weather: '',
+    favoriteMemory: ''
+  });
+  const [hasCompletedBaseline, setHasCompletedBaseline] = useState(false);
   const [showSideAd, setShowSideAd] = useState(true);
   const [isLandscape, setIsLandscape] = useState(false);
   const [isCreatorLive, setIsCreatorLive] = useState(false);
