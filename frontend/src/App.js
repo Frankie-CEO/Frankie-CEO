@@ -431,73 +431,162 @@ const App = () => {
 
   // Live streaming functions
   const initializeAgora = async () => {
-    const client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
-    
-    client.on('user-published', async (user, mediaType) => {
-      await client.subscribe(user, mediaType);
+    try {
+      const client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
       
-      if (mediaType === 'video') {
-        setRemoteUsers(prev => [...prev.filter(u => u.uid !== user.uid), user]);
-      }
-      
-      if (mediaType === 'audio') {
-        user.audioTrack?.play();
-      }
-    });
+      client.on('user-published', async (user, mediaType) => {
+        await client.subscribe(user, mediaType);
+        
+        if (mediaType === 'video') {
+          setRemoteUsers(prev => [...prev.filter(u => u.uid !== user.uid), user]);
+          
+          // Play remote video
+          const remoteVideoTrack = user.videoTrack;
+          const playerContainer = document.getElementById(`player-${user.uid}`);
+          if (playerContainer && remoteVideoTrack) {
+            remoteVideoTrack.play(playerContainer);
+          }
+        }
+        
+        if (mediaType === 'audio') {
+          user.audioTrack?.play();
+        }
+      });
 
-    client.on('user-unpublished', (user) => {
-      setRemoteUsers(prev => prev.filter(u => u.uid !== user.uid));
-    });
+      client.on('user-unpublished', (user) => {
+        setRemoteUsers(prev => prev.filter(u => u.uid !== user.uid));
+      });
 
-    setAgoraClient(client);
-    return client;
+      client.on('user-left', (user) => {
+        setRemoteUsers(prev => prev.filter(u => u.uid !== user.uid));
+      });
+
+      setAgoraClient(client);
+      return client;
+    } catch (error) {
+      console.error('Error initializing Agora:', error);
+      throw error;
+    }
   };
 
   const startLiveStream = async () => {
     try {
-      // Get Agora token
+      const streamTitle = `${user?.username || 'Creator'}'s Live Stream`;
+      const channelName = `live_${USER_ID}_${Date.now()}`;
+      const uid = parseInt(USER_ID.replace(/\D/g, '').slice(-8)) || Math.floor(Math.random() * 100000);
+
+      // Get Agora token for publisher (creator)
       const tokenResponse = await axios.post(`${BACKEND_URL}/api/agora/token`, {
-        channel: `channel_${USER_ID}`,
-        uid: parseInt(USER_ID.replace(/\D/g, '').slice(0, 8)) || 12345,
+        channel: channelName,
+        uid: uid,
         role: 'publisher'
       });
 
+      console.log('Agora token generated:', tokenResponse.data);
+
+      // Initialize Agora client
       const client = await initializeAgora();
       
-      // Join channel
-      await client.join(AGORA_APP_ID, tokenResponse.data.channel, tokenResponse.data.token);
+      // Set client role to host (broadcaster)
+      await client.setClientRole('host');
       
-      // Create local tracks
-      const [microphoneTrack, cameraTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
+      // Join channel
+      await client.join(AGORA_APP_ID, channelName, tokenResponse.data.token, uid);
+      console.log('Joined Agora channel:', channelName);
+      
+      // Create local tracks (camera and microphone)
+      console.log('Creating local tracks...');
+      const [microphoneTrack, cameraTrack] = await AgoraRTC.createMicrophoneAndCameraTracks(
+        {
+          // Audio config
+          encoderConfig: {
+            sampleRate: 48000,
+            stereo: true,
+            bitrate: 128,
+          },
+        },
+        {
+          // Video config
+          encoderConfig: {
+            width: 1280,
+            height: 720,
+            frameRate: 30,
+            bitrate: 2000,
+          },
+        }
+      );
+      
+      console.log('Local tracks created successfully');
       
       setLocalTracks({ video: cameraTrack, audio: microphoneTrack });
       
+      // Play local video
+      const localVideoContainer = document.getElementById('local-video-container');
+      if (localVideoContainer && cameraTrack) {
+        cameraTrack.play(localVideoContainer);
+      }
+      
       // Publish tracks
       await client.publish([microphoneTrack, cameraTrack]);
+      console.log('Tracks published successfully');
       
-      // Start live stream session
-      await axios.post(`${BACKEND_URL}/api/live-streams/start`, {
+      // Create live stream session in backend
+      const streamResponse = await axios.post(`${BACKEND_URL}/api/live-streams/start`, {
         creator_id: USER_ID,
-        title: `${user?.username || 'Creator'}'s Live Stream`,
-        channel: tokenResponse.data.channel
+        title: streamTitle,
+        channel: channelName,
+        agora_uid: uid
       });
       
+      console.log('Live stream created:', streamResponse.data);
+      
+      setCurrentStream(streamResponse.data.stream);
       setIsCreatorLive(true);
+      
+      // Refresh live streams list
+      const streamsResponse = await axios.get(`${BACKEND_URL}/api/live-streams`);
+      setLiveStreams(streamsResponse.data.streams);
       
     } catch (error) {
       console.error('Error starting live stream:', error);
+      alert(`Failed to start live stream: ${error.message}`);
     }
   };
 
   const endLiveStream = async () => {
     try {
-      if (localTracks.video) localTracks.video.close();
-      if (localTracks.audio) localTracks.audio.close();
-      if (agoraClient) await agoraClient.leave();
+      // Stop local tracks
+      if (localTracks.video) {
+        localTracks.video.stop();
+        localTracks.video.close();
+      }
+      if (localTracks.audio) {
+        localTracks.audio.stop();
+        localTracks.audio.close();
+      }
       
+      // Leave Agora channel
+      if (agoraClient) {
+        await agoraClient.leave();
+      }
+      
+      // End stream in backend
+      if (currentStream) {
+        await axios.post(`${BACKEND_URL}/api/live-streams/${currentStream.stream_id}/end`);
+      }
+      
+      // Reset state
       setLocalTracks({ video: null, audio: null });
       setIsCreatorLive(false);
       setRemoteUsers([]);
+      setCurrentStream(null);
+      setAgoraClient(null);
+      
+      // Refresh live streams list
+      const streamsResponse = await axios.get(`${BACKEND_URL}/api/live-streams`);
+      setLiveStreams(streamsResponse.data.streams);
+      
+      console.log('Live stream ended successfully');
       
     } catch (error) {
       console.error('Error ending live stream:', error);
@@ -506,21 +595,32 @@ const App = () => {
 
   const joinLiveStream = async (stream) => {
     try {
+      const uid = parseInt(USER_ID.replace(/\D/g, '').slice(-8)) || Math.floor(Math.random() * 100000);
+      
       // Get viewer token
       const tokenResponse = await axios.post(`${BACKEND_URL}/api/agora/token`, {
-        channel: `channel_${stream.creator_id}`,
-        uid: parseInt(USER_ID.replace(/\D/g, '').slice(0, 8)) || 12345,
+        channel: stream.channel || `live_${stream.creator_id}_${Date.now()}`,
+        uid: uid,
         role: 'subscriber'
       });
 
+      // Initialize Agora client
       const client = await initializeAgora();
-      await client.join(AGORA_APP_ID, tokenResponse.data.channel, tokenResponse.data.token);
+      
+      // Set client role to audience (viewer)
+      await client.setClientRole('audience');
+      
+      // Join channel as viewer
+      await client.join(AGORA_APP_ID, tokenResponse.data.channel, tokenResponse.data.token, uid);
       
       setCurrentStream(stream);
       setCurrentVideo(null);
       
+      console.log('Joined live stream as viewer:', stream.title);
+      
     } catch (error) {
       console.error('Error joining live stream:', error);
+      alert(`Failed to join live stream: ${error.message}`);
     }
   };
 
