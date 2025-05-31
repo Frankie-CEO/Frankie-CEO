@@ -677,13 +677,36 @@ const App = () => {
           />
         )}
         
-        {currentStream && localTracks.video && (
-          <div className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} bg-black flex items-center justify-center`}>
-            <div ref={(ref) => {
-              if (ref && localTracks.video) {
-                localTracks.video.play(ref);
-              }
-            }} className="w-full h-full" />
+        {currentStream && (
+          <div className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} bg-black flex items-center justify-center relative`}>
+            {/* Local video (creator's camera) */}
+            {isCreatorLive && localTracks.video && (
+              <div 
+                id="local-video-container"
+                className={`w-full h-full ${remoteUsers.length > 0 ? 'absolute inset-0' : ''}`}
+              />
+            )}
+            
+            {/* Remote videos (viewers see creator's stream) */}
+            {remoteUsers.map((user) => (
+              <div
+                key={user.uid}
+                id={`player-${user.uid}`}
+                className="w-full h-full"
+              />
+            ))}
+            
+            {/* Placeholder if no video yet */}
+            {!localTracks.video && remoteUsers.length === 0 && (
+              <div className="text-center text-white">
+                <div className="animate-pulse">
+                  <Camera size={48} className="mx-auto mb-4 text-neon-orange" />
+                  <p className="text-lg">
+                    {isCreatorLive ? 'Starting camera...' : 'Connecting to live stream...'}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
         
