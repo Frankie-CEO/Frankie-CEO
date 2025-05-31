@@ -512,6 +512,8 @@ async def start_live_stream(stream_data: dict):
             "stream_id": stream_id,
             "creator_id": stream_data["creator_id"],
             "title": stream_data["title"],
+            "channel": stream_data.get("channel", f"live_{stream_data['creator_id']}_{int(time.time())}"),
+            "agora_uid": stream_data.get("agora_uid"),
             "viewer_count": 0,
             "is_active": True,
             "start_time": datetime.utcnow().isoformat(),
@@ -520,6 +522,8 @@ async def start_live_stream(stream_data: dict):
         
         await db.live_streams.insert_one(stream)
         live_streams[stream_id] = stream
+        
+        logger.info(f"Live stream started: {stream_id} by {stream_data['creator_id']}")
         
         return {"success": True, "stream": serialize_doc(stream)}
         
