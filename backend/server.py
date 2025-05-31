@@ -375,7 +375,7 @@ async def track_video_watch(watch_data: VideoWatch):
 
 @app.post("/api/color-pulse")
 async def submit_color_pulse(pulse_data: ColorPulse):
-    """Submit Color Pulse choice and award tokens"""
+    """Submit Color Pulse choice with baseline assessment data"""
     try:
         # Award +2 tokens for Color Pulse choice
         await db.users.update_one(
@@ -396,19 +396,43 @@ async def submit_color_pulse(pulse_data: ColorPulse):
                 {"$set": {"neurodiversity_class": new_class}}
             )
         
-        # Store Color Pulse data
-        await db.color_pulses.insert_one({
+        # Store comprehensive Color Pulse data including baseline assessment
+        pulse_record = {
             **pulse_data.dict(),
-            "timestamp": datetime.utcnow().isoformat()
-        })
+            "timestamp": datetime.utcnow().isoformat(),
+            "session_type": "baseline_assessment" if pulse_data.is_baseline else "periodic_pulse"
+        }
+        
+        await db.color_pulses.insert_one(pulse_record)
+        
+        # If this is a baseline assessment, also store it separately for research
+        if pulse_data.is_baseline:
+            baseline_record = {
+                "user_id": pulse_data.user_id,
+                "video_id": pulse_data.video_id,
+                "mood": pulse_data.mood,
+                "weather": pulse_data.weather,
+                "favorite_memory": pulse_data.favorite_memory,
+                "initial_color_choice": pulse_data.color_choice,
+                "timestamp": datetime.utcnow().isoformat(),
+                "session_start": True
+            }
+            await db.baseline_assessments.insert_one(baseline_record)
         
         return {
             "success": True,
             "tokens_earned": 2,
-            "neurodiversity_class": new_class if user else "Unclassified"
+            "neurodiversity_class": new_class if user else "Unclassified",
+            "assessment_type": "baseline" if pulse_data.is_baseline else "periodic",
+            "baseline_data": {
+                "mood": pulse_data.mood,
+                "weather": pulse_data.weather,
+                "favorite_memory": pulse_data.favorite_memory
+            } if pulse_data.is_baseline else None
         }
         
     except Exception as e:
+        logger.error(f"Error submitting color pulse: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/user/{user_id}/profile")
