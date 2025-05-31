@@ -184,8 +184,22 @@ const App = () => {
     checkOrientation();
     window.addEventListener('resize', checkOrientation);
     
+    // Full screen event listeners
+    const handleFullScreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+    
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullScreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullScreenChange);
+    
     return () => {
       window.removeEventListener('resize', checkOrientation);
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullScreenChange);
       if (wsRef.current) {
         wsRef.current.close();
       }
