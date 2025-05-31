@@ -291,6 +291,8 @@ const App = () => {
     // Show Color Pulse prompt every 30 seconds for testing (normally 9 minutes)
     colorPulseIntervalRef.current = setInterval(() => {
       if (isPlaying) {
+        // Generate new infinite colors each time
+        setColorOptions(generateInfiniteColors());
         setShowColorPulse(true);
       }
     }, 30000); // 30 seconds for testing - change to 540000 for production
