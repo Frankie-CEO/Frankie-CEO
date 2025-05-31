@@ -1211,16 +1211,16 @@ const App = () => {
                   
                   {/* Live Video Preview */}
                   <div className="bg-black rounded-lg overflow-hidden">
-                    <div 
-                      id="local-video-container" 
-                      className="w-full h-48 bg-gray-900 flex items-center justify-center"
-                    >
-                      {!localTracks.video && (
-                        <div className="text-center text-white">
-                          <Camera size={32} className="mx-auto mb-2 text-neon-orange" />
-                          <p>Camera loading...</p>
+                    <div className="w-full h-48 bg-gradient-to-br from-red-900 via-red-700 to-red-900 flex items-center justify-center">
+                      <div className="text-center text-white">
+                        <div className="animate-pulse">
+                          <div className="w-12 h-12 bg-red-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <Camera size={24} className="text-white" />
+                          </div>
+                          <p className="text-lg font-bold">📹 Live Preview</p>
+                          <p className="text-sm text-red-200 mt-1">Your stream is broadcasting</p>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                   
