@@ -71,10 +71,11 @@ class AraStreamingPlatformTest(unittest.TestCase):
             "user_id": self.user_id,
             "video_id": self.video_id,
             "color_choice": "#FF5733",  # Orange
-            "mood": "Happy",
-            "memory": "Strong",
-            "context": "Leisure",
-            "timestamp": datetime.utcnow().isoformat()
+            "mood": "Happy & Content",
+            "weather": "Sunny & Bright",
+            "favorite_memory": "A childhood adventure",
+            "timestamp": datetime.utcnow().isoformat(),
+            "is_baseline": True
         }
         
         response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
