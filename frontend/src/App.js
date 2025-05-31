@@ -659,34 +659,44 @@ const App = () => {
         
         {currentStream && (
           <div className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} bg-black flex items-center justify-center relative`}>
-            {/* Local video (creator's camera) */}
-            {isCreatorLive && localTracks.video && (
-              <div 
-                id="local-video-container"
-                className={`w-full h-full ${remoteUsers.length > 0 ? 'absolute inset-0' : ''}`}
-              />
-            )}
-            
-            {/* Remote videos (viewers see creator's stream) */}
-            {remoteUsers.map((user) => (
-              <div
-                key={user.uid}
-                id={`player-${user.uid}`}
-                className="w-full h-full"
-              />
-            ))}
-            
-            {/* Placeholder if no video yet */}
-            {!localTracks.video && remoteUsers.length === 0 && (
+            {/* Simulated live stream */}
+            <div className="w-full h-full bg-gradient-to-br from-red-900 via-red-700 to-red-900 flex flex-col items-center justify-center">
               <div className="text-center text-white">
-                <div className="animate-pulse">
-                  <Camera size={48} className="mx-auto mb-4 text-neon-orange" />
-                  <p className="text-lg">
-                    {isCreatorLive ? 'Starting camera...' : 'Connecting to live stream...'}
+                <div className="animate-pulse mb-4">
+                  <div className="w-16 h-16 bg-red-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <Radio size={32} className="text-white animate-pulse" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2">🔴 LIVE</h3>
+                  <p className="text-lg text-red-200">{currentStream.title}</p>
+                  <p className="text-sm text-red-300 mt-2">
+                    {isCreatorLive ? 'You are broadcasting live!' : 'Live stream in progress...'}
                   </p>
                 </div>
+                
+                <div className="flex items-center justify-center space-x-6 mt-6">
+                  <div className="flex items-center space-x-2">
+                    <Users size={20} className="text-red-300" />
+                    <span className="text-white font-semibold">{currentStream.viewer_count || 0} viewers</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Eye size={20} className="text-red-300" />
+                    <span className="text-white">Live</span>
+                  </div>
+                </div>
+                
+                {isCreatorLive && (
+                  <div className="mt-6 text-sm text-red-200">
+                    <p>📹 Camera simulation active</p>
+                    <p>🎤 Audio simulation active</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+            
+            {/* Live stream overlay */}
+            <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-bold animate-pulse">
+              ● LIVE
+            </div>
           </div>
         )}
         
