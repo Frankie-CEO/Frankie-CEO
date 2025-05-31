@@ -184,6 +184,21 @@ const App = () => {
     checkOrientation();
     window.addEventListener('resize', checkOrientation);
     
+    // Keyboard shortcuts for full screen
+    const handleKeyPress = (event) => {
+      // F key or F11 for full screen toggle
+      if ((event.key === 'f' || event.key === 'F' || event.key === 'F11') && (currentVideo || currentStream)) {
+        event.preventDefault();
+        toggleFullScreen();
+      }
+      // Escape key to exit full screen
+      if (event.key === 'Escape' && isFullScreen) {
+        toggleFullScreen();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    
     // Full screen event listeners
     const handleFullScreenChange = () => {
       setIsFullScreen(!!document.fullscreenElement);
@@ -196,6 +211,7 @@ const App = () => {
     
     return () => {
       window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('keydown', handleKeyPress);
       document.removeEventListener('fullscreenchange', handleFullScreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
       document.removeEventListener('mozfullscreenchange', handleFullScreenChange);
