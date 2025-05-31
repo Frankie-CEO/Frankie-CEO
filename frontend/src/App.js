@@ -17,7 +17,9 @@ import {
   X,
   Camera,
   Mic,
-  PhoneOff
+  PhoneOff,
+  Maximize,
+  Minimize
 } from 'lucide-react';
 import './App.css';
 
