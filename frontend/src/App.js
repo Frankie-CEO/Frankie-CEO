@@ -54,12 +54,97 @@ const App = () => {
   const intervalRef = useRef(null);  // Separate ref for interval
   const colorPulseIntervalRef = useRef(null);
 
-  // Color options for Color Pulse
-  const colorOptions = [
-    { color: '#FF5733', name: 'Vibrant Orange' },
-    { color: '#33FF57', name: 'Electric Green' },
-    { color: '#C733FF', name: 'Neon Purple' }
-  ];
+  // Dynamic color generation for infinite Color Pulse variations
+  const generateInfiniteColors = () => {
+    const colorCategories = {
+      warm: {
+        base: ['#FF5733', '#FF6B47', '#FF4500', '#FF7F50', '#FFB347', '#FFA500', '#FF8C69', '#FF6347'],
+        variations: () => {
+          const hue = Math.random() * 60; // 0-60 degrees (reds, oranges, yellows)
+          const saturation = 70 + Math.random() * 30; // 70-100% saturation
+          const lightness = 45 + Math.random() * 30; // 45-75% lightness
+          return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+      },
+      cool: {
+        base: ['#33FF57', '#00FF7F', '#40E0D0', '#00CED1', '#1E90FF', '#6495ED', '#7FFFD4', '#98FB98'],
+        variations: () => {
+          const hue = 120 + Math.random() * 120; // 120-240 degrees (greens, cyans, blues)
+          const saturation = 60 + Math.random() * 40; // 60-100% saturation
+          const lightness = 40 + Math.random() * 35; // 40-75% lightness
+          return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+      },
+      neutral: {
+        base: ['#C733FF', '#9966CC', '#8A2BE2', '#DA70D6', '#DDA0DD', '#EE82EE', '#FF69B4', '#FFB6C1'],
+        variations: () => {
+          const hue = 270 + Math.random() * 60; // 270-330 degrees (purples, magentas)
+          const saturation = 50 + Math.random() * 50; // 50-100% saturation
+          const lightness = 35 + Math.random() * 40; // 35-75% lightness
+          return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+      }
+    };
+
+    const categories = Object.keys(colorCategories);
+    const colors = [];
+
+    for (let i = 0; i < 3; i++) {
+      const category = categories[i];
+      const categoryData = colorCategories[category];
+      
+      // 50% chance to use base color, 50% chance to generate variation
+      const useVariation = Math.random() > 0.5;
+      let color, colorName;
+      
+      if (useVariation) {
+        color = categoryData.variations();
+        colorName = `Dynamic ${category.charAt(0).toUpperCase() + category.slice(1)}`;
+      } else {
+        const baseColors = categoryData.base;
+        color = baseColors[Math.floor(Math.random() * baseColors.length)];
+        colorName = getColorName(color, category);
+      }
+      
+      colors.push({
+        color: color,
+        name: colorName,
+        category: category,
+        gradient: generateGradient(color),
+        energy: Math.floor(Math.random() * 100) + 1
+      });
+    }
+
+    return colors;
+  };
+
+  const getColorName = (color, category) => {
+    const colorNames = {
+      warm: ['Solar Flare', 'Sunset Burst', 'Flame Dancer', 'Golden Hour', 'Fire Bloom', 'Amber Wave', 'Coral Dream', 'Phoenix Glow'],
+      cool: ['Ocean Depth', 'Mint Breeze', 'Cyber Teal', 'Aurora Green', 'Electric Blue', 'Crystal Lake', 'Neon Rain', 'Cosmic Blue'],
+      neutral: ['Mystic Purple', 'Galaxy Violet', 'Dream Magenta', 'Royal Orchid', 'Cosmic Pink', 'Nebula Purple', 'Electric Plum', 'Stellar Rose']
+    };
+    
+    const names = colorNames[category];
+    return names[Math.floor(Math.random() * names.length)];
+  };
+
+  const generateGradient = (baseColor) => {
+    // Create a beautiful gradient based on the base color
+    const variations = [];
+    for (let i = 0; i < 3; i++) {
+      // Create slight variations in hue, saturation, and lightness
+      const hueShift = (Math.random() - 0.5) * 30;
+      const satShift = (Math.random() - 0.5) * 20;
+      const lightShift = (Math.random() - 0.5) * 20;
+      
+      // Convert hex to HSL for manipulation (simplified)
+      variations.push(baseColor);
+    }
+    return `linear-gradient(135deg, ${baseColor}, ${baseColor}aa, ${baseColor}88)`;
+  };
+
+  const [colorOptions, setColorOptions] = useState(generateInfiniteColors());
 
   // Mood, memory, and context options
   const moodOptions = ['Happy', 'Excited', 'Calm', 'Focused', 'Creative'];
