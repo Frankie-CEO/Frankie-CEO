@@ -326,29 +326,36 @@ const App = () => {
   };
 
   const startColorPulseTimer = () => {
-    // Show Color Pulse prompt every 30 seconds for testing (normally 9 minutes)
+    // Show Color Pulse prompt every 9 minutes (540 seconds) after baseline
     colorPulseIntervalRef.current = setInterval(() => {
-      if (isPlaying) {
+      if (isPlaying && hasCompletedBaseline) {
         // Generate new infinite colors each time
         setColorOptions(generateInfiniteColors());
+        setColorPulseStep('colors');
         setShowColorPulse(true);
       }
-    }, 30000); // 30 seconds for testing - change to 540000 for production
+    }, 540000); // 9 minutes = 540,000 milliseconds
   };
 
-  const submitColorPulse = async (color, mood, memory, context) => {
+  const submitColorPulse = async (color) => {
     try {
       await axios.post(`${BACKEND_URL}/api/color-pulse`, {
         user_id: USER_ID,
         video_id: currentVideo?.video_id || currentStream?.stream_id || 'unknown',
         color_choice: color,
-        mood,
-        memory,
-        context,
-        timestamp: new Date().toISOString()
+        mood: baselineData.mood,
+        weather: baselineData.weather,
+        favorite_memory: baselineData.favoriteMemory,
+        timestamp: new Date().toISOString(),
+        is_baseline: !hasCompletedBaseline
       });
       
       setShowColorPulse(false);
+      
+      if (!hasCompletedBaseline) {
+        setHasCompletedBaseline(true);
+        startVideoAfterBaseline();
+      }
       
       // Refresh user data
       const userResponse = await axios.get(`${BACKEND_URL}/api/user/${USER_ID}/profile`);
