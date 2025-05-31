@@ -59,6 +59,7 @@ const App = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   
   const videoRef = useRef(null);
+  const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
   const watchTimeRef = useRef(0);
   const intervalRef = useRef(null);  // Separate ref for interval
