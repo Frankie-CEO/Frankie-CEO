@@ -513,24 +513,29 @@ const App = () => {
     if (!currentVideo && !currentStream) return null;
 
     return (
-      <div className="relative bg-black rounded-lg overflow-hidden">
+      <div 
+        ref={videoContainerRef}
+        className={`relative bg-black rounded-lg overflow-hidden ${
+          isFullScreen ? 'fixed inset-0 z-50 rounded-none' : ''
+        }`}
+      >
         {currentVideo && demoMode && (
-          <div className="w-full h-64 bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center">
+          <div className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center`}>
             <div className="text-center mb-4">
-              <h3 className="text-white text-xl font-bold mb-2">{currentVideo.title}</h3>
-              <p className="text-gray-300 text-sm mb-4">🎬 Demo Mode - Simulating Video Playback</p>
+              <h3 className={`text-white ${isFullScreen ? 'text-4xl' : 'text-xl'} font-bold mb-2`}>{currentVideo.title}</h3>
+              <p className={`text-gray-300 ${isFullScreen ? 'text-lg' : 'text-sm'} mb-4`}>🎬 Demo Mode - Simulating Video Playback</p>
               <div className="flex items-center justify-center space-x-4">
-                <div className={`w-4 h-4 rounded-full ${isPlaying ? 'bg-red-500 animate-pulse' : 'bg-gray-500'}`}></div>
-                <span className="text-white">{isPlaying ? 'Playing' : 'Paused'}</span>
+                <div className={`${isFullScreen ? 'w-6 h-6' : 'w-4 h-4'} rounded-full ${isPlaying ? 'bg-red-500 animate-pulse' : 'bg-gray-500'}`}></div>
+                <span className={`text-white ${isFullScreen ? 'text-xl' : ''}`}>{isPlaying ? 'Playing' : 'Paused'}</span>
               </div>
             </div>
-            <div className="w-full max-w-md bg-gray-700 rounded-full h-2">
+            <div className={`${isFullScreen ? 'w-1/2' : 'w-full max-w-md'} bg-gray-700 rounded-full ${isFullScreen ? 'h-4' : 'h-2'}`}>
               <div 
-                className="bg-gradient-to-r from-neon-orange to-neon-green h-2 rounded-full transition-all duration-1000"
+                className={`bg-gradient-to-r from-neon-orange to-neon-green ${isFullScreen ? 'h-4' : 'h-2'} rounded-full transition-all duration-1000`}
                 style={{ width: `${Math.min((watchTime / currentVideo.duration) * 100, 100)}%` }}
               ></div>
             </div>
-            <p className="text-gray-400 text-xs mt-2">
+            <p className={`text-gray-400 ${isFullScreen ? 'text-base' : 'text-xs'} mt-2`}>
               Token Earning Demo: +1 token every 10 seconds
             </p>
           </div>
@@ -540,8 +545,8 @@ const App = () => {
           <video
             ref={videoRef}
             src={currentVideo.url}
-            className="w-full h-64 object-cover"
-            controls={true}
+            className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} object-cover`}
+            controls={false}
             muted={true}
             autoPlay={isPlaying}
             onPlay={() => setIsPlaying(true)}
@@ -557,7 +562,7 @@ const App = () => {
         )}
         
         {currentStream && localTracks.video && (
-          <div className="w-full h-64 bg-black flex items-center justify-center">
+          <div className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} bg-black flex items-center justify-center`}>
             <div ref={(ref) => {
               if (ref && localTracks.video) {
                 localTracks.video.play(ref);
@@ -567,59 +572,79 @@ const App = () => {
         )}
         
         {/* Video info overlay */}
-        <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent p-4">
-          <h3 className="text-white font-bold text-lg">
+        <div className={`absolute top-0 left-0 right-0 bg-gradient-to-b from-black/80 to-transparent ${isFullScreen ? 'p-8' : 'p-4'}`}>
+          <h3 className={`text-white font-bold ${isFullScreen ? 'text-3xl' : 'text-lg'}`}>
             {currentVideo ? currentVideo.title : currentStream?.title}
           </h3>
           {user && (
-            <div className="flex items-center space-x-4 mt-2">
+            <div className={`flex items-center space-x-4 mt-2`}>
               <div className="flex items-center space-x-2">
-                <Zap className="text-yellow-500" size={16} />
-                <span className="text-yellow-500 font-semibold">{user.tokens} tokens</span>
+                <Zap className={`text-yellow-500 ${isFullScreen ? 'w-6 h-6' : 'w-4 h-4'}`} />
+                <span className={`text-yellow-500 font-semibold ${isFullScreen ? 'text-xl' : ''}`}>{user.tokens} tokens</span>
               </div>
-              <div className="text-neon-purple text-sm">
+              <div className={`text-neon-purple ${isFullScreen ? 'text-lg' : 'text-sm'}`}>
                 {user.neurodiversity_class}
               </div>
             </div>
           )}
           {demoMode && (
-            <div className="text-green-400 text-xs mt-1 flex items-center">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+            <div className={`text-green-400 ${isFullScreen ? 'text-sm' : 'text-xs'} mt-1 flex items-center`}>
+              <div className={`${isFullScreen ? 'w-3 h-3' : 'w-2 h-2'} bg-green-400 rounded-full mr-2 animate-pulse`}></div>
               Demo Mode Active
             </div>
           )}
         </div>
         
         {/* Video controls */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+        <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent ${isFullScreen ? 'p-8' : 'p-4'}`}>
           <div className="flex items-center justify-between text-white">
             <div className="flex items-center space-x-4">
               <button
-                onClick={isPlaying ? pauseVideo : () => playVideo(currentVideo)}
-                className="p-2 rounded-full bg-neon-orange hover:bg-neon-orange/80 transition-colors"
+                onClick={isPlaying ? pauseVideo : () => {
+                  if (currentVideo && hasCompletedBaseline) {
+                    setIsPlaying(true);
+                    startWatchTimer();
+                  } else if (currentVideo) {
+                    playVideo(currentVideo);
+                  }
+                }}
+                className={`${isFullScreen ? 'p-4' : 'p-2'} rounded-full bg-neon-orange hover:bg-neon-orange/80 transition-colors`}
               >
-                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                {isPlaying ? <Pause size={isFullScreen ? 32 : 20} /> : <Play size={isFullScreen ? 32 : 20} />}
               </button>
               <div className="flex items-center space-x-2">
-                <Volume2 size={16} />
-                <span className="text-sm">{Math.floor(watchTime / 60)}:{String(watchTime % 60).padStart(2, '0')}</span>
+                <Volume2 size={isFullScreen ? 24 : 16} />
+                <span className={`${isFullScreen ? 'text-lg' : 'text-sm'}`}>
+                  {Math.floor(watchTime / 60)}:{String(watchTime % 60).padStart(2, '0')}
+                </span>
               </div>
               {demoMode && (
                 <button
                   onClick={() => setDemoMode(false)}
-                  className="text-xs bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded"
+                  className={`${isFullScreen ? 'text-sm' : 'text-xs'} bg-blue-600 hover:bg-blue-700 ${isFullScreen ? 'px-4 py-2' : 'px-2 py-1'} rounded`}
                 >
                   Try Real Video
                 </button>
               )}
             </div>
             
-            {currentStream && (
-              <div className="flex items-center space-x-2">
-                <Eye size={16} />
-                <span className="text-sm">{currentStream.viewer_count || 0}</span>
-              </div>
-            )}
+            <div className="flex items-center space-x-4">
+              {currentStream && (
+                <div className="flex items-center space-x-2">
+                  <Eye size={isFullScreen ? 24 : 16} />
+                  <span className={`${isFullScreen ? 'text-lg' : 'text-sm'}`}>{currentStream.viewer_count || 0}</span>
+                </div>
+              )}
+              
+              {/* Full Screen Toggle Button */}
+              <button
+                onClick={toggleFullScreen}
+                className={`${isFullScreen ? 'p-4' : 'p-2'} rounded-full bg-gray-700 hover:bg-gray-600 transition-colors`}
+                title={isFullScreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+              >
+                {isFullScreen ? <Minimize size={isFullScreen ? 24 : 20} /> : <Maximize size={isFullScreen ? 24 : 20} />}
+              </button>
+            </div>
           </div>
         </div>
       </div>
