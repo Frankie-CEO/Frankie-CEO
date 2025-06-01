@@ -711,6 +711,10 @@ const App = () => {
       
       setCurrentStream(stream);
       setCurrentVideo(null);
+      setShowComments(false);
+      
+      // Load live chat messages
+      loadLiveChatMessages(stream.stream_id);
       
       console.log('Joined live stream as viewer:', stream.title);
       
