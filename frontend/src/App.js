@@ -638,23 +638,41 @@ const App = () => {
         )}
         
         {currentVideo && !demoMode && (
-          <video
-            ref={videoRef}
-            src={currentVideo.url}
-            className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} object-cover`}
-            controls={false}
-            muted={true}
-            autoPlay={isPlaying}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onTimeUpdate={(e) => {
-              const currentTime = Math.floor(e.target.currentTime);
-              if (currentTime !== watchTimeRef.current) {
-                watchTimeRef.current = currentTime;
-                setWatchTime(currentTime);
-              }
-            }}
-          />
+          <>
+            {currentVideo.url.includes('drive.google.com') ? (
+              // Google Drive video using iframe
+              <iframe
+                src={currentVideo.url}
+                className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} border-0`}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                title={currentVideo.title}
+                onLoad={() => {
+                  setIsPlaying(true);
+                  startWatchTimer();
+                }}
+              />
+            ) : (
+              // Regular video element
+              <video
+                ref={videoRef}
+                src={currentVideo.url}
+                className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} object-cover`}
+                controls={false}
+                muted={true}
+                autoPlay={isPlaying}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onTimeUpdate={(e) => {
+                  const currentTime = Math.floor(e.target.currentTime);
+                  if (currentTime !== watchTimeRef.current) {
+                    watchTimeRef.current = currentTime;
+                    setWatchTime(currentTime);
+                  }
+                }}
+              />
+            )}
+          </>
         )}
         
         {currentStream && (
