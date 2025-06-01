@@ -19,7 +19,14 @@ import {
   Mic,
   PhoneOff,
   Maximize,
-  Minimize
+  Minimize,
+  MessageCircle,
+  ThumbsUp,
+  ThumbsDown,
+  Reply,
+  Send,
+  Heart,
+  Smile
 } from 'lucide-react';
 import './App.css';
 
