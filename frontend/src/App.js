@@ -65,6 +65,15 @@ const App = () => {
   const [demoMode, setDemoMode] = useState(false); // Disable demo mode to test real videos
   const [isFullScreen, setIsFullScreen] = useState(false);
   
+  // Comments and Chat state
+  const [videoComments, setVideoComments] = useState([]);
+  const [showComments, setShowComments] = useState(false);
+  const [liveChatMessages, setLiveChatMessages] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [newChatMessage, setNewChatMessage] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [showChatEmojis, setShowChatEmojis] = useState(false);
+  
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
