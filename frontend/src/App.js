@@ -940,7 +940,252 @@ const App = () => {
     );
   };
 
-  const renderColorPulse = () => {
+  // YouTube-style Comments Section
+  const renderVideoComments = () => {
+    if (!showComments || !currentVideo) return null;
+
+    return (
+      <div className="bg-gray-800 rounded-lg p-4 mt-4 border border-neon-purple/30">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-white flex items-center">
+            <MessageCircle className="mr-2 text-neon-purple" size={20} />
+            Comments ({videoComments.length})
+          </h3>
+          <button
+            onClick={() => setShowComments(false)}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Comment Input */}
+        <div className="mb-6">
+          {replyingTo && (
+            <div className="mb-2 flex items-center justify-between bg-gray-700 p-2 rounded">
+              <span className="text-sm text-gray-300">
+                Replying to: {replyingTo.username}
+              </span>
+              <button
+                onClick={() => setReplyingTo(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
+          <div className="flex space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-neon-orange to-neon-purple rounded-full flex items-center justify-center text-white text-sm font-bold">
+              {user?.username?.[0]?.toUpperCase() || 'U'}
+            </div>
+            <div className="flex-1">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder={replyingTo ? `Reply to ${replyingTo.username}...` : "Add a comment..."}
+                className="w-full bg-gray-700 text-white rounded-lg p-3 border border-gray-600 focus:border-neon-purple focus:outline-none resize-none"
+                rows="3"
+              />
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-xs text-gray-400">
+                  +1 token for commenting • {280 - newComment.length} characters left
+                </span>
+                <button
+                  onClick={submitComment}
+                  disabled={!newComment.trim()}
+                  className="bg-neon-purple hover:bg-neon-purple/80 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+                >
+                  <Send size={16} />
+                  <span>{replyingTo ? 'Reply' : 'Comment'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Comments List */}
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          {videoComments.map((comment) => (
+            <div key={comment.comment_id} className="border-b border-gray-700 pb-4">
+              <div className="flex space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-neon-green to-neon-orange rounded-full flex items-center justify-center text-white text-sm font-bold">
+                  {comment.username?.[0]?.toUpperCase() || 'A'}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className="font-semibold text-white">{comment.username}</span>
+                    <span className="text-xs text-gray-400">
+                      {new Date(comment.timestamp).toLocaleDateString()}
+                    </span>
+                    {comment.is_pinned && (
+                      <span className="text-xs bg-neon-orange text-white px-2 py-1 rounded">
+                        📌 Pinned
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-gray-300 mb-2">{comment.content}</p>
+                  <div className="flex items-center space-x-4">
+                    <button
+                      onClick={() => likeComment(comment.comment_id)}
+                      className="flex items-center space-x-1 text-gray-400 hover:text-neon-green transition-colors"
+                    >
+                      <ThumbsUp size={16} />
+                      <span className="text-sm">{comment.likes || 0}</span>
+                    </button>
+                    <button
+                      onClick={() => dislikeComment(comment.comment_id)}
+                      className="flex items-center space-x-1 text-gray-400 hover:text-red-400 transition-colors"
+                    >
+                      <ThumbsDown size={16} />
+                      <span className="text-sm">{comment.dislikes || 0}</span>
+                    </button>
+                    <button
+                      onClick={() => setReplyingTo(comment)}
+                      className="flex items-center space-x-1 text-gray-400 hover:text-neon-purple transition-colors"
+                    >
+                      <Reply size={16} />
+                      <span className="text-sm">Reply</span>
+                    </button>
+                    {comment.replies_count > 0 && (
+                      <span className="text-sm text-gray-400">
+                        {comment.replies_count} replies
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {videoComments.length === 0 && (
+            <div className="text-center text-gray-400 py-8">
+              <MessageCircle size={48} className="mx-auto mb-4 opacity-50" />
+              <p>No comments yet. Be the first to share your thoughts!</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Twitch-style Live Chat
+  const renderLiveChat = () => {
+    if (!currentStream) return null;
+
+    return (
+      <div className="bg-gray-800 rounded-lg border border-neon-green/30 h-96 flex flex-col">
+        {/* Chat Header */}
+        <div className="flex items-center justify-between p-3 border-b border-gray-700">
+          <h3 className="font-bold text-white flex items-center">
+            <MessageCircle className="mr-2 text-neon-green" size={18} />
+            Live Chat
+          </h3>
+          <div className="flex items-center space-x-2 text-sm text-gray-400">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span>{liveChatMessages.length} messages</span>
+          </div>
+        </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          {liveChatMessages.map((message, index) => (
+            <div
+              key={message.message_id || index}
+              className="flex items-start space-x-2 text-sm animate-fadeIn"
+            >
+              <div className="w-6 h-6 bg-gradient-to-r from-neon-green to-neon-purple rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                {message.username?.[0]?.toUpperCase() || 'A'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className="font-semibold text-neon-green">
+                  {message.username}:
+                </span>
+                <span className="text-white ml-2 break-words">
+                  {message.message}
+                </span>
+                <span className="text-xs text-gray-500 ml-2">
+                  {new Date(message.timestamp).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </span>
+              </div>
+            </div>
+          ))}
+
+          {liveChatMessages.length === 0 && (
+            <div className="text-center text-gray-400 py-8">
+              <MessageCircle size={32} className="mx-auto mb-2 opacity-50" />
+              <p className="text-sm">Chat is empty. Start the conversation!</p>
+            </div>
+          )}
+        </div>
+
+        {/* Chat Input */}
+        <div className="p-3 border-t border-gray-700">
+          <div className="flex space-x-2">
+            <div className="w-7 h-7 bg-gradient-to-r from-neon-orange to-neon-purple rounded-full flex items-center justify-center text-white text-xs font-bold">
+              {user?.username?.[0]?.toUpperCase() || 'U'}
+            </div>
+            <div className="flex-1 flex space-x-2">
+              <input
+                type="text"
+                value={newChatMessage}
+                onChange={(e) => setNewChatMessage(e.target.value)}
+                placeholder="Say something..."
+                className="flex-1 bg-gray-700 text-white rounded-lg px-3 py-2 border border-gray-600 focus:border-neon-green focus:outline-none text-sm"
+                maxLength={200}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChatMessage();
+                  }
+                }}
+              />
+              <button
+                onClick={() => setShowChatEmojis(!showChatEmojis)}
+                className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-gray-300 hover:text-neon-green transition-colors"
+                title="Emojis"
+              >
+                <Smile size={18} />
+              </button>
+              <button
+                onClick={sendChatMessage}
+                disabled={!newChatMessage.trim()}
+                className="p-2 bg-neon-green hover:bg-neon-green/80 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                title="Send message"
+              >
+                <Send size={18} />
+              </button>
+            </div>
+          </div>
+          
+          {/* Character count and emoji picker */}
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-xs text-gray-500">
+              {200 - newChatMessage.length} characters left
+            </span>
+            {showChatEmojis && (
+              <div className="absolute bottom-16 right-4 bg-gray-800 border border-gray-600 rounded-lg p-2 grid grid-cols-6 gap-1">
+                {['😀', '😂', '❤️', '👍', '🔥', '💯', '😍', '🤔', '😮', '👏', '🎉', '💪'].map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => {
+                      setNewChatMessage(prev => prev + emoji);
+                      setShowChatEmojis(false);
+                    }}
+                    className="p-1 hover:bg-gray-700 rounded text-lg"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
     if (!showColorPulse) return null;
 
     const isBaseline = colorPulseStep === 'baseline';
