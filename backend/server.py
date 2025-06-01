@@ -103,6 +103,26 @@ class ColorPulse(BaseModel):
     timestamp: str
     is_baseline: bool = False
 
+class VideoComment(BaseModel):
+    user_id: str
+    video_id: str
+    content: str
+    parent_comment_id: Optional[str] = None  # For threading/replies
+    timestamp: Optional[str] = None
+
+class LiveChatMessage(BaseModel):
+    user_id: str
+    stream_id: str
+    message: str
+    message_type: str = "chat"  # chat, emoji, system
+    timestamp: Optional[str] = None
+
+class CommentInteraction(BaseModel):
+    user_id: str
+    comment_id: str
+    interaction_type: str  # like, dislike, report
+    timestamp: Optional[str] = None
+
 class LiveStream(BaseModel):
     stream_id: str
     creator_id: str
