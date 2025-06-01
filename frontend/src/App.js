@@ -275,6 +275,7 @@ const App = () => {
     }
   };
 
+  // WebSocket setup
   const setupWebSocket = () => {
     const wsUrl = BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://');
     wsRef.current = new WebSocket(`${wsUrl}/ws/${USER_ID}`);
@@ -290,8 +291,103 @@ const App = () => {
             ? { ...stream, viewer_count: message.count }
             : stream
         ));
+      } else if (message.type === 'live_chat_message') {
+        // Real-time live chat message
+        if (currentStream && message.stream_id === currentStream.stream_id) {
+          setLiveChatMessages(prev => [...prev, message.message]);
+        }
       }
     };
+  };
+
+  // Comment functions (YouTube-style)
+  const loadVideoComments = async (videoId) => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/videos/${videoId}/comments`);
+      setVideoComments(response.data.comments);
+    } catch (error) {
+      console.error('Error loading comments:', error);
+    }
+  };
+
+  const submitComment = async () => {
+    if (!newComment.trim() || !currentVideo) return;
+    
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/videos/${currentVideo.video_id}/comments`, {
+        user_id: USER_ID,
+        video_id: currentVideo.video_id,
+        content: newComment,
+        parent_comment_id: replyingTo
+      });
+      
+      if (response.data.success) {
+        setNewComment('');
+        setReplyingTo(null);
+        loadVideoComments(currentVideo.video_id);
+        
+        // Update user tokens
+        const userResponse = await axios.get(`${BACKEND_URL}/api/user/${USER_ID}/profile`);
+        setUser(userResponse.data.user);
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
+  };
+
+  const likeComment = async (commentId) => {
+    try {
+      await axios.post(`${BACKEND_URL}/api/comments/${commentId}/interact`, {
+        user_id: USER_ID,
+        comment_id: commentId,
+        interaction_type: 'like'
+      });
+      
+      loadVideoComments(currentVideo.video_id);
+    } catch (error) {
+      console.error('Error liking comment:', error);
+    }
+  };
+
+  const dislikeComment = async (commentId) => {
+    try {
+      await axios.post(`${BACKEND_URL}/api/comments/${commentId}/interact`, {
+        user_id: USER_ID,
+        comment_id: commentId,
+        interaction_type: 'dislike'
+      });
+      
+      loadVideoComments(currentVideo.video_id);
+    } catch (error) {
+      console.error('Error disliking comment:', error);
+    }
+  };
+
+  // Live chat functions (Twitch-style)
+  const loadLiveChatMessages = async (streamId) => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/live-streams/${streamId}/chat`);
+      setLiveChatMessages(response.data.messages);
+    } catch (error) {
+      console.error('Error loading live chat:', error);
+    }
+  };
+
+  const sendChatMessage = async () => {
+    if (!newChatMessage.trim() || !currentStream) return;
+    
+    try {
+      await axios.post(`${BACKEND_URL}/api/live-streams/${currentStream.stream_id}/chat`, {
+        user_id: USER_ID,
+        stream_id: currentStream.stream_id,
+        message: newChatMessage,
+        message_type: 'chat'
+      });
+      
+      setNewChatMessage('');
+    } catch (error) {
+      console.error('Error sending chat message:', error);
+    }
   };
 
   const checkOrientation = () => {
