@@ -658,7 +658,7 @@ const App = () => {
                 ref={videoRef}
                 src={currentVideo.url}
                 className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} object-cover`}
-                controls={false}
+                controls={true}
                 muted={true}
                 autoPlay={isPlaying}
                 onPlay={() => setIsPlaying(true)}
