@@ -1702,7 +1702,20 @@ const App = () => {
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-white">Live Streams</h2>
-            {renderVideoPlayer()}
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Live Video Player */}
+              <div className="lg:col-span-2">
+                {renderVideoPlayer()}
+              </div>
+              
+              {/* Twitch-style Live Chat */}
+              {currentStream && (
+                <div className="lg:col-span-1">
+                  {renderLiveChat()}
+                </div>
+              )}
+            </div>
             
             {isCreatorLive && (
               <div className="bg-red-600 rounded-lg p-4">
