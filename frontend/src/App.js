@@ -900,6 +900,21 @@ const App = () => {
                   Try Real Video
                 </button>
               )}
+              
+              {/* Comments/Chat Toggle Button */}
+              {!isFullScreen && (
+                <button
+                  onClick={() => {
+                    if (currentVideo) {
+                      setShowComments(!showComments);
+                    }
+                  }}
+                  className="p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors"
+                  title="Toggle Comments"
+                >
+                  <MessageCircle size={20} />
+                </button>
+              )}
             </div>
             
             <div className="flex items-center space-x-4">
