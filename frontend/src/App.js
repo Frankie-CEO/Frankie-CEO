@@ -1669,6 +1669,9 @@ const App = () => {
             <h2 className="text-2xl font-bold text-white">Featured Videos</h2>
             {renderVideoPlayer()}
             
+            {/* YouTube-style Comments for Videos */}
+            {currentVideo && renderVideoComments()}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {videos.map((video) => (
                 <div
