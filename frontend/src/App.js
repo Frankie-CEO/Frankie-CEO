@@ -431,6 +431,10 @@ const App = () => {
     setWatchTime(0);
     setHasCompletedBaseline(false);
     
+    // Load comments for this video
+    loadVideoComments(video.video_id);
+    setShowComments(true);
+    
     // Reset baseline data and show mandatory Color Pulse assessment
     setBaselineData({
       mood: '',
