@@ -152,22 +152,22 @@ async def shutdown_event():
 async def initialize_sample_data():
     """Initialize sample videos and users"""
     try:
-        # Sample videos with reliable URLs that support CORS
+        # Sample videos with your custom video and working URLs
         sample_videos = [
             {
                 "video_id": "vid_001",
-                "title": "Amazing Nature Documentary",
-                "duration": 1800,  # 30 minutes
-                "url": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4",
-                "thumbnail": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.jpg",
+                "title": "Your Custom Video - Quality Test",
+                "duration": 1800,  # 30 minutes - adjust based on actual duration
+                "url": "https://drive.google.com/file/d/1cGcWb3fPZXN2Q0p-O-kSgV2RwFW2dDEB/preview",
+                "thumbnail": "https://drive.google.com/thumbnail?id=1cGcWb3fPZXN2Q0p-O-kSgV2RwFW2dDEB&sz=w1920-h1080",
                 "size_mb": 30
             },
             {
                 "video_id": "vid_002", 
                 "title": "Tech Innovation 2025",
                 "duration": 1200,  # 20 minutes
-                "url": "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-                "thumbnail": "https://sample-videos.com/image/tech1.jpg",
+                "url": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4",
+                "thumbnail": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.jpg",
                 "size_mb": 28
             },
             {
