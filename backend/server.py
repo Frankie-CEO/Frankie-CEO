@@ -634,6 +634,230 @@ async def get_creator_stats(creator_id: str):
         }
         
     except Exception as e:
+        logger.error(f"Error getting creator stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# YouTube-style Video Comments API
+
+@app.post("/api/videos/{video_id}/comments")
+async def add_video_comment(video_id: str, comment_data: VideoComment):
+    """Add a comment to a video (YouTube-style)"""
+    try:
+        comment_id = str(uuid.uuid4())
+        
+        comment = {
+            "comment_id": comment_id,
+            "user_id": comment_data.user_id,
+            "video_id": video_id,
+            "content": comment_data.content,
+            "parent_comment_id": comment_data.parent_comment_id,
+            "timestamp": datetime.utcnow().isoformat(),
+            "likes": 0,
+            "dislikes": 0,
+            "replies_count": 0,
+            "is_edited": False,
+            "is_pinned": False
+        }
+        
+        await db.video_comments.insert_one(comment)
+        
+        # If this is a reply, increment parent's reply count
+        if comment_data.parent_comment_id:
+            await db.video_comments.update_one(
+                {"comment_id": comment_data.parent_comment_id},
+                {"$inc": {"replies_count": 1}}
+            )
+        
+        # Award +1 token for commenting (engagement reward)
+        await db.users.update_one(
+            {"user_id": comment_data.user_id},
+            {"$inc": {"tokens": 1}},
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "comment": serialize_doc(comment),
+            "tokens_earned": 1
+        }
+        
+    except Exception as e:
+        logger.error(f"Error adding video comment: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/videos/{video_id}/comments")
+async def get_video_comments(video_id: str, parent_only: bool = True):
+    """Get comments for a video (YouTube-style threading)"""
+    try:
+        if parent_only:
+            # Get only top-level comments (no replies)
+            comments = await db.video_comments.find({
+                "video_id": video_id,
+                "parent_comment_id": None
+            }).sort("timestamp", -1).to_list(length=50)
+        else:
+            # Get all comments including replies
+            comments = await db.video_comments.find({
+                "video_id": video_id
+            }).sort("timestamp", 1).to_list(length=200)
+        
+        # Enrich comments with user data
+        for comment in comments:
+            user = await db.users.find_one({"user_id": comment["user_id"]})
+            comment["username"] = user.get("username", f"User_{comment['user_id'][:8]}") if user else "Anonymous"
+        
+        return {"comments": serialize_doc(comments)}
+        
+    except Exception as e:
+        logger.error(f"Error getting video comments: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/comments/{comment_id}/replies")
+async def get_comment_replies(comment_id: str):
+    """Get replies to a specific comment"""
+    try:
+        replies = await db.video_comments.find({
+            "parent_comment_id": comment_id
+        }).sort("timestamp", 1).to_list(length=50)
+        
+        # Enrich replies with user data
+        for reply in replies:
+            user = await db.users.find_one({"user_id": reply["user_id"]})
+            reply["username"] = user.get("username", f"User_{reply['user_id'][:8]}") if user else "Anonymous"
+        
+        return {"replies": serialize_doc(replies)}
+        
+    except Exception as e:
+        logger.error(f"Error getting comment replies: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/comments/{comment_id}/interact")
+async def interact_with_comment(comment_id: str, interaction_data: CommentInteraction):
+    """Like, dislike, or report a comment"""
+    try:
+        # Check if user already interacted with this comment
+        existing_interaction = await db.comment_interactions.find_one({
+            "user_id": interaction_data.user_id,
+            "comment_id": comment_id
+        })
+        
+        if existing_interaction:
+            # Update existing interaction
+            old_type = existing_interaction["interaction_type"]
+            await db.comment_interactions.update_one(
+                {"user_id": interaction_data.user_id, "comment_id": comment_id},
+                {"$set": {
+                    "interaction_type": interaction_data.interaction_type,
+                    "timestamp": datetime.utcnow().isoformat()
+                }}
+            )
+            
+            # Update comment counts
+            if old_type == "like":
+                await db.video_comments.update_one(
+                    {"comment_id": comment_id},
+                    {"$inc": {"likes": -1}}
+                )
+            elif old_type == "dislike":
+                await db.video_comments.update_one(
+                    {"comment_id": comment_id},
+                    {"$inc": {"dislikes": -1}}
+                )
+        else:
+            # Create new interaction
+            await db.comment_interactions.insert_one({
+                "user_id": interaction_data.user_id,
+                "comment_id": comment_id,
+                "interaction_type": interaction_data.interaction_type,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+        
+        # Update comment counts
+        if interaction_data.interaction_type == "like":
+            await db.video_comments.update_one(
+                {"comment_id": comment_id},
+                {"$inc": {"likes": 1}}
+            )
+        elif interaction_data.interaction_type == "dislike":
+            await db.video_comments.update_one(
+                {"comment_id": comment_id},
+                {"$inc": {"dislikes": 1}}
+            )
+        
+        return {"success": True, "interaction": interaction_data.interaction_type}
+        
+    except Exception as e:
+        logger.error(f"Error interacting with comment: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Twitch-style Live Chat API
+
+@app.post("/api/live-streams/{stream_id}/chat")
+async def send_live_chat_message(stream_id: str, message_data: LiveChatMessage):
+    """Send a message to live stream chat (Twitch-style)"""
+    try:
+        message_id = str(uuid.uuid4())
+        
+        message = {
+            "message_id": message_id,
+            "user_id": message_data.user_id,
+            "stream_id": stream_id,
+            "message": message_data.message,
+            "message_type": message_data.message_type,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        await db.live_chat.insert_one(message)
+        
+        # Get user data for real-time broadcast
+        user = await db.users.find_one({"user_id": message_data.user_id})
+        username = user.get("username", f"User_{message_data.user_id[:8]}") if user else "Anonymous"
+        
+        message["username"] = username
+        
+        # Broadcast to all connected clients via WebSocket
+        websocket_message = {
+            "type": "live_chat_message",
+            "stream_id": stream_id,
+            "message": serialize_doc(message)
+        }
+        
+        # Send to all connected clients
+        for client_id, client_ws in connected_clients.items():
+            try:
+                await client_ws.send_text(json.dumps(websocket_message))
+            except:
+                pass
+        
+        return {
+            "success": True,
+            "message": serialize_doc(message)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error sending live chat message: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/live-streams/{stream_id}/chat")
+async def get_live_chat_messages(stream_id: str, limit: int = 50):
+    """Get recent live chat messages for a stream"""
+    try:
+        messages = await db.live_chat.find({
+            "stream_id": stream_id
+        }).sort("timestamp", -1).limit(limit).to_list(length=limit)
+        
+        # Reverse to show chronological order (oldest first)
+        messages.reverse()
+        
+        # Enrich messages with user data
+        for message in messages:
+            user = await db.users.find_one({"user_id": message["user_id"]})
+            message["username"] = user.get("username", f"User_{message['user_id'][:8]}") if user else "Anonymous"
+        
+        return {"messages": serialize_doc(messages)}
+        
+    except Exception as e:
+        logger.error(f"Error getting live chat messages: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # WebSocket for real-time features
