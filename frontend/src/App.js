@@ -1188,6 +1188,18 @@ const App = () => {
   };
 
   const renderColorPulse = () => {
+    if (!showColorPulse) return null;
+
+    const isBaseline = colorPulseStep === 'baseline';
+    const isComplete = baselineData.mood && baselineData.weather && baselineData.favoriteMemory;
+
+    return (
+      <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-900 rounded-xl p-6 max-w-2xl w-full border-2 border-neon-purple shadow-2xl max-h-[90vh] overflow-y-auto">
+          
+          {isBaseline ? (
+            // Baseline Assessment Questions
+            <div className="text-center">
               <h2 className="text-3xl font-bold text-white mb-2 bg-gradient-to-r from-neon-orange to-neon-purple bg-clip-text text-transparent">
                 🧠 Welcome to Your Viewing Experience
               </h2>
