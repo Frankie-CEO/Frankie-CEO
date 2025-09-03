@@ -14,6 +14,13 @@ class AraStreamingPlatformTest(unittest.TestCase):
         self.user_id = f"test_user_{uuid.uuid4().hex[:8]}"
         self.video_id = "vid_001"  # Using a sample video ID from the backend
         
+        # Initialize variables that will be set during tests
+        self.comment_id = None
+        self.reply_id = None
+        self.stream_id = None
+        self.chat_stream_id = None
+        self.chat_message_id = None
+        
     def test_01_root_endpoint(self):
         """Test the root endpoint"""
         print("\n🔍 Testing root endpoint...")
