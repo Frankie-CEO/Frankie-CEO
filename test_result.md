@@ -122,15 +122,18 @@ backend:
 
   - task: "Video comments API (YouTube-style)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Recently integrated comment system with CRUD operations, needs testing"
+        - working: true
+          agent: "testing"
+          comment: "✅ PASSED: YouTube-style comment system fully functional. POST /api/videos/{video_id}/comments creates comments and awards +1 token. GET /api/videos/{video_id}/comments retrieves comments with user data. Comment threading works with parent_comment_id. GET /api/comments/{comment_id}/replies retrieves replies. POST /api/comments/{comment_id}/interact handles like/dislike interactions. All CRUD operations working correctly."
 
   - task: "Live chat API (Twitch-style)"
     implemented: true
