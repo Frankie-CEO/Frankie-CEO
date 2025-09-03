@@ -380,20 +380,62 @@ class AraStreamingPlatformTest(unittest.TestCase):
 if __name__ == "__main__":
     # Run the tests in order
     test_suite = unittest.TestSuite()
+    
+    # Basic API tests
     test_suite.addTest(AraStreamingPlatformTest("test_01_root_endpoint"))
     test_suite.addTest(AraStreamingPlatformTest("test_02_get_videos"))
     test_suite.addTest(AraStreamingPlatformTest("test_03_get_user_profile"))
+    
+    # Video streaming and token system tests
     test_suite.addTest(AraStreamingPlatformTest("test_04_track_video_watch"))
     test_suite.addTest(AraStreamingPlatformTest("test_05_submit_color_pulse"))
     test_suite.addTest(AraStreamingPlatformTest("test_06_get_updated_profile"))
     test_suite.addTest(AraStreamingPlatformTest("test_07_get_leaderboard"))
     test_suite.addTest(AraStreamingPlatformTest("test_08_get_ads"))
+    
+    # Live streaming and Agora.io tests
     test_suite.addTest(AraStreamingPlatformTest("test_09_get_live_streams"))
     test_suite.addTest(AraStreamingPlatformTest("test_10_generate_agora_token"))
     test_suite.addTest(AraStreamingPlatformTest("test_11_start_live_stream"))
     test_suite.addTest(AraStreamingPlatformTest("test_12_end_live_stream"))
-    test_suite.addTest(AraStreamingPlatformTest("test_13_get_creator_stats"))
+    
+    # YouTube-style video comments tests (HIGH PRIORITY)
+    test_suite.addTest(AraStreamingPlatformTest("test_13_add_video_comment"))
+    test_suite.addTest(AraStreamingPlatformTest("test_14_get_video_comments"))
+    test_suite.addTest(AraStreamingPlatformTest("test_15_add_comment_reply"))
+    test_suite.addTest(AraStreamingPlatformTest("test_16_get_comment_replies"))
+    test_suite.addTest(AraStreamingPlatformTest("test_17_like_comment"))
+    test_suite.addTest(AraStreamingPlatformTest("test_18_dislike_comment"))
+    
+    # Twitch-style live chat tests (HIGH PRIORITY)
+    test_suite.addTest(AraStreamingPlatformTest("test_19_send_live_chat_message"))
+    test_suite.addTest(AraStreamingPlatformTest("test_20_get_live_chat_messages"))
+    test_suite.addTest(AraStreamingPlatformTest("test_21_send_emoji_chat_message"))
+    
+    # Creator stats test
+    test_suite.addTest(AraStreamingPlatformTest("test_22_get_creator_stats"))
     
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
-    runner.run(test_suite)
+    result = runner.run(test_suite)
+    
+    # Print summary
+    print(f"\n{'='*60}")
+    print(f"TEST SUMMARY")
+    print(f"{'='*60}")
+    print(f"Tests run: {result.testsRun}")
+    print(f"Failures: {len(result.failures)}")
+    print(f"Errors: {len(result.errors)}")
+    
+    if result.failures:
+        print(f"\nFAILURES:")
+        for test, traceback in result.failures:
+            print(f"- {test}: {traceback}")
+    
+    if result.errors:
+        print(f"\nERRORS:")
+        for test, traceback in result.errors:
+            print(f"- {test}: {traceback}")
+    
+    success_rate = ((result.testsRun - len(result.failures) - len(result.errors)) / result.testsRun) * 100
+    print(f"\nSuccess Rate: {success_rate:.1f}%")
