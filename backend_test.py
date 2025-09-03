@@ -173,7 +173,200 @@ class AraStreamingPlatformTest(unittest.TestCase):
         self.assertTrue(data["success"])
         print("✅ End live stream test passed")
         
-    def test_13_get_creator_stats(self):
+    def test_13_add_video_comment(self):
+        """Test adding a comment to a video (YouTube-style)"""
+        print("\n🔍 Testing add video comment endpoint...")
+        comment_data = {
+            "user_id": self.user_id,
+            "video_id": self.video_id,
+            "content": "This is an amazing video! Great content and production quality.",
+            "parent_comment_id": None
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/videos/{self.video_id}/comments", json=comment_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertIn("comment", data)
+        self.assertEqual(data["comment"]["content"], comment_data["content"])
+        self.assertEqual(data["tokens_earned"], 1)  # +1 token for commenting
+        
+        # Store comment ID for reply test
+        self.comment_id = data["comment"]["comment_id"]
+        print(f"✅ Add video comment test passed - Comment ID: {self.comment_id}")
+        
+    def test_14_get_video_comments(self):
+        """Test getting comments for a video"""
+        print("\n🔍 Testing get video comments endpoint...")
+        response = requests.get(f"{BACKEND_URL}/api/videos/{self.video_id}/comments")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("comments", data)
+        self.assertTrue(len(data["comments"]) > 0)
+        
+        # Check if our comment is in the list
+        comment_found = False
+        for comment in data["comments"]:
+            if comment["comment_id"] == self.comment_id:
+                comment_found = True
+                self.assertEqual(comment["user_id"], self.user_id)
+                break
+        self.assertTrue(comment_found)
+        print(f"✅ Get video comments test passed - Found {len(data['comments'])} comments")
+        
+    def test_15_add_comment_reply(self):
+        """Test adding a reply to a comment"""
+        print("\n🔍 Testing add comment reply endpoint...")
+        reply_data = {
+            "user_id": f"reply_user_{uuid.uuid4().hex[:8]}",
+            "video_id": self.video_id,
+            "content": "I totally agree! This creator always delivers quality content.",
+            "parent_comment_id": self.comment_id
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/videos/{self.video_id}/comments", json=reply_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["comment"]["parent_comment_id"], self.comment_id)
+        
+        # Store reply ID for later tests
+        self.reply_id = data["comment"]["comment_id"]
+        print(f"✅ Add comment reply test passed - Reply ID: {self.reply_id}")
+        
+    def test_16_get_comment_replies(self):
+        """Test getting replies to a specific comment"""
+        print("\n🔍 Testing get comment replies endpoint...")
+        response = requests.get(f"{BACKEND_URL}/api/comments/{self.comment_id}/replies")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("replies", data)
+        self.assertTrue(len(data["replies"]) > 0)
+        
+        # Check if our reply is in the list
+        reply_found = False
+        for reply in data["replies"]:
+            if reply["comment_id"] == self.reply_id:
+                reply_found = True
+                break
+        self.assertTrue(reply_found)
+        print(f"✅ Get comment replies test passed - Found {len(data['replies'])} replies")
+        
+    def test_17_like_comment(self):
+        """Test liking a comment"""
+        print("\n🔍 Testing like comment endpoint...")
+        interaction_data = {
+            "user_id": f"liker_user_{uuid.uuid4().hex[:8]}",
+            "comment_id": self.comment_id,
+            "interaction_type": "like"
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/comments/{self.comment_id}/interact", json=interaction_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["interaction"], "like")
+        print("✅ Like comment test passed")
+        
+    def test_18_dislike_comment(self):
+        """Test disliking a comment"""
+        print("\n🔍 Testing dislike comment endpoint...")
+        interaction_data = {
+            "user_id": f"disliker_user_{uuid.uuid4().hex[:8]}",
+            "comment_id": self.comment_id,
+            "interaction_type": "dislike"
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/comments/{self.comment_id}/interact", json=interaction_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["interaction"], "dislike")
+        print("✅ Dislike comment test passed")
+        
+    def test_19_send_live_chat_message(self):
+        """Test sending a message to live stream chat (Twitch-style)"""
+        print("\n🔍 Testing send live chat message endpoint...")
+        
+        # First, start a new live stream for chat testing
+        stream_data = {
+            "creator_id": self.user_id,
+            "title": "Chat Test Stream"
+        }
+        
+        stream_response = requests.post(f"{BACKEND_URL}/api/live-streams/start", json=stream_data)
+        self.assertEqual(stream_response.status_code, 200)
+        self.chat_stream_id = stream_response.json()["stream"]["stream_id"]
+        
+        # Now send a chat message
+        message_data = {
+            "user_id": self.user_id,
+            "stream_id": self.chat_stream_id,
+            "message": "Hello everyone! This stream is amazing! 🔥",
+            "message_type": "chat"
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/live-streams/{self.chat_stream_id}/chat", json=message_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertIn("message", data)
+        self.assertEqual(data["message"]["message"], message_data["message"])
+        self.assertEqual(data["message"]["message_type"], "chat")
+        
+        # Store message ID for later tests
+        self.chat_message_id = data["message"]["message_id"]
+        print(f"✅ Send live chat message test passed - Message ID: {self.chat_message_id}")
+        
+    def test_20_get_live_chat_messages(self):
+        """Test getting live chat messages for a stream"""
+        print("\n🔍 Testing get live chat messages endpoint...")
+        
+        # Send a few more messages to test retrieval
+        for i in range(3):
+            message_data = {
+                "user_id": f"chat_user_{i}_{uuid.uuid4().hex[:4]}",
+                "stream_id": self.chat_stream_id,
+                "message": f"Chat message #{i+1} - Great stream! 👍",
+                "message_type": "chat"
+            }
+            requests.post(f"{BACKEND_URL}/api/live-streams/{self.chat_stream_id}/chat", json=message_data)
+        
+        # Now get all messages
+        response = requests.get(f"{BACKEND_URL}/api/live-streams/{self.chat_stream_id}/chat")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("messages", data)
+        self.assertTrue(len(data["messages"]) >= 4)  # At least our 4 messages
+        
+        # Check if our original message is in the list
+        message_found = False
+        for message in data["messages"]:
+            if message["message_id"] == self.chat_message_id:
+                message_found = True
+                self.assertEqual(message["user_id"], self.user_id)
+                break
+        self.assertTrue(message_found)
+        print(f"✅ Get live chat messages test passed - Found {len(data['messages'])} messages")
+        
+    def test_21_send_emoji_chat_message(self):
+        """Test sending an emoji message to live stream chat"""
+        print("\n🔍 Testing send emoji chat message endpoint...")
+        message_data = {
+            "user_id": self.user_id,
+            "stream_id": self.chat_stream_id,
+            "message": "🎉🔥💯",
+            "message_type": "emoji"
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/live-streams/{self.chat_stream_id}/chat", json=message_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["message"]["message_type"], "emoji")
+        print("✅ Send emoji chat message test passed")
+        
+    def test_22_get_creator_stats(self):
         """Test getting creator stats"""
         print("\n🔍 Testing creator stats endpoint...")
         response = requests.get(f"{BACKEND_URL}/api/creator/{self.user_id}/stats")
