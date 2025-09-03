@@ -264,9 +264,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Video comments API (YouTube-style)"
-    - "Live chat API (Twitch-style)"
-    - "Video streaming API endpoints"
     - "Video player with comments section"
     - "Live chat UI for streaming"
   stuck_tasks:
