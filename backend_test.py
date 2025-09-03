@@ -389,7 +389,7 @@ if __name__ == "__main__":
     test_suite = unittest.TestSuite()
     
     # Basic API tests
-    test_suite.addTest(AraStreamingPlatformTest("test_01_root_endpoint"))
+    test_suite.addTest(AraStreamingPlatformTest("test_01_api_health_check"))
     test_suite.addTest(AraStreamingPlatformTest("test_02_get_videos"))
     test_suite.addTest(AraStreamingPlatformTest("test_03_get_user_profile"))
     
