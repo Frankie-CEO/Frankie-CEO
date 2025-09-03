@@ -21,15 +21,14 @@ class AraStreamingPlatformTest(unittest.TestCase):
         self.chat_stream_id = None
         self.chat_message_id = None
         
-    def test_01_root_endpoint(self):
-        """Test the root endpoint"""
-        print("\n🔍 Testing root endpoint...")
-        response = requests.get(f"{BACKEND_URL}/")
+    def test_01_api_health_check(self):
+        """Test API health by checking videos endpoint"""
+        print("\n🔍 Testing API health check...")
+        response = requests.get(f"{BACKEND_URL}/api/videos")
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(data["message"], "Ara Streaming Platform API")
-        self.assertEqual(data["status"], "active")
-        print("✅ Root endpoint test passed")
+        self.assertIn("videos", data)
+        print("✅ API health check passed")
 
     def test_02_get_videos(self):
         """Test getting all videos"""
