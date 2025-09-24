@@ -251,12 +251,19 @@ class AraStreamingPlatformTest(unittest.TestCase):
         
         print(f"✅ Agora environment validation test passed - App ID: {data['appId'][:8]}***")
         
-    def test_11_start_live_stream(self):
-        """Test starting a live stream"""
-        print("\n🔍 Testing start live stream endpoint...")
+    def test_11_start_live_stream_with_channel_data(self):
+        """Test starting a live stream with real channel data"""
+        print("\n🔍 Testing start live stream with WebRTC channel data...")
+        
+        # Use the channel from our token test if available
+        channel_name = self.test_channel if hasattr(self, 'test_channel') else f"webrtc_stream_{self.user_id}_{int(time.time())}"
+        agora_uid = int(time.time()) % 100000
+        
         stream_data = {
             "creator_id": self.user_id,
-            "title": "Test Live Stream"
+            "title": "WebRTC Live Stream Test",
+            "channel": channel_name,
+            "agora_uid": agora_uid
         }
         
         response = requests.post(f"{BACKEND_URL}/api/live-streams/start", json=stream_data)
@@ -265,12 +272,72 @@ class AraStreamingPlatformTest(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertIn("stream", data)
         self.assertEqual(data["stream"]["creator_id"], self.user_id)
-        self.assertEqual(data["stream"]["title"], "Test Live Stream")
+        self.assertEqual(data["stream"]["title"], "WebRTC Live Stream Test")
+        self.assertEqual(data["stream"]["channel"], channel_name)
+        self.assertEqual(data["stream"]["agora_uid"], agora_uid)
         self.assertTrue(data["stream"]["is_active"])
+        self.assertIsNotNone(data["stream"]["start_time"])
         
-        # Store stream ID for end test
+        # Store stream ID and data for other tests
         self.stream_id = data["stream"]["stream_id"]
-        print(f"✅ Start live stream test passed - Stream ID: {self.stream_id}")
+        self.webrtc_stream_data = data["stream"]
+        print(f"✅ WebRTC live stream start test passed - Stream ID: {self.stream_id}, Channel: {channel_name}")
+        
+    def test_11b_complete_streaming_workflow(self):
+        """Test complete streaming workflow: token → start → active → end"""
+        print("\n🔍 Testing complete WebRTC streaming workflow...")
+        
+        # Step 1: Generate publisher token
+        workflow_channel = f"workflow_test_{int(time.time())}"
+        workflow_uid = int(time.time()) % 100000
+        
+        token_request = {
+            "channel": workflow_channel,
+            "uid": workflow_uid,
+            "role": "publisher"
+        }
+        
+        token_response = requests.post(f"{BACKEND_URL}/api/agora/token", json=token_request)
+        self.assertEqual(token_response.status_code, 200)
+        token_data = token_response.json()
+        
+        # Step 2: Start live stream with token data
+        stream_data = {
+            "creator_id": self.user_id,
+            "title": "Complete Workflow Test Stream",
+            "channel": workflow_channel,
+            "agora_uid": workflow_uid
+        }
+        
+        start_response = requests.post(f"{BACKEND_URL}/api/live-streams/start", json=stream_data)
+        self.assertEqual(start_response.status_code, 200)
+        start_data = start_response.json()
+        workflow_stream_id = start_data["stream"]["stream_id"]
+        
+        # Step 3: Verify stream appears in active streams
+        time.sleep(1)  # Brief delay for database consistency
+        active_response = requests.get(f"{BACKEND_URL}/api/live-streams")
+        self.assertEqual(active_response.status_code, 200)
+        active_data = active_response.json()
+        
+        # Find our stream in active streams
+        stream_found = False
+        for stream in active_data["streams"]:
+            if stream["stream_id"] == workflow_stream_id:
+                stream_found = True
+                self.assertEqual(stream["channel"], workflow_channel)
+                self.assertEqual(stream["agora_uid"], workflow_uid)
+                break
+        
+        self.assertTrue(stream_found, "Stream not found in active streams list")
+        
+        # Step 4: End the stream
+        end_response = requests.post(f"{BACKEND_URL}/api/live-streams/{workflow_stream_id}/end")
+        self.assertEqual(end_response.status_code, 200)
+        end_data = end_response.json()
+        self.assertTrue(end_data["success"])
+        
+        print(f"✅ Complete streaming workflow test passed - Token → Start → Active → End")
         
     def test_12_end_live_stream(self):
         """Test ending a live stream"""
