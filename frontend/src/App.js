@@ -455,6 +455,26 @@ const App = () => {
     }
   };
 
+  // Load Color Pulse analytics for creator
+  const loadColorPulseAnalytics = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/creator/${USER_ID}/color-pulse-analytics`);
+      setColorPulseAnalytics(response.data);
+    } catch (error) {
+      console.error('Error loading color pulse analytics:', error);
+    }
+  };
+
+  // Load live stream analytics for active stream
+  const loadLiveStreamAnalytics = async (streamId) => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/live-streams/${streamId}/color-pulse-analytics`);
+      setLiveStreamAnalytics(response.data);
+    } catch (error) {
+      console.error('Error loading live stream analytics:', error);
+    }
+  };
+
   const checkOrientation = () => {
     setIsLandscape(window.innerWidth > window.innerHeight);
   };
