@@ -1228,6 +1228,14 @@ if __name__ == "__main__":
     # Creator stats test
     test_suite.addTest(AraStreamingPlatformTest("test_22_get_creator_stats"))
     
+    # Color Pulse Analytics tests (HIGH PRIORITY - NEW IMPLEMENTATION)
+    test_suite.addTest(AraStreamingPlatformTest("test_23_creator_color_pulse_analytics"))
+    test_suite.addTest(AraStreamingPlatformTest("test_24_live_stream_color_pulse_analytics"))
+    test_suite.addTest(AraStreamingPlatformTest("test_25_color_pulse_analytics_edge_cases"))
+    test_suite.addTest(AraStreamingPlatformTest("test_26_color_pulse_data_aggregation_validation"))
+    test_suite.addTest(AraStreamingPlatformTest("test_27_real_time_data_freshness"))
+    test_suite.addTest(AraStreamingPlatformTest("test_28_performance_with_large_datasets"))
+    
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(test_suite)
