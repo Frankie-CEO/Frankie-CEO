@@ -74,6 +74,11 @@ const App = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [showChatEmojis, setShowChatEmojis] = useState(false);
   
+  // Color Pulse Analytics state
+  const [colorPulseAnalytics, setColorPulseAnalytics] = useState(null);
+  const [liveStreamAnalytics, setLiveStreamAnalytics] = useState(null);
+  const [showAnalytics, setShowAnalytics] = useState(true);
+  
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
