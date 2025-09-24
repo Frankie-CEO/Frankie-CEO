@@ -336,6 +336,27 @@ const App = () => {
     }
   }, [isCreatorLive, currentStream]);
 
+  // Load ticker ads on app start
+  useEffect(() => {
+    loadTickerAds();
+  }, []);
+
+  // Rotate ticker ads automatically
+  useEffect(() => {
+    if (tickerAds.length > 0 && (currentVideo || currentStream)) {
+      const currentAd = tickerAds[currentTickerIndex];
+      const duration = currentAd?.duration ? currentAd.duration * 1000 : 30000; // Default 30 seconds
+      
+      const tickerRotation = setTimeout(() => {
+        setCurrentTickerIndex((prevIndex) => 
+          prevIndex >= tickerAds.length - 1 ? 0 : prevIndex + 1
+        );
+      }, duration);
+
+      return () => clearTimeout(tickerRotation);
+    }
+  }, [currentTickerIndex, tickerAds, currentVideo, currentStream]);
+
   const initializeApp = async () => {
     try {
       // Load user profile
