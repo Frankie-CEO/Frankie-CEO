@@ -1020,6 +1020,154 @@ async def get_live_chat_messages(stream_id: str, limit: int = 50):
         logger.error(f"Error getting live chat messages: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/live-streams/{stream_id}/color-pulse-analytics")
+async def get_live_stream_color_pulse_analytics(stream_id: str):
+    """Get real-time Color Pulse analytics for a specific live stream"""
+    try:
+        # Get stream info
+        stream = await db.live_streams.find_one({"stream_id": stream_id})
+        if not stream:
+            raise HTTPException(status_code=404, detail="Stream not found")
+        
+        # Get Color Pulse data from viewers during this stream
+        stream_start = stream.get("start_time")
+        current_time = datetime.utcnow().isoformat()
+        
+        # Real-time Color Pulse interactions during this stream
+        stream_pulses = await db.color_pulses.find({
+            "timestamp": {"$gte": stream_start, "$lte": current_time}
+        }).sort("timestamp", -1).to_list(length=200)
+        
+        # Live audience sentiment analysis
+        live_sentiment = {"warm": 0, "cool": 0, "neutral": 0}
+        viewer_moods = {}
+        recent_interactions = []
+        
+        for pulse in stream_pulses:
+            # Color trend analysis
+            color_category = categorize_color_simple(pulse.get("color_choice", ""))
+            live_sentiment[color_category] += 1
+            
+            # Mood tracking
+            mood = pulse.get("mood", "").lower()
+            user_id = pulse.get("user_id", "unknown")
+            
+            if mood:
+                viewer_moods[user_id] = mood
+            
+            # Recent interactions for live feed
+            recent_interactions.append({
+                "user_id": user_id[:8] + "***",
+                "color": pulse.get("color_choice"),
+                "mood": pulse.get("mood"),
+                "timestamp": pulse.get("timestamp"),
+                "time_in_stream": calculate_time_diff(stream_start, pulse.get("timestamp"))
+            })
+        
+        # Calculate live audience mood score
+        mood_scores = {
+            "happy": 5, "excited": 5, "joyful": 5, "energetic": 4, "optimistic": 4,
+            "calm": 3, "peaceful": 3, "content": 3, "focused": 3, "relaxed": 3,
+            "sad": 1, "angry": 1, "anxious": 2, "tired": 2, "stressed": 1,
+            "neutral": 3, "contemplative": 3, "curious": 4, "surprised": 4
+        }
+        
+        total_mood_score = sum(mood_scores.get(mood, 3) for mood in viewer_moods.values())
+        audience_mood_avg = total_mood_score / len(viewer_moods) if viewer_moods else 3
+        
+        # Engagement timeline (5-minute intervals)
+        engagement_timeline = create_engagement_timeline(stream_pulses, stream_start)
+        
+        return {
+            "stream_info": {
+                "stream_id": stream_id,
+                "title": stream.get("title"),
+                "duration_minutes": calculate_stream_duration(stream_start),
+                "is_active": stream.get("is_active", False)
+            },
+            "live_sentiment": {
+                "color_distribution": live_sentiment,
+                "total_interactions": len(stream_pulses),
+                "audience_mood_score": round(audience_mood_avg, 2),
+                "mood_level": get_mood_level(audience_mood_avg),
+                "unique_viewers": len(viewer_moods),
+                "last_updated": current_time
+            },
+            "real_time_feed": {
+                "recent_interactions": recent_interactions[-20:],  # Last 20 interactions
+                "engagement_timeline": engagement_timeline,
+                "mood_trends": list(viewer_moods.values())
+            },
+            "audience_insights": {
+                "dominant_sentiment": max(live_sentiment.keys(), key=lambda k: live_sentiment[k]) if any(live_sentiment.values()) else "neutral",
+                "engagement_rate": len(stream_pulses) / max(calculate_stream_duration(stream_start), 1),
+                "viewer_retention": len(set([p.get("user_id") for p in stream_pulses]))
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting live stream color pulse analytics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+def calculate_time_diff(start_time: str, current_time: str) -> str:
+    """Calculate time difference in minutes"""
+    try:
+        start = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+        current = datetime.fromisoformat(current_time.replace('Z', '+00:00'))
+        diff_minutes = int((current - start).total_seconds() / 60)
+        return f"{diff_minutes}m"
+    except:
+        return "0m"
+
+def calculate_stream_duration(start_time: str) -> int:
+    """Calculate stream duration in minutes"""
+    try:
+        start = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+        current = datetime.utcnow()
+        return int((current - start).total_seconds() / 60)
+    except:
+        return 0
+
+def create_engagement_timeline(pulses: list, start_time: str) -> list:
+    """Create 5-minute interval engagement timeline"""
+    timeline = []
+    try:
+        start = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+        current = datetime.utcnow()
+        duration_minutes = int((current - start).total_seconds() / 60)
+        
+        # Create 5-minute intervals
+        for i in range(0, max(duration_minutes, 5), 5):
+            interval_start = start + timedelta(minutes=i)
+            interval_end = start + timedelta(minutes=i + 5)
+            
+            interval_pulses = [
+                p for p in pulses 
+                if interval_start <= datetime.fromisoformat(p.get("timestamp", "").replace('Z', '+00:00')) < interval_end
+            ]
+            
+            timeline.append({
+                "interval": f"{i}-{i+5}min",
+                "interactions": len(interval_pulses),
+                "dominant_mood": get_dominant_mood([p.get("mood") for p in interval_pulses if p.get("mood")])
+            })
+    except:
+        timeline = [{"interval": "0-5min", "interactions": len(pulses), "dominant_mood": "neutral"}]
+    
+    return timeline[-12:]  # Last 12 intervals (1 hour)
+
+def get_dominant_mood(moods: list) -> str:
+    """Get the most common mood from a list"""
+    if not moods:
+        return "neutral"
+    
+    mood_counts = {}
+    for mood in moods:
+        if mood:
+            mood_counts[mood] = mood_counts.get(mood, 0) + 1
+    
+    return max(mood_counts.keys(), key=lambda k: mood_counts[k]) if mood_counts else "neutral"
+
 # WebSocket for real-time features
 @app.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: str):
