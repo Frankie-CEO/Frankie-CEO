@@ -222,6 +222,48 @@ async def initialize_sample_data():
                 "content": "Level Up Your Game! 🎮",
                 "url": "https://example.com/gaming",
                 "dimensions": "160x600"
+            },
+            {
+                "ad_id": "ad_003",
+                "type": "ticker",
+                "content": "🔥 LIMITED TIME: Get 50% OFF Premium Gaming Gear - Use Code STREAM50",
+                "url": "https://example.com/gaming-deals",
+                "duration": 30
+            },
+            {
+                "ad_id": "ad_004",
+                "type": "ticker", 
+                "content": "💡 New AI Tools for Creators - Boost Your Content with Smart Analytics",
+                "url": "https://example.com/ai-tools",
+                "duration": 25
+            },
+            {
+                "ad_id": "ad_005",
+                "type": "ticker",
+                "content": "🎵 Stream Music Royalty-Free - 10,000+ Tracks Available Now",
+                "url": "https://example.com/music",
+                "duration": 28
+            },
+            {
+                "ad_id": "ad_006",
+                "type": "ticker",
+                "content": "📱 Mobile Streaming App Coming Soon - Sign Up for Early Access Beta",
+                "url": "https://example.com/mobile-app",
+                "duration": 32
+            },
+            {
+                "ad_id": "ad_007",
+                "type": "ticker",
+                "content": "🏆 Creator of the Month: Win $1000 Prize - Submit Your Best Stream",
+                "url": "https://example.com/contest",
+                "duration": 30
+            },
+            {
+                "ad_id": "ad_008",
+                "type": "ticker",
+                "content": "⚡ Supercharge Your Setup - Professional Streaming Equipment Sale",
+                "url": "https://example.com/equipment",
+                "duration": 27
             }
         ]
         
