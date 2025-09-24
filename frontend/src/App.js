@@ -268,6 +268,42 @@ const App = () => {
     }
   }, [localTracks.video, isCreatorLive]);
 
+  // Handle remote video track rendering
+  useEffect(() => {
+    remoteUsers.forEach((user) => {
+      if (user.videoTrack) {
+        const container = document.getElementById(`player-${user.uid}`);
+        if (container) {
+          // Clear any existing content but keep the overlay
+          const overlay = container.querySelector('.absolute');
+          container.innerHTML = '';
+          if (overlay) container.appendChild(overlay);
+          
+          // Play the remote video track
+          user.videoTrack.play(container);
+          console.log(`✅ Remote video track playing for user ${user.uid}`);
+          
+          // Style the video element
+          const videoElement = container.querySelector('video');
+          if (videoElement) {
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.objectFit = 'cover';
+            videoElement.style.borderRadius = '0.5rem';
+          }
+          
+          // Re-add the overlay
+          if (!container.querySelector('.absolute')) {
+            const userLabel = document.createElement('div');
+            userLabel.className = 'absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded';
+            userLabel.textContent = `User ${user.uid}`;
+            container.appendChild(userLabel);
+          }
+        }
+      }
+    });
+  }, [remoteUsers]);
+
   const initializeApp = async () => {
     try {
       // Load user profile
