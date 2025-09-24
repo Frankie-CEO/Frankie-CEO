@@ -587,7 +587,7 @@ const App = () => {
 
   const startLiveStream = async () => {
     try {
-      console.log('Starting live stream...');
+      console.log('Starting live stream with real WebRTC...');
       
       // Check if AgoraRTC is available
       if (typeof AgoraRTC === 'undefined') {
@@ -596,9 +596,38 @@ const App = () => {
         return;
       }
       
+      if (!AGORA_APP_ID) {
+        console.error('Agora App ID not configured');
+        alert('Live streaming configuration error. Please check Agora App ID.');
+        return;
+      }
+
       const streamTitle = `${user?.username || 'Creator'}'s Live Stream`;
       const channelName = `live_${USER_ID}_${Date.now()}`;
       const uid = parseInt(USER_ID.replace(/\D/g, '').slice(-8)) || Math.floor(Math.random() * 100000);
+
+      console.log('Requesting camera and microphone permissions...');
+      
+      // Request camera and microphone permissions first
+      try {
+        await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            width: { ideal: 1280 }, 
+            height: { ideal: 720 }, 
+            frameRate: { ideal: 30 } 
+          }, 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        console.log('✅ Camera and microphone permissions granted');
+      } catch (permissionError) {
+        console.error('❌ Camera/microphone permission denied:', permissionError);
+        alert('Camera and microphone access is required for live streaming. Please allow permissions and try again.');
+        return;
+      }
 
       // Get Agora token for publisher (creator)
       console.log('Getting Agora token...');
@@ -610,8 +639,46 @@ const App = () => {
 
       console.log('Agora token generated:', tokenResponse.data);
 
-      // For now, simulate live streaming since AgoraRTC might not be available
-      console.log('Simulating live stream creation...');
+      // Initialize Agora client
+      console.log('Initializing Agora client...');
+      const client = await initializeAgora();
+      
+      // Set client role to host (publisher)
+      await client.setClientRole('host');
+      console.log('✅ Client role set to host');
+
+      // Join the Agora channel
+      console.log('Joining Agora channel...');
+      await client.join(AGORA_APP_ID, channelName, tokenResponse.data.token, uid);
+      console.log('✅ Successfully joined Agora channel');
+
+      // Create local video and audio tracks
+      console.log('Creating local media tracks...');
+      const [videoTrack, audioTrack] = await Promise.all([
+        AgoraRTC.createCameraVideoTrack({
+          encoderConfig: {
+            width: 1280,
+            height: 720,
+            frameRate: 30,
+            bitrateMin: 1000,
+            bitrateMax: 3000
+          }
+        }),
+        AgoraRTC.createMicrophoneAudioTrack({
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        })
+      ]);
+
+      console.log('✅ Local tracks created successfully');
+
+      // Publish local tracks to the channel
+      await client.publish([videoTrack, audioTrack]);
+      console.log('✅ Local tracks published to channel');
+
+      // Store tracks in state
+      setLocalTracks({ video: videoTrack, audio: audioTrack });
       
       // Create live stream session in backend
       const streamResponse = await axios.post(`${BACKEND_URL}/api/live-streams/start`, {
@@ -626,12 +693,6 @@ const App = () => {
       setCurrentStream(streamResponse.data.stream);
       setIsCreatorLive(true);
       
-      // Simulate local tracks for demo
-      setLocalTracks({ 
-        video: { enabled: true, setEnabled: (enabled) => console.log('Video:', enabled) }, 
-        audio: { enabled: true, setEnabled: (enabled) => console.log('Audio:', enabled) }
-      });
-      
       // Refresh live streams list
       const streamsResponse = await axios.get(`${BACKEND_URL}/api/live-streams`);
       setLiveStreams(streamsResponse.data.streams);
@@ -639,11 +700,32 @@ const App = () => {
       // Switch to Live tab to show the stream
       setActiveTab('live');
       
-      console.log('Live stream started successfully!');
+      console.log('🎉 Live stream started successfully with real WebRTC!');
+      alert('🎉 You are now live! Your stream is broadcasting to viewers.');
       
     } catch (error) {
-      console.error('Error starting live stream:', error);
-      alert(`Failed to start live stream: ${error.message || 'Unknown error'}`);
+      console.error('❌ Error starting live stream:', error);
+      
+      // Clean up on error
+      if (localTracks.video) {
+        localTracks.video.close();
+      }
+      if (localTracks.audio) {
+        localTracks.audio.close();
+      }
+      
+      let errorMessage = 'Failed to start live stream. ';
+      if (error.message?.includes('permission')) {
+        errorMessage += 'Camera/microphone access denied. Please allow permissions.';
+      } else if (error.message?.includes('token')) {
+        errorMessage += 'Authentication failed. Please try again.';
+      } else if (error.message?.includes('network')) {
+        errorMessage += 'Network connection issue. Check your internet.';
+      } else {
+        errorMessage += error.message || 'Unknown error occurred.';
+      }
+      
+      alert(errorMessage);
       setIsCreatorLive(false);
       setLocalTracks({ video: null, audio: null });
     }
