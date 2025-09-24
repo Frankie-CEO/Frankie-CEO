@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Verify the full functionality of the Ara streaming platform, focusing on the newly integrated comment and live chat features that were recently fixed after resolving JavaScript parsing errors."
+user_problem_statement: "Test the newly implemented Color Pulse analytics APIs to ensure they're working correctly, including Creator Color Pulse Analytics API, Live Stream Color Pulse Analytics API, and data aggregation validation."
 
 backend:
   - task: "Video streaming API endpoints"
