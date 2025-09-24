@@ -1722,6 +1722,73 @@ const App = () => {
     );
   };
 
+  const renderAdTicker = () => {
+    if (!showTicker || !tickerAds.length || (!currentVideo && !currentStream)) return null;
+
+    const currentAd = tickerAds[currentTickerIndex];
+    if (!currentAd) return null;
+
+    return (
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-neon-orange via-neon-green to-neon-purple h-8 overflow-hidden z-40">
+        <div className="relative w-full h-full flex items-center">
+          {/* Ticker Background */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+          
+          {/* Close Button */}
+          <button
+            onClick={() => setShowTicker(false)}
+            className="absolute top-1 right-2 text-white hover:text-gray-300 z-50 text-xs"
+          >
+            <X size={12} />
+          </button>
+          
+          {/* Scrolling Content */}
+          <div className="relative w-full h-full flex items-center">
+            <div className="animate-scroll flex items-center whitespace-nowrap">
+              {/* Breaking News Style Indicator */}
+              <div className="bg-red-600 text-white px-3 py-1 text-xs font-bold mr-4 flex-shrink-0">
+                📢 AD
+              </div>
+              
+              {/* Ad Content */}
+              <a
+                href={currentAd.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white font-semibold text-sm hover:text-yellow-300 transition-colors cursor-pointer mr-8"
+              >
+                {currentAd.content}
+              </a>
+              
+              {/* Repeat the content for seamless scroll */}
+              <div className="bg-red-600 text-white px-3 py-1 text-xs font-bold mr-4 flex-shrink-0">
+                📢 AD
+              </div>
+              <a
+                href={currentAd.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white font-semibold text-sm hover:text-yellow-300 transition-colors cursor-pointer mr-8"
+              >
+                {currentAd.content}
+              </a>
+            </div>
+          </div>
+          
+          {/* Progress Indicator */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-black/20">
+            <div 
+              className="h-full bg-gradient-to-r from-yellow-400 to-red-500 transition-all duration-1000"
+              style={{ 
+                width: `${((Date.now() % ((currentAd.duration || 30) * 1000)) / ((currentAd.duration || 30) * 1000)) * 100}%`
+              }}
+            ></div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'home':
