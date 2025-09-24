@@ -491,39 +491,75 @@ class AraStreamingPlatformTest(unittest.TestCase):
             print(f"⚠️  Dislike comment test failed with status {response.status_code}: {response.text}")
             # Don't fail the test, just log the issue
         
-    def test_19_send_live_chat_message(self):
-        """Test sending a message to live stream chat (Twitch-style)"""
-        print("\n🔍 Testing send live chat message endpoint...")
+    def test_19_live_chat_during_active_stream(self):
+        """Test live chat functionality during an active WebRTC stream"""
+        print("\n🔍 Testing live chat during active WebRTC stream...")
         
-        # First, start a new live stream for chat testing
-        stream_data = {
-            "creator_id": self.user_id,
-            "title": "Chat Test Stream"
-        }
+        # Use existing stream if available, otherwise create new one
+        if hasattr(self, 'stream_id') and self.stream_id:
+            chat_stream_id = self.stream_id
+            print(f"Using existing stream: {chat_stream_id}")
+        else:
+            # Create a new WebRTC stream for chat testing
+            stream_data = {
+                "creator_id": self.user_id,
+                "title": "WebRTC Chat Test Stream",
+                "channel": f"chat_test_{int(time.time())}",
+                "agora_uid": int(time.time()) % 100000
+            }
+            
+            stream_response = requests.post(f"{BACKEND_URL}/api/live-streams/start", json=stream_data)
+            self.assertEqual(stream_response.status_code, 200)
+            chat_stream_id = stream_response.json()["stream"]["stream_id"]
+            print(f"Created new stream for chat: {chat_stream_id}")
         
-        stream_response = requests.post(f"{BACKEND_URL}/api/live-streams/start", json=stream_data)
-        self.assertEqual(stream_response.status_code, 200)
-        self.chat_stream_id = stream_response.json()["stream"]["stream_id"]
+        self.chat_stream_id = chat_stream_id
         
-        # Now send a chat message
-        message_data = {
-            "user_id": self.user_id,
-            "stream_id": self.chat_stream_id,
-            "message": "Hello everyone! This stream is amazing! 🔥",
-            "message_type": "chat"
-        }
+        # Test different types of chat messages
+        test_messages = [
+            {
+                "user_id": self.user_id,
+                "message": "Welcome to the WebRTC live stream! 🎥",
+                "message_type": "chat"
+            },
+            {
+                "user_id": f"viewer_{uuid.uuid4().hex[:6]}",
+                "message": "Amazing quality! The WebRTC integration is smooth!",
+                "message_type": "chat"
+            },
+            {
+                "user_id": f"fan_{uuid.uuid4().hex[:6]}",
+                "message": "🔥💯🎉",
+                "message_type": "emoji"
+            },
+            {
+                "user_id": "system",
+                "message": "New viewer joined the stream",
+                "message_type": "system"
+            }
+        ]
         
-        response = requests.post(f"{BACKEND_URL}/api/live-streams/{self.chat_stream_id}/chat", json=message_data)
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
-        self.assertTrue(data["success"])
-        self.assertIn("message", data)
-        self.assertEqual(data["message"]["message"], message_data["message"])
-        self.assertEqual(data["message"]["message_type"], "chat")
+        sent_message_ids = []
         
-        # Store message ID for later tests
-        self.chat_message_id = data["message"]["message_id"]
-        print(f"✅ Send live chat message test passed - Message ID: {self.chat_message_id}")
+        for i, message_data in enumerate(test_messages):
+            message_data["stream_id"] = chat_stream_id
+            
+            response = requests.post(f"{BACKEND_URL}/api/live-streams/{chat_stream_id}/chat", json=message_data)
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertTrue(data["success"])
+            self.assertIn("message", data)
+            self.assertEqual(data["message"]["message"], message_data["message"])
+            self.assertEqual(data["message"]["message_type"], message_data["message_type"])
+            
+            sent_message_ids.append(data["message"]["message_id"])
+            
+            # Brief delay between messages to simulate real chat
+            time.sleep(0.5)
+        
+        # Store first message ID for later tests
+        self.chat_message_id = sent_message_ids[0]
+        print(f"✅ Live chat during active stream test passed - Sent {len(test_messages)} messages")
         
     def test_20_get_live_chat_messages(self):
         """Test getting live chat messages for a stream"""
