@@ -1233,6 +1233,9 @@ const App = () => {
             </div>
           </div>
         </div>
+        
+        {/* Ad Ticker - Shows during video/stream viewing */}
+        {renderAdTicker()}
       </div>
     );
   };
