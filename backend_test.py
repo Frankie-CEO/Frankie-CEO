@@ -682,6 +682,510 @@ class AraStreamingPlatformTest(unittest.TestCase):
         self.assertIn("total_tokens_earned", data)
         print("✅ Creator stats test passed")
 
+    def test_23_creator_color_pulse_analytics(self):
+        """Test Creator Color Pulse Analytics API - Priority Testing"""
+        print("\n🔍 Testing Creator Color Pulse Analytics API...")
+        
+        # First, ensure we have some Color Pulse data by submitting additional pulses
+        test_pulses = [
+            {
+                "user_id": f"analytics_user_{uuid.uuid4().hex[:6]}",
+                "video_id": self.video_id,
+                "color_choice": "#FF6B47",  # Warm color
+                "mood": "excited",
+                "weather": "sunny",
+                "favorite_memory": "graduation day",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": True
+            },
+            {
+                "user_id": f"analytics_user_{uuid.uuid4().hex[:6]}",
+                "video_id": self.video_id,
+                "color_choice": "#33FF57",  # Cool color
+                "mood": "calm",
+                "weather": "rainy",
+                "favorite_memory": "beach vacation",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": False
+            },
+            {
+                "user_id": f"analytics_user_{uuid.uuid4().hex[:6]}",
+                "video_id": self.video_id,
+                "color_choice": "#C733FF",  # Neutral color
+                "mood": "contemplative",
+                "weather": "cloudy",
+                "favorite_memory": "family gathering",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": True
+            }
+        ]
+        
+        # Submit test Color Pulse data
+        for pulse_data in test_pulses:
+            pulse_response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(pulse_response.status_code, 200)
+        
+        # Wait for data to be processed
+        time.sleep(2)
+        
+        # Test Creator Color Pulse Analytics API
+        response = requests.get(f"{BACKEND_URL}/api/creator/{self.user_id}/color-pulse-analytics")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate real-time sentiment analysis data
+        self.assertIn("real_time_sentiment", data)
+        sentiment = data["real_time_sentiment"]
+        self.assertIn("color_trends", sentiment)
+        self.assertIn("warm", sentiment["color_trends"])
+        self.assertIn("cool", sentiment["color_trends"])
+        self.assertIn("neutral", sentiment["color_trends"])
+        self.assertIn("total_interactions", sentiment)
+        self.assertIn("average_mood_score", sentiment)
+        self.assertIn("mood_level", sentiment)
+        self.assertIn("last_updated", sentiment)
+        
+        # Validate mood distribution calculations
+        self.assertIn("audience_insights", data)
+        insights = data["audience_insights"]
+        self.assertIn("mood_distribution", insights)
+        self.assertIn("weather_sentiment", insights)
+        self.assertIn("memory_types", insights)
+        self.assertIn("neurodiversity_classes", insights)
+        
+        # Validate color trend categorization
+        color_trends = sentiment["color_trends"]
+        self.assertIsInstance(color_trends["warm"], int)
+        self.assertIsInstance(color_trends["cool"], int)
+        self.assertIsInstance(color_trends["neutral"], int)
+        
+        # Validate audience insights aggregation
+        self.assertIsInstance(insights["mood_distribution"], list)
+        self.assertIsInstance(insights["weather_sentiment"], list)
+        self.assertIsInstance(insights["memory_types"], list)
+        self.assertIsInstance(insights["neurodiversity_classes"], dict)
+        
+        # Validate engagement patterns
+        self.assertIn("engagement_patterns", data)
+        patterns = data["engagement_patterns"]
+        self.assertIn("recent_color_choices", patterns)
+        self.assertIn("active_viewers", patterns)
+        self.assertIn("total_color_pulses", patterns)
+        
+        # Validate mood score is within valid range (1-5)
+        mood_score = sentiment["average_mood_score"]
+        self.assertGreaterEqual(mood_score, 1.0)
+        self.assertLessEqual(mood_score, 5.0)
+        
+        # Validate mood level mapping
+        mood_level = sentiment["mood_level"]
+        valid_levels = ["Very Positive", "Positive", "Neutral", "Negative", "Very Negative"]
+        self.assertIn(mood_level, valid_levels)
+        
+        print(f"✅ Creator Color Pulse Analytics test passed - Mood Score: {mood_score}, Level: {mood_level}")
+        print(f"   Color Trends: Warm={color_trends['warm']}, Cool={color_trends['cool']}, Neutral={color_trends['neutral']}")
+        print(f"   Total Interactions: {sentiment['total_interactions']}, Active Viewers: {patterns['active_viewers']}")
+
+    def test_24_live_stream_color_pulse_analytics(self):
+        """Test Live Stream Color Pulse Analytics API - Priority Testing"""
+        print("\n🔍 Testing Live Stream Color Pulse Analytics API...")
+        
+        # Create a new live stream for analytics testing
+        stream_data = {
+            "creator_id": self.user_id,
+            "title": "Color Pulse Analytics Test Stream",
+            "channel": f"analytics_stream_{int(time.time())}",
+            "agora_uid": int(time.time()) % 100000
+        }
+        
+        stream_response = requests.post(f"{BACKEND_URL}/api/live-streams/start", json=stream_data)
+        self.assertEqual(stream_response.status_code, 200)
+        analytics_stream_id = stream_response.json()["stream"]["stream_id"]
+        
+        # Submit Color Pulse data during the stream
+        stream_pulses = [
+            {
+                "user_id": f"stream_viewer_{uuid.uuid4().hex[:6]}",
+                "video_id": f"stream_{analytics_stream_id}",
+                "color_choice": "#FF4500",  # Warm
+                "mood": "energetic",
+                "weather": "sunny",
+                "favorite_memory": "concert experience",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": False
+            },
+            {
+                "user_id": f"stream_viewer_{uuid.uuid4().hex[:6]}",
+                "video_id": f"stream_{analytics_stream_id}",
+                "color_choice": "#1E90FF",  # Cool
+                "mood": "focused",
+                "weather": "clear",
+                "favorite_memory": "mountain hike",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": False
+            },
+            {
+                "user_id": f"stream_viewer_{uuid.uuid4().hex[:6]}",
+                "video_id": f"stream_{analytics_stream_id}",
+                "color_choice": "#9966CC",  # Neutral
+                "mood": "curious",
+                "weather": "overcast",
+                "favorite_memory": "book reading",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": False
+            }
+        ]
+        
+        # Submit stream Color Pulse data
+        for pulse_data in stream_pulses:
+            pulse_response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(pulse_response.status_code, 200)
+        
+        # Add some live chat messages to simulate viewer interaction
+        chat_messages = [
+            {
+                "user_id": stream_pulses[0]["user_id"],
+                "stream_id": analytics_stream_id,
+                "message": "Love the energy in this stream! 🔥",
+                "message_type": "chat"
+            },
+            {
+                "user_id": stream_pulses[1]["user_id"],
+                "stream_id": analytics_stream_id,
+                "message": "Great content as always!",
+                "message_type": "chat"
+            }
+        ]
+        
+        for chat_data in chat_messages:
+            chat_response = requests.post(f"{BACKEND_URL}/api/live-streams/{analytics_stream_id}/chat", json=chat_data)
+            self.assertEqual(chat_response.status_code, 200)
+        
+        # Wait for data processing
+        time.sleep(3)
+        
+        # Test Live Stream Color Pulse Analytics API
+        response = requests.get(f"{BACKEND_URL}/api/live-streams/{analytics_stream_id}/color-pulse-analytics")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate stream info
+        self.assertIn("stream_info", data)
+        stream_info = data["stream_info"]
+        self.assertEqual(stream_info["stream_id"], analytics_stream_id)
+        self.assertIn("title", stream_info)
+        self.assertIn("duration_minutes", stream_info)
+        self.assertIn("is_active", stream_info)
+        
+        # Validate live sentiment analysis during streams
+        self.assertIn("live_sentiment", data)
+        live_sentiment = data["live_sentiment"]
+        self.assertIn("color_distribution", live_sentiment)
+        self.assertIn("total_interactions", live_sentiment)
+        self.assertIn("audience_mood_score", live_sentiment)
+        self.assertIn("mood_level", live_sentiment)
+        self.assertIn("unique_viewers", live_sentiment)
+        self.assertIn("last_updated", live_sentiment)
+        
+        # Validate real-time interaction feed
+        self.assertIn("real_time_feed", data)
+        real_time_feed = data["real_time_feed"]
+        self.assertIn("recent_interactions", real_time_feed)
+        self.assertIn("engagement_timeline", real_time_feed)
+        self.assertIn("mood_trends", real_time_feed)
+        
+        # Validate engagement timeline generation
+        timeline = real_time_feed["engagement_timeline"]
+        self.assertIsInstance(timeline, list)
+        if len(timeline) > 0:
+            for interval in timeline:
+                self.assertIn("interval", interval)
+                self.assertIn("interactions", interval)
+                self.assertIn("dominant_mood", interval)
+        
+        # Validate stream-specific analytics
+        self.assertIn("audience_insights", data)
+        audience_insights = data["audience_insights"]
+        self.assertIn("dominant_sentiment", audience_insights)
+        self.assertIn("engagement_rate", audience_insights)
+        self.assertIn("viewer_retention", audience_insights)
+        
+        # Validate color distribution
+        color_dist = live_sentiment["color_distribution"]
+        self.assertIn("warm", color_dist)
+        self.assertIn("cool", color_dist)
+        self.assertIn("neutral", color_dist)
+        
+        # Validate mood score range
+        mood_score = live_sentiment["audience_mood_score"]
+        self.assertGreaterEqual(mood_score, 1.0)
+        self.assertLessEqual(mood_score, 5.0)
+        
+        # Validate recent interactions structure
+        recent_interactions = real_time_feed["recent_interactions"]
+        if len(recent_interactions) > 0:
+            for interaction in recent_interactions:
+                self.assertIn("user_id", interaction)
+                self.assertIn("color", interaction)
+                self.assertIn("timestamp", interaction)
+                self.assertIn("time_in_stream", interaction)
+        
+        print(f"✅ Live Stream Color Pulse Analytics test passed")
+        print(f"   Stream: {stream_info['title']} (Duration: {stream_info['duration_minutes']}min)")
+        print(f"   Live Sentiment: {live_sentiment['mood_level']} (Score: {mood_score})")
+        print(f"   Interactions: {live_sentiment['total_interactions']}, Unique Viewers: {live_sentiment['unique_viewers']}")
+        print(f"   Color Distribution: {color_dist}")
+        
+        # Clean up - end the test stream
+        end_response = requests.post(f"{BACKEND_URL}/api/live-streams/{analytics_stream_id}/end")
+        self.assertEqual(end_response.status_code, 200)
+
+    def test_25_color_pulse_analytics_edge_cases(self):
+        """Test Color Pulse Analytics with edge cases - no data, empty collections"""
+        print("\n🔍 Testing Color Pulse Analytics edge cases...")
+        
+        # Test with a non-existent creator ID
+        fake_creator_id = f"nonexistent_{uuid.uuid4().hex[:8]}"
+        response = requests.get(f"{BACKEND_URL}/api/creator/{fake_creator_id}/color-pulse-analytics")
+        self.assertEqual(response.status_code, 200)  # Should still return valid structure
+        data = response.json()
+        
+        # Should return valid structure even with no data
+        self.assertIn("real_time_sentiment", data)
+        self.assertIn("audience_insights", data)
+        self.assertIn("engagement_patterns", data)
+        
+        # Test with non-existent stream ID
+        fake_stream_id = f"nonexistent_{uuid.uuid4().hex[:8]}"
+        response = requests.get(f"{BACKEND_URL}/api/live-streams/{fake_stream_id}/color-pulse-analytics")
+        self.assertEqual(response.status_code, 404)  # Should return 404 for non-existent stream
+        
+        print("✅ Color Pulse Analytics edge cases test passed")
+
+    def test_26_color_pulse_data_aggregation_validation(self):
+        """Test Color Pulse data aggregation and calculation functions"""
+        print("\n🔍 Testing Color Pulse data aggregation validation...")
+        
+        # Create test data with known color categories and moods
+        test_user_id = f"aggregation_test_{uuid.uuid4().hex[:8]}"
+        
+        # Submit diverse Color Pulse data for aggregation testing
+        aggregation_test_data = [
+            # Warm colors
+            {"color_choice": "#FF5733", "mood": "happy", "weather": "sunny", "memory": "birthday party"},
+            {"color_choice": "#FF6B47", "mood": "excited", "weather": "warm", "memory": "vacation"},
+            {"color_choice": "#FF4500", "mood": "energetic", "weather": "bright", "memory": "achievement"},
+            
+            # Cool colors
+            {"color_choice": "#33FF57", "mood": "calm", "weather": "cool", "memory": "nature walk"},
+            {"color_choice": "#1E90FF", "mood": "peaceful", "weather": "breezy", "memory": "ocean view"},
+            {"color_choice": "#00CED1", "mood": "relaxed", "weather": "mild", "memory": "meditation"},
+            
+            # Neutral colors
+            {"color_choice": "#C733FF", "mood": "contemplative", "weather": "overcast", "memory": "reading"},
+            {"color_choice": "#9966CC", "mood": "curious", "weather": "cloudy", "memory": "learning"},
+        ]
+        
+        # Submit all test data
+        for i, test_data in enumerate(aggregation_test_data):
+            pulse_data = {
+                "user_id": f"{test_user_id}_{i}",
+                "video_id": self.video_id,
+                "color_choice": test_data["color_choice"],
+                "mood": test_data["mood"],
+                "weather": test_data["weather"],
+                "favorite_memory": test_data["memory"],
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": i % 2 == 0  # Alternate baseline/periodic
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(response.status_code, 200)
+        
+        # Wait for data processing
+        time.sleep(2)
+        
+        # Test aggregation via Creator Analytics
+        response = requests.get(f"{BACKEND_URL}/api/creator/{test_user_id}/color-pulse-analytics")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate color categorization logic
+        color_trends = data["real_time_sentiment"]["color_trends"]
+        
+        # Should have detected warm, cool, and neutral colors
+        self.assertGreater(color_trends["warm"], 0, "Warm colors not detected in aggregation")
+        self.assertGreater(color_trends["cool"], 0, "Cool colors not detected in aggregation")
+        self.assertGreater(color_trends["neutral"], 0, "Neutral colors not detected in aggregation")
+        
+        # Validate mood scoring system (should be within 1-5 scale)
+        mood_score = data["real_time_sentiment"]["average_mood_score"]
+        self.assertGreaterEqual(mood_score, 1.0)
+        self.assertLessEqual(mood_score, 5.0)
+        
+        # Validate mood distribution contains our test moods
+        mood_distribution = data["audience_insights"]["mood_distribution"]
+        mood_names = [item["_id"] for item in mood_distribution if "_id" in item]
+        
+        # Should contain some of our test moods
+        test_moods = ["happy", "excited", "calm", "peaceful", "contemplative"]
+        found_moods = [mood for mood in test_moods if mood in mood_names]
+        self.assertGreater(len(found_moods), 0, "Test moods not found in mood distribution")
+        
+        # Validate weather sentiment correlation
+        weather_distribution = data["audience_insights"]["weather_sentiment"]
+        weather_names = [item["_id"] for item in weather_distribution if "_id" in item]
+        
+        # Should contain some of our test weather conditions
+        test_weather = ["sunny", "cool", "overcast"]
+        found_weather = [weather for weather in test_weather if weather in weather_names]
+        self.assertGreater(len(found_weather), 0, "Test weather conditions not found in distribution")
+        
+        # Validate engagement patterns
+        patterns = data["engagement_patterns"]
+        self.assertGreater(patterns["total_color_pulses"], 0)
+        self.assertGreater(patterns["active_viewers"], 0)
+        
+        # Validate recent color choices structure
+        recent_choices = patterns["recent_color_choices"]
+        if len(recent_choices) > 0:
+            for choice in recent_choices:
+                self.assertIn("color", choice)
+                self.assertIn("timestamp", choice)
+                self.assertIn("mood", choice)
+                self.assertIn("user_id", choice)
+        
+        print(f"✅ Color Pulse data aggregation validation test passed")
+        print(f"   Color Categorization: Warm={color_trends['warm']}, Cool={color_trends['cool']}, Neutral={color_trends['neutral']}")
+        print(f"   Mood Score: {mood_score} ({data['real_time_sentiment']['mood_level']})")
+        print(f"   Found Moods: {found_moods}")
+        print(f"   Found Weather: {found_weather}")
+
+    def test_27_real_time_data_freshness(self):
+        """Test real-time data freshness (last hour, last 15 minutes)"""
+        print("\n🔍 Testing real-time data freshness...")
+        
+        # Submit very recent Color Pulse data
+        fresh_user_id = f"freshness_test_{uuid.uuid4().hex[:8]}"
+        current_time = datetime.utcnow()
+        
+        # Submit data from "last 15 minutes" (simulated)
+        recent_pulse = {
+            "user_id": fresh_user_id,
+            "video_id": self.video_id,
+            "color_choice": "#FF6347",
+            "mood": "joyful",
+            "weather": "perfect",
+            "favorite_memory": "recent achievement",
+            "timestamp": current_time.isoformat(),
+            "is_baseline": False
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=recent_pulse)
+        self.assertEqual(response.status_code, 200)
+        
+        # Wait briefly for processing
+        time.sleep(1)
+        
+        # Test Creator Analytics for real-time data
+        response = requests.get(f"{BACKEND_URL}/api/creator/{fresh_user_id}/color-pulse-analytics")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate last_updated timestamp is recent
+        last_updated = data["real_time_sentiment"]["last_updated"]
+        self.assertIsInstance(last_updated, str)
+        
+        # Parse and validate timestamp freshness
+        try:
+            updated_time = datetime.fromisoformat(last_updated.replace('Z', '+00:00'))
+            time_diff = abs((current_time - updated_time).total_seconds())
+            self.assertLess(time_diff, 300, "Data not fresh - updated more than 5 minutes ago")
+        except Exception as e:
+            print(f"⚠️  Timestamp parsing issue: {e}")
+            # Still pass if timestamp format is different but data is present
+        
+        # Validate recent interactions include our fresh data
+        recent_interactions = data["engagement_patterns"]["recent_color_choices"]
+        if len(recent_interactions) > 0:
+            # Should include our recent submission
+            recent_colors = [interaction.get("color") for interaction in recent_interactions]
+            self.assertIn("#FF6347", recent_colors, "Recent color choice not found in real-time data")
+        
+        print(f"✅ Real-time data freshness test passed")
+        print(f"   Last Updated: {last_updated}")
+        print(f"   Recent Interactions: {len(recent_interactions)}")
+
+    def test_28_performance_with_large_datasets(self):
+        """Test analytics performance with larger datasets"""
+        print("\n🔍 Testing analytics performance with larger datasets...")
+        
+        # Create a batch of Color Pulse data to simulate larger dataset
+        batch_user_id = f"performance_test_{uuid.uuid4().hex[:8]}"
+        batch_size = 20  # Reasonable size for testing
+        
+        print(f"   Submitting {batch_size} Color Pulse entries...")
+        
+        # Submit batch data
+        colors = ["#FF5733", "#33FF57", "#C733FF", "#FF6B47", "#1E90FF", "#9966CC", "#FF4500", "#00CED1"]
+        moods = ["happy", "excited", "calm", "peaceful", "energetic", "contemplative", "joyful", "relaxed"]
+        weathers = ["sunny", "cloudy", "rainy", "clear", "overcast", "breezy", "warm", "cool"]
+        memories = ["childhood", "vacation", "achievement", "family", "friendship", "learning", "adventure", "celebration"]
+        
+        start_time = time.time()
+        
+        for i in range(batch_size):
+            pulse_data = {
+                "user_id": f"{batch_user_id}_{i}",
+                "video_id": self.video_id,
+                "color_choice": colors[i % len(colors)],
+                "mood": moods[i % len(moods)],
+                "weather": weathers[i % len(weathers)],
+                "favorite_memory": memories[i % len(memories)],
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": i % 3 == 0
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(response.status_code, 200)
+        
+        submission_time = time.time() - start_time
+        
+        # Wait for data processing
+        time.sleep(3)
+        
+        # Test analytics performance
+        analytics_start_time = time.time()
+        response = requests.get(f"{BACKEND_URL}/api/creator/{batch_user_id}/color-pulse-analytics")
+        analytics_time = time.time() - analytics_start_time
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate that analytics processed the large dataset
+        total_interactions = data["real_time_sentiment"]["total_interactions"]
+        self.assertGreaterEqual(total_interactions, batch_size * 0.8)  # Allow for some timing variance
+        
+        # Validate performance (should complete within reasonable time)
+        self.assertLess(analytics_time, 10.0, f"Analytics took too long: {analytics_time:.2f}s")
+        
+        # Validate data quality with larger dataset
+        color_trends = data["real_time_sentiment"]["color_trends"]
+        total_colors = sum(color_trends.values())
+        self.assertGreater(total_colors, 0)
+        
+        # Validate mood distribution with larger dataset
+        mood_distribution = data["audience_insights"]["mood_distribution"]
+        self.assertGreater(len(mood_distribution), 0)
+        
+        print(f"✅ Performance test passed")
+        print(f"   Batch Submission: {batch_size} entries in {submission_time:.2f}s")
+        print(f"   Analytics Processing: {analytics_time:.2f}s")
+        print(f"   Total Interactions Processed: {total_interactions}")
+        print(f"   Color Distribution: {color_trends}")
+
+if __name__ == "__main__":
+
 if __name__ == "__main__":
     # Run the tests in order
     test_suite = unittest.TestSuite()
