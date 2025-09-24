@@ -79,6 +79,11 @@ const App = () => {
   const [liveStreamAnalytics, setLiveStreamAnalytics] = useState(null);
   const [showAnalytics, setShowAnalytics] = useState(true);
   
+  // Ad Ticker state
+  const [tickerAds, setTickerAds] = useState([]);
+  const [currentTickerIndex, setCurrentTickerIndex] = useState(0);
+  const [showTicker, setShowTicker] = useState(true);
+  
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
