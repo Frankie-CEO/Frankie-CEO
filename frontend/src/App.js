@@ -244,6 +244,30 @@ const App = () => {
     };
   }, []);
 
+  // Handle local video track rendering
+  useEffect(() => {
+    if (localTracks.video && isCreatorLive) {
+      const container = document.getElementById('local-video-container');
+      if (container) {
+        // Clear any existing content
+        container.innerHTML = '';
+        
+        // Play the video track in the container
+        localTracks.video.play(container);
+        console.log('✅ Local video track playing in container');
+        
+        // Add some styling to make it look good
+        const videoElement = container.querySelector('video');
+        if (videoElement) {
+          videoElement.style.width = '100%';
+          videoElement.style.height = '100%';
+          videoElement.style.objectFit = 'cover';
+          videoElement.style.borderRadius = '0.5rem';
+        }
+      }
+    }
+  }, [localTracks.video, isCreatorLive]);
+
   const initializeApp = async () => {
     try {
       // Load user profile
