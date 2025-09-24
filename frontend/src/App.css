@@ -1107,3 +1107,155 @@ select:focus {
   border-radius: 0.5rem;
   border: 1px solid rgba(51, 255, 87, 0.3);
 }
+
+/* Ad Ticker Styles */
+.ad-ticker {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2rem;
+  background: linear-gradient(90deg, var(--neon-orange), var(--neon-green), var(--neon-purple));
+  overflow: hidden;
+  z-index: 40;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ticker-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.ticker-scroll {
+  display: flex;
+  align-items: center;
+  animation: tickerScroll 45s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes tickerScroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll {
+  animation: tickerScroll 45s linear infinite;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 2rem;
+  height: 100%;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.ticker-item:hover {
+  color: #fbbf24;
+}
+
+.ticker-label {
+  background: #dc2626;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  margin-right: 1rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ticker-close {
+  position: absolute;
+  top: 0.125rem;
+  right: 0.25rem;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.3s ease;
+  z-index: 50;
+}
+
+.ticker-close:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.ticker-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 45;
+  transition: width 1s ease-out;
+}
+
+/* Ticker Animation Variants */
+@keyframes tickerScrollFast {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-150%);
+  }
+}
+
+@keyframes tickerScrollSlow {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-80%);
+  }
+}
+
+.ticker-fast {
+  animation: tickerScrollFast 30s linear infinite;
+}
+
+.ticker-slow {
+  animation: tickerScrollSlow 60s linear infinite;
+}
+
+/* Ticker responsive design */
+@media (max-width: 768px) {
+  .ad-ticker {
+    height: 1.75rem;
+  }
+  
+  .ticker-item {
+    font-size: 0.75rem;
+    padding: 0 1rem;
+  }
+  
+  .ticker-label {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.5rem;
+    margin-right: 0.75rem;
+  }
+}
+
+/* Hide ticker in fullscreen mode */
+.video-fullscreen ~ .ad-ticker {
+  display: none !important;
+}
