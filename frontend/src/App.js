@@ -922,44 +922,70 @@ const App = () => {
         
         {currentStream && (
           <div className={`w-full ${isFullScreen ? 'h-full' : 'h-64'} bg-black flex items-center justify-center relative`}>
-            {/* Simulated live stream */}
-            <div className="w-full h-full bg-gradient-to-br from-red-900 via-red-700 to-red-900 flex flex-col items-center justify-center">
-              <div className="text-center text-white">
-                <div className="animate-pulse mb-4">
-                  <div className="w-16 h-16 bg-red-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <Radio size={32} className="text-white animate-pulse" />
+            {/* Remote Video Display for Live Streams */}
+            {remoteUsers.length > 0 ? (
+              <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-2">
+                {remoteUsers.map((user) => (
+                  <div 
+                    key={user.uid}
+                    id={`player-${user.uid}`}
+                    className="w-full h-full bg-gray-900 rounded-lg overflow-hidden relative"
+                  >
+                    {/* Remote video will be played here by Agora SDK */}
+                    <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                      User {user.uid}
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">🔴 LIVE</h3>
-                  <p className="text-lg text-red-200">{currentStream.title}</p>
-                  <p className="text-sm text-red-300 mt-2">
-                    {isCreatorLive ? 'You are broadcasting live!' : 'Live stream in progress...'}
-                  </p>
-                </div>
-                
-                <div className="flex items-center justify-center space-x-6 mt-6">
-                  <div className="flex items-center space-x-2">
-                    <Users size={20} className="text-red-300" />
-                    <span className="text-white font-semibold">{currentStream.viewer_count || 0} viewers</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Eye size={20} className="text-red-300" />
-                    <span className="text-white">Live</span>
-                  </div>
-                </div>
-                
-                {isCreatorLive && (
-                  <div className="mt-6 text-sm text-red-200">
-                    <p>📹 Camera simulation active</p>
-                    <p>🎤 Audio simulation active</p>
-                  </div>
-                )}
+                ))}
               </div>
-            </div>
+            ) : (
+              /* No remote streams yet - show waiting state */
+              <div className="w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-black flex flex-col items-center justify-center">
+                <div className="text-center text-white">
+                  <div className="animate-pulse mb-4">
+                    <div className="w-16 h-16 bg-red-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <Radio size={32} className="text-white animate-pulse" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-2">🔴 LIVE</h3>
+                    <p className="text-lg text-gray-200">{currentStream.title}</p>
+                    <p className="text-sm text-gray-400 mt-2">
+                      {isCreatorLive ? 'You are broadcasting live!' : 'Connecting to live stream...'}
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-center justify-center space-x-6 mt-6">
+                    <div className="flex items-center space-x-2">
+                      <Users size={20} className="text-gray-400" />
+                      <span className="text-white font-semibold">{remoteUsers.length} viewers</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Eye size={20} className="text-gray-400" />
+                      <span className="text-white">Live</span>
+                    </div>
+                  </div>
+                  
+                  {!isCreatorLive && (
+                    <div className="mt-6 text-sm text-gray-400">
+                      <p>📡 Waiting for stream to start...</p>
+                      <p>🔄 Real-time WebRTC connection</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             
             {/* Live stream overlay */}
-            <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-bold animate-pulse">
-              ● LIVE
+            <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-bold flex items-center space-x-2">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span>LIVE</span>
             </div>
+            
+            {/* Connection Status */}
+            {currentStream && (
+              <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-3 py-1 rounded-lg backdrop-blur-sm">
+                {agoraClient ? '🟢 Connected' : '🟡 Connecting...'}
+              </div>
+            )}
           </div>
         )}
         
