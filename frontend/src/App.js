@@ -502,6 +502,17 @@ const App = () => {
     }
   };
 
+  // Load ticker ads
+  const loadTickerAds = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/ads`);
+      const tickerAdsOnly = response.data.ads.filter(ad => ad.type === 'ticker');
+      setTickerAds(tickerAdsOnly);
+    } catch (error) {
+      console.error('Error loading ticker ads:', error);
+    }
+  };
+
   const checkOrientation = () => {
     setIsLandscape(window.innerWidth > window.innerHeight);
   };
