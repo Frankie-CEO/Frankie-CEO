@@ -733,24 +733,42 @@ const App = () => {
 
   const endLiveStream = async () => {
     try {
-      // Stop local tracks
+      console.log('Ending live stream...');
+      
+      // Unpublish and stop local tracks
+      if (agoraClient && (localTracks.video || localTracks.audio)) {
+        const tracksToUnpublish = [];
+        if (localTracks.video) tracksToUnpublish.push(localTracks.video);
+        if (localTracks.audio) tracksToUnpublish.push(localTracks.audio);
+        
+        if (tracksToUnpublish.length > 0) {
+          await agoraClient.unpublish(tracksToUnpublish);
+          console.log('✅ Unpublished local tracks');
+        }
+      }
+      
+      // Stop and close local tracks
       if (localTracks.video) {
         localTracks.video.stop();
         localTracks.video.close();
+        console.log('✅ Video track stopped and closed');
       }
       if (localTracks.audio) {
         localTracks.audio.stop();
         localTracks.audio.close();
+        console.log('✅ Audio track stopped and closed');
       }
       
       // Leave Agora channel
       if (agoraClient) {
         await agoraClient.leave();
+        console.log('✅ Left Agora channel');
       }
       
       // End stream in backend
       if (currentStream) {
         await axios.post(`${BACKEND_URL}/api/live-streams/${currentStream.stream_id}/end`);
+        console.log('✅ Stream ended in backend');
       }
       
       // Reset state
@@ -764,7 +782,8 @@ const App = () => {
       const streamsResponse = await axios.get(`${BACKEND_URL}/api/live-streams`);
       setLiveStreams(streamsResponse.data.streams);
       
-      console.log('Live stream ended successfully');
+      console.log('🎉 Live stream ended successfully');
+      alert('✅ Stream ended successfully!');
       
     } catch (error) {
       console.error('Error ending live stream:', error);
