@@ -1185,8 +1185,6 @@ class AraStreamingPlatformTest(unittest.TestCase):
         print(f"   Color Distribution: {color_trends}")
 
 if __name__ == "__main__":
-
-if __name__ == "__main__":
     # Run the tests in order
     test_suite = unittest.TestSuite()
     
