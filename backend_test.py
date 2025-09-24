@@ -664,10 +664,14 @@ if __name__ == "__main__":
     test_suite.addTest(AraStreamingPlatformTest("test_07_get_leaderboard"))
     test_suite.addTest(AraStreamingPlatformTest("test_08_get_ads"))
     
-    # Live streaming and Agora.io tests
+    # Live streaming and Agora.io WebRTC tests
     test_suite.addTest(AraStreamingPlatformTest("test_09_get_live_streams"))
-    test_suite.addTest(AraStreamingPlatformTest("test_10_generate_agora_token"))
-    test_suite.addTest(AraStreamingPlatformTest("test_11_start_live_stream"))
+    test_suite.addTest(AraStreamingPlatformTest("test_10_generate_agora_token_publisher"))
+    test_suite.addTest(AraStreamingPlatformTest("test_10b_generate_agora_token_subscriber"))
+    test_suite.addTest(AraStreamingPlatformTest("test_10c_agora_token_different_channels"))
+    test_suite.addTest(AraStreamingPlatformTest("test_10d_agora_environment_validation"))
+    test_suite.addTest(AraStreamingPlatformTest("test_11_start_live_stream_with_channel_data"))
+    test_suite.addTest(AraStreamingPlatformTest("test_11b_complete_streaming_workflow"))
     test_suite.addTest(AraStreamingPlatformTest("test_12_end_live_stream"))
     
     # YouTube-style video comments tests (HIGH PRIORITY)
