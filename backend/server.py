@@ -637,6 +637,166 @@ async def get_creator_stats(creator_id: str):
         logger.error(f"Error getting creator stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/creator/{creator_id}/color-pulse-analytics")
+async def get_color_pulse_analytics(creator_id: str):
+    """Get Color Pulse analytics for creator's audience"""
+    try:
+        # Get creator's video IDs (assuming they contain creator_id)
+        creator_videos = await db.videos.find({"video_id": {"$regex": creator_id}}).to_list(length=None)
+        creator_video_ids = [video["video_id"] for video in creator_videos]
+        
+        # If no specific videos, get all Color Pulse data related to creator's streams/content
+        # For now, we'll analyze all viewers who interacted with creator's content
+        
+        # Real-time Color Pulse sentiment analysis
+        recent_pulses = await db.color_pulses.find({
+            "timestamp": {"$gte": (datetime.utcnow() - timedelta(hours=1)).isoformat()}
+        }).sort("timestamp", -1).limit(100).to_list(length=100)
+        
+        # Mood distribution from baseline assessments
+        mood_pipeline = [
+            {"$match": {"mood": {"$ne": None}, "mood": {"$ne": ""}}},
+            {"$group": {"_id": "$mood", "count": {"$sum": 1}}}
+        ]
+        mood_distribution = await db.color_pulses.aggregate(mood_pipeline).to_list(length=None)
+        
+        # Weather sentiment correlation
+        weather_pipeline = [
+            {"$match": {"weather": {"$ne": None}, "weather": {"$ne": ""}}},
+            {"$group": {"_id": "$weather", "count": {"$sum": 1}}}
+        ]
+        weather_distribution = await db.color_pulses.aggregate(weather_pipeline).to_list(length=None)
+        
+        # Color category trends (warm/cool/neutral)
+        color_trends = {"warm": 0, "cool": 0, "neutral": 0}
+        for pulse in recent_pulses:
+            color = pulse.get("color_choice", "")
+            category = categorize_color_simple(color)
+            color_trends[category] += 1
+        
+        # Neurodiversity class distribution of audience
+        audience_users = list(set([pulse.get("user_id") for pulse in recent_pulses if pulse.get("user_id")]))
+        neurodiversity_distribution = {}
+        
+        for user_id in audience_users:
+            user = await db.users.find_one({"user_id": user_id})
+            if user:
+                neuro_class = user.get("neurodiversity_class", "Unclassified")
+                neurodiversity_distribution[neuro_class] = neurodiversity_distribution.get(neuro_class, 0) + 1
+        
+        # Real-time emotional state (last 15 minutes)
+        current_time = datetime.utcnow()
+        recent_15min = await db.color_pulses.find({
+            "timestamp": {"$gte": (current_time - timedelta(minutes=15)).isoformat()}
+        }).to_list(length=50)
+        
+        # Calculate overall audience mood score
+        mood_scores = {
+            "happy": 5, "excited": 5, "joyful": 5, "energetic": 4, "optimistic": 4,
+            "calm": 3, "peaceful": 3, "content": 3, "focused": 3, "relaxed": 3,
+            "sad": 1, "angry": 1, "anxious": 2, "tired": 2, "stressed": 1,
+            "neutral": 3, "contemplative": 3, "curious": 4, "surprised": 4
+        }
+        
+        total_mood_score = 0
+        mood_count = 0
+        for pulse in recent_15min:
+            mood = pulse.get("mood", "").lower()
+            if mood in mood_scores:
+                total_mood_score += mood_scores[mood]
+                mood_count += 1
+        
+        average_mood_score = total_mood_score / mood_count if mood_count > 0 else 3
+        
+        # Memory type analysis for deeper insights
+        memory_pipeline = [
+            {"$match": {"favorite_memory": {"$ne": None}, "favorite_memory": {"$ne": ""}}},
+            {"$group": {"_id": "$favorite_memory", "count": {"$sum": 1}}}
+        ]
+        memory_distribution = await db.color_pulses.aggregate(memory_pipeline).to_list(length=None)
+        
+        return {
+            "real_time_sentiment": {
+                "color_trends": color_trends,
+                "total_interactions": len(recent_pulses),
+                "average_mood_score": round(average_mood_score, 2),
+                "mood_level": get_mood_level(average_mood_score),
+                "last_updated": current_time.isoformat()
+            },
+            "audience_insights": {
+                "mood_distribution": serialize_doc(mood_distribution),
+                "weather_sentiment": serialize_doc(weather_distribution),
+                "memory_types": serialize_doc(memory_distribution),
+                "neurodiversity_classes": neurodiversity_distribution
+            },
+            "engagement_patterns": {
+                "recent_color_choices": [
+                    {
+                        "color": pulse.get("color_choice"),
+                        "timestamp": pulse.get("timestamp"),
+                        "mood": pulse.get("mood"),
+                        "user_id": pulse.get("user_id", "anonymous")[:8]
+                    } for pulse in recent_pulses[-10:]  # Last 10 interactions
+                ],
+                "active_viewers": len(audience_users),
+                "total_color_pulses": len(recent_pulses)
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting color pulse analytics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+def categorize_color_simple(color: str) -> str:
+    """Simple color categorization for analytics"""
+    if not color:
+        return "neutral"
+    
+    # Handle HSL colors
+    if color.startswith('hsl'):
+        try:
+            hue = float(color.split('(')[1].split(',')[0])
+            if 0 <= hue <= 60 or 300 <= hue <= 360:
+                return "warm"
+            elif 60 < hue <= 180:
+                return "cool"
+            else:
+                return "neutral"
+        except:
+            return "neutral"
+    
+    # Handle hex colors
+    if color.startswith('#'):
+        try:
+            hex_color = color.lstrip('#')
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+            
+            if r > g and r > b:
+                return "warm"
+            elif g > r and g > b:
+                return "cool"
+            else:
+                return "neutral"
+        except:
+            return "neutral"
+    
+    return "neutral"
+
+def get_mood_level(score: float) -> str:
+    """Convert mood score to descriptive level"""
+    if score >= 4.5:
+        return "Very Positive"
+    elif score >= 3.5:
+        return "Positive"
+    elif score >= 2.5:
+        return "Neutral"
+    elif score >= 1.5:
+        return "Negative"
+    else:
+        return "Very Negative"
+
 # YouTube-style Video Comments API
 
 @app.post("/api/videos/{video_id}/comments")
