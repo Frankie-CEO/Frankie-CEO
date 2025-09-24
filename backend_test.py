@@ -144,11 +144,11 @@ class AraStreamingPlatformTest(unittest.TestCase):
         self.assertIn("streams", data)
         print(f"✅ Live streams test passed - Found {len(data['streams'])} active streams")
         
-    def test_10_generate_agora_token(self):
-        """Test generating Agora token for live streaming"""
-        print("\n🔍 Testing Agora token generation endpoint...")
+    def test_10_generate_agora_token_publisher(self):
+        """Test generating Agora token for publisher (streamer) role"""
+        print("\n🔍 Testing Agora token generation for publisher role...")
         token_request = {
-            "channel": f"test_channel_{self.user_id}",
+            "channel": f"live_stream_{self.user_id}_{int(time.time())}",
             "uid": 12345,
             "role": "publisher"
         }
@@ -159,7 +159,97 @@ class AraStreamingPlatformTest(unittest.TestCase):
         self.assertIn("token", data)
         self.assertIn("appId", data)
         self.assertEqual(data["channel"], token_request["channel"])
-        print("✅ Agora token generation test passed")
+        self.assertEqual(data["uid"], token_request["uid"])
+        self.assertEqual(data["role"], "publisher")
+        
+        # Validate token format (should be a non-empty string)
+        self.assertIsInstance(data["token"], str)
+        self.assertGreater(len(data["token"]), 50)  # Agora tokens are typically long
+        
+        # Store for later use
+        self.publisher_token = data["token"]
+        self.test_channel = data["channel"]
+        print(f"✅ Publisher token generation test passed - Channel: {data['channel']}")
+        
+    def test_10b_generate_agora_token_subscriber(self):
+        """Test generating Agora token for subscriber (viewer) role"""
+        print("\n🔍 Testing Agora token generation for subscriber role...")
+        token_request = {
+            "channel": self.test_channel if hasattr(self, 'test_channel') else f"viewer_channel_{self.user_id}",
+            "uid": 67890,
+            "role": "subscriber"
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/agora/token", json=token_request)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("token", data)
+        self.assertIn("appId", data)
+        self.assertEqual(data["channel"], token_request["channel"])
+        self.assertEqual(data["uid"], token_request["uid"])
+        self.assertEqual(data["role"], "subscriber")
+        
+        # Validate token format
+        self.assertIsInstance(data["token"], str)
+        self.assertGreater(len(data["token"]), 50)
+        
+        # Store for later use
+        self.subscriber_token = data["token"]
+        print(f"✅ Subscriber token generation test passed - Channel: {data['channel']}")
+        
+    def test_10c_agora_token_different_channels(self):
+        """Test generating tokens for different channel names"""
+        print("\n🔍 Testing Agora token generation with different channel names...")
+        
+        test_channels = [
+            f"gaming_stream_{int(time.time())}",
+            f"music_live_{self.user_id}",
+            f"talk_show_{uuid.uuid4().hex[:8]}",
+            f"educational_content_{int(time.time())}"
+        ]
+        
+        for channel in test_channels:
+            token_request = {
+                "channel": channel,
+                "uid": int(time.time()) % 100000,  # Generate different UIDs
+                "role": "publisher"
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/agora/token", json=token_request)
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertEqual(data["channel"], channel)
+            self.assertIsInstance(data["token"], str)
+            self.assertGreater(len(data["token"]), 50)
+        
+        print(f"✅ Multiple channel token generation test passed - Tested {len(test_channels)} channels")
+        
+    def test_10d_agora_environment_validation(self):
+        """Test Agora environment variables are properly configured"""
+        print("\n🔍 Testing Agora environment configuration...")
+        
+        # Test with a simple token request to validate backend configuration
+        token_request = {
+            "channel": f"env_test_{int(time.time())}",
+            "uid": 99999,
+            "role": "publisher"
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/agora/token", json=token_request)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate that appId is returned (indicates AGORA_APP_ID is configured)
+        self.assertIn("appId", data)
+        self.assertIsInstance(data["appId"], str)
+        self.assertGreater(len(data["appId"]), 10)  # Agora App IDs are typically 32 characters
+        
+        # Validate token generation (indicates AGORA_APP_CERTIFICATE is configured)
+        self.assertIn("token", data)
+        self.assertIsInstance(data["token"], str)
+        self.assertGreater(len(data["token"]), 50)
+        
+        print(f"✅ Agora environment validation test passed - App ID: {data['appId'][:8]}***")
         
     def test_11_start_live_stream(self):
         """Test starting a live stream"""
