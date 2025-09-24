@@ -309,6 +309,28 @@ const App = () => {
     });
   }, [remoteUsers]);
 
+  // Load Color Pulse analytics when creator dashboard is accessed
+  useEffect(() => {
+    if (activeTab === 'creator') {
+      loadColorPulseAnalytics();
+      // Refresh analytics every 30 seconds for real-time updates
+      const analyticsInterval = setInterval(loadColorPulseAnalytics, 30000);
+      return () => clearInterval(analyticsInterval);
+    }
+  }, [activeTab]);
+
+  // Load live stream analytics when streaming
+  useEffect(() => {
+    if (isCreatorLive && currentStream) {
+      loadLiveStreamAnalytics(currentStream.stream_id);
+      // Refresh live analytics every 15 seconds for real-time updates
+      const liveAnalyticsInterval = setInterval(() => {
+        loadLiveStreamAnalytics(currentStream.stream_id);
+      }, 15000);
+      return () => clearInterval(liveAnalyticsInterval);
+    }
+  }, [isCreatorLive, currentStream]);
+
   const initializeApp = async () => {
     try {
       // Load user profile
