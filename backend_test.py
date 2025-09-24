@@ -682,9 +682,9 @@ if __name__ == "__main__":
     test_suite.addTest(AraStreamingPlatformTest("test_17_like_comment"))
     test_suite.addTest(AraStreamingPlatformTest("test_18_dislike_comment"))
     
-    # Twitch-style live chat tests (HIGH PRIORITY)
-    test_suite.addTest(AraStreamingPlatformTest("test_19_send_live_chat_message"))
-    test_suite.addTest(AraStreamingPlatformTest("test_20_get_live_chat_messages"))
+    # Twitch-style live chat tests for WebRTC streams (HIGH PRIORITY)
+    test_suite.addTest(AraStreamingPlatformTest("test_19_live_chat_during_active_stream"))
+    test_suite.addTest(AraStreamingPlatformTest("test_20_get_live_chat_messages_with_metadata"))
     test_suite.addTest(AraStreamingPlatformTest("test_21_send_emoji_chat_message"))
     
     # Creator stats test
