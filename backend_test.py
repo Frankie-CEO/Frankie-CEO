@@ -561,45 +561,55 @@ class AraStreamingPlatformTest(unittest.TestCase):
         self.chat_message_id = sent_message_ids[0]
         print(f"✅ Live chat during active stream test passed - Sent {len(test_messages)} messages")
         
-    def test_20_get_live_chat_messages(self):
-        """Test getting live chat messages for a stream"""
-        print("\n🔍 Testing get live chat messages endpoint...")
+    def test_20_get_live_chat_messages_with_metadata(self):
+        """Test getting live chat messages with proper metadata and ordering"""
+        print("\n🔍 Testing live chat message retrieval with metadata...")
         
-        # Add a small delay to ensure message is saved
+        # Ensure we have messages from previous test
         time.sleep(1)
         
-        # Send a few more messages to test retrieval
-        for i in range(3):
-            message_data = {
-                "user_id": f"chat_user_{i}_{uuid.uuid4().hex[:4]}",
-                "stream_id": self.chat_stream_id,
-                "message": f"Chat message #{i+1} - Great stream! 👍",
-                "message_type": "chat"
-            }
-            requests.post(f"{BACKEND_URL}/api/live-streams/{self.chat_stream_id}/chat", json=message_data)
-        
-        # Add another delay after sending messages
-        time.sleep(1)
-        
-        # Now get all messages
+        # Get all messages for the stream
         response = requests.get(f"{BACKEND_URL}/api/live-streams/{self.chat_stream_id}/chat")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("messages", data)
         
-        # Check if our original message is in the list
-        message_found = False
-        for message in data["messages"]:
-            if message["message_id"] == self.chat_message_id:
-                message_found = True
-                self.assertEqual(message["user_id"], self.user_id)
-                break
+        messages = data["messages"]
+        self.assertGreater(len(messages), 0, "No messages found in chat")
         
-        if len(data["messages"]) >= 1 and message_found:
-            print(f"✅ Get live chat messages test passed - Found {len(data['messages'])} messages")
-        else:
-            print(f"⚠️  Chat messages endpoint working but specific message not found - Found {len(data['messages'])} total messages")
-            # Still pass the test as the endpoint is working
+        # Validate message structure and metadata
+        for message in messages:
+            # Check required fields
+            self.assertIn("message_id", message)
+            self.assertIn("user_id", message)
+            self.assertIn("stream_id", message)
+            self.assertIn("message", message)
+            self.assertIn("message_type", message)
+            self.assertIn("timestamp", message)
+            self.assertIn("username", message)  # Should be enriched with user data
+            
+            # Validate field types
+            self.assertIsInstance(message["message_id"], str)
+            self.assertIsInstance(message["user_id"], str)
+            self.assertEqual(message["stream_id"], self.chat_stream_id)
+            self.assertIsInstance(message["message"], str)
+            self.assertIn(message["message_type"], ["chat", "emoji", "system"])
+            self.assertIsInstance(message["timestamp"], str)
+            self.assertIsInstance(message["username"], str)
+        
+        # Check chronological ordering (messages should be in chronological order)
+        if len(messages) > 1:
+            timestamps = [message["timestamp"] for message in messages]
+            sorted_timestamps = sorted(timestamps)
+            self.assertEqual(timestamps, sorted_timestamps, "Messages not in chronological order")
+        
+        # Test with limit parameter
+        limited_response = requests.get(f"{BACKEND_URL}/api/live-streams/{self.chat_stream_id}/chat?limit=2")
+        self.assertEqual(limited_response.status_code, 200)
+        limited_data = limited_response.json()
+        self.assertLessEqual(len(limited_data["messages"]), 2)
+        
+        print(f"✅ Live chat message retrieval test passed - Found {len(messages)} messages with proper metadata")
         
     def test_21_send_emoji_chat_message(self):
         """Test sending an emoji message to live stream chat"""
