@@ -2032,6 +2032,219 @@ const App = () => {
                 </div>
               </div>
             )}
+            
+            {/* Color Pulse Analytics Dashboard */}
+            <div className="bg-gray-800 rounded-lg p-6 border border-neon-purple/30">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-white flex items-center">
+                  <div className="w-3 h-3 bg-gradient-to-r from-neon-purple to-neon-green rounded-full mr-3 animate-pulse"></div>
+                  Audience Sentiment Analytics
+                </h3>
+                <button
+                  onClick={() => setShowAnalytics(!showAnalytics)}
+                  className="text-neon-purple hover:text-neon-green transition-colors text-sm"
+                >
+                  {showAnalytics ? 'Hide' : 'Show'} Analytics
+                </button>
+              </div>
+              
+              {showAnalytics && (
+                <div className="space-y-6">
+                  {/* Real-time Sentiment Overview */}
+                  {isCreatorLive && liveStreamAnalytics ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Live Mood Score */}
+                      <div className="bg-gray-700 rounded-lg p-4 border border-red-500/30">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-red-400 mb-2">
+                            {liveStreamAnalytics.live_sentiment?.audience_mood_score || 'N/A'}
+                          </div>
+                          <div className="text-red-300 text-sm font-semibold mb-1">Live Mood Score</div>
+                          <div className="text-xs text-gray-400">
+                            {liveStreamAnalytics.live_sentiment?.mood_level || 'Neutral'}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Active Viewers */}
+                      <div className="bg-gray-700 rounded-lg p-4 border border-green-500/30">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-green-400 mb-2">
+                            {liveStreamAnalytics.live_sentiment?.unique_viewers || 0}
+                          </div>
+                          <div className="text-green-300 text-sm font-semibold mb-1">Engaged Viewers</div>
+                          <div className="text-xs text-gray-400">
+                            {liveStreamAnalytics.live_sentiment?.total_interactions || 0} interactions
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Dominant Sentiment */}
+                      <div className="bg-gray-700 rounded-lg p-4 border border-purple-500/30">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-purple-400 mb-2 capitalize">
+                            {liveStreamAnalytics.audience_insights?.dominant_sentiment || 'Neutral'}
+                          </div>
+                          <div className="text-purple-300 text-sm font-semibold mb-1">Dominant Vibe</div>
+                          <div className="text-xs text-gray-400">
+                            Live sentiment trend
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : colorPulseAnalytics ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Overall Mood Score */}
+                      <div className="bg-gray-700 rounded-lg p-4 border border-neon-purple/30">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-neon-purple mb-2">
+                            {colorPulseAnalytics.real_time_sentiment?.average_mood_score || 'N/A'}
+                          </div>
+                          <div className="text-purple-300 text-sm font-semibold mb-1">Audience Mood</div>
+                          <div className="text-xs text-gray-400">
+                            {colorPulseAnalytics.real_time_sentiment?.mood_level || 'Neutral'}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Total Interactions */}
+                      <div className="bg-gray-700 rounded-lg p-4 border border-neon-green/30">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-neon-green mb-2">
+                            {colorPulseAnalytics.real_time_sentiment?.total_interactions || 0}
+                          </div>
+                          <div className="text-green-300 text-sm font-semibold mb-1">Recent Pulses</div>
+                          <div className="text-xs text-gray-400">Last hour</div>
+                        </div>
+                      </div>
+                      
+                      {/* Active Viewers */}
+                      <div className="bg-gray-700 rounded-lg p-4 border border-neon-orange/30">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-neon-orange mb-2">
+                            {colorPulseAnalytics.engagement_patterns?.active_viewers || 0}
+                          </div>
+                          <div className="text-orange-300 text-sm font-semibold mb-1">Active Viewers</div>
+                          <div className="text-xs text-gray-400">Engaged audience</div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-400 py-8">
+                      <div className="animate-spin w-8 h-8 border-2 border-neon-purple border-t-transparent rounded-full mx-auto mb-4"></div>
+                      <p>Loading audience analytics...</p>
+                    </div>
+                  )}
+                  
+                  {/* Color Sentiment Trends */}
+                  {(colorPulseAnalytics || liveStreamAnalytics) && (
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-4">Color Sentiment Distribution</h4>
+                      <div className="grid grid-cols-3 gap-4">
+                        {/* Warm Colors */}
+                        <div className="text-center">
+                          <div className="w-full bg-gray-600 rounded-full h-3 mb-2">
+                            <div 
+                              className="bg-gradient-to-r from-red-500 to-orange-500 h-3 rounded-full transition-all duration-500"
+                              style={{ 
+                                width: `${((isCreatorLive ? liveStreamAnalytics?.live_sentiment?.color_distribution?.warm : colorPulseAnalytics?.real_time_sentiment?.color_trends?.warm) || 0) / Math.max((isCreatorLive ? (liveStreamAnalytics?.live_sentiment?.total_interactions || 1) : (colorPulseAnalytics?.real_time_sentiment?.total_interactions || 1)), 1) * 100}%` 
+                              }}
+                            ></div>
+                          </div>
+                          <div className="text-orange-400 font-semibold text-sm">
+                            {(isCreatorLive ? liveStreamAnalytics?.live_sentiment?.color_distribution?.warm : colorPulseAnalytics?.real_time_sentiment?.color_trends?.warm) || 0}
+                          </div>
+                          <div className="text-xs text-gray-400">Warm (Energetic)</div>
+                        </div>
+                        
+                        {/* Cool Colors */}
+                        <div className="text-center">
+                          <div className="w-full bg-gray-600 rounded-full h-3 mb-2">
+                            <div 
+                              className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-500"
+                              style={{ 
+                                width: `${((isCreatorLive ? liveStreamAnalytics?.live_sentiment?.color_distribution?.cool : colorPulseAnalytics?.real_time_sentiment?.color_trends?.cool) || 0) / Math.max((isCreatorLive ? (liveStreamAnalytics?.live_sentiment?.total_interactions || 1) : (colorPulseAnalytics?.real_time_sentiment?.total_interactions || 1)), 1) * 100}%` 
+                              }}
+                            ></div>
+                          </div>
+                          <div className="text-green-400 font-semibold text-sm">
+                            {(isCreatorLive ? liveStreamAnalytics?.live_sentiment?.color_distribution?.cool : colorPulseAnalytics?.real_time_sentiment?.color_trends?.cool) || 0}
+                          </div>
+                          <div className="text-xs text-gray-400">Cool (Calm)</div>
+                        </div>
+                        
+                        {/* Neutral Colors */}
+                        <div className="text-center">
+                          <div className="w-full bg-gray-600 rounded-full h-3 mb-2">
+                            <div 
+                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
+                              style={{ 
+                                width: `${((isCreatorLive ? liveStreamAnalytics?.live_sentiment?.color_distribution?.neutral : colorPulseAnalytics?.real_time_sentiment?.color_trends?.neutral) || 0) / Math.max((isCreatorLive ? (liveStreamAnalytics?.live_sentiment?.total_interactions || 1) : (colorPulseAnalytics?.real_time_sentiment?.total_interactions || 1)), 1) * 100}%` 
+                              }}
+                            ></div>
+                          </div>
+                          <div className="text-purple-400 font-semibold text-sm">
+                            {(isCreatorLive ? liveStreamAnalytics?.live_sentiment?.color_distribution?.neutral : colorPulseAnalytics?.real_time_sentiment?.color_trends?.neutral) || 0}
+                          </div>
+                          <div className="text-xs text-gray-400">Neutral (Balanced)</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Mood Distribution */}
+                  {colorPulseAnalytics?.audience_insights?.mood_distribution && (
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-4">Audience Mood Breakdown</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {colorPulseAnalytics.audience_insights.mood_distribution.slice(0, 8).map((mood, index) => (
+                          <div key={mood._id || index} className="text-center p-3 bg-gray-600 rounded-lg">
+                            <div className="text-lg font-bold text-neon-green">{mood.count}</div>
+                            <div className="text-xs text-gray-300 capitalize">{mood._id || 'Unknown'}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Real-time Activity Feed for Live Streams */}
+                  {isCreatorLive && liveStreamAnalytics?.real_time_feed?.recent_interactions && (
+                    <div className="bg-gray-700 rounded-lg p-4">
+                      <h4 className="text-white font-semibold mb-4 flex items-center">
+                        <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
+                        Live Audience Interactions
+                      </h4>
+                      <div className="space-y-2 max-h-32 overflow-y-auto">
+                        {liveStreamAnalytics.real_time_feed.recent_interactions.slice(0, 5).map((interaction, index) => (
+                          <div key={index} className="flex items-center justify-between text-sm p-2 bg-gray-600 rounded">
+                            <div className="flex items-center space-x-3">
+                              <div 
+                                className="w-4 h-4 rounded-full" 
+                                style={{ backgroundColor: interaction.color || '#666' }}
+                              ></div>
+                              <span className="text-gray-300">{interaction.user_id}</span>
+                              {interaction.mood && (
+                                <span className="text-xs text-neon-purple capitalize px-2 py-1 bg-purple-900/30 rounded">
+                                  {interaction.mood}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-400">{interaction.time_in_stream}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Last Updated */}
+                  <div className="text-center text-xs text-gray-500">
+                    Last updated: {new Date().toLocaleTimeString()}
+                    {isCreatorLive && <span className="text-red-400 ml-2">● Live updates every 15s</span>}
+                    {!isCreatorLive && <span className="text-neon-purple ml-2">● Updates every 30s</span>}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         );
 
