@@ -1728,14 +1728,41 @@ const App = () => {
                   
                   {/* Live Video Preview */}
                   <div className="bg-black rounded-lg overflow-hidden">
-                    <div className="w-full h-48 bg-gradient-to-br from-red-900 via-red-700 to-red-900 flex items-center justify-center">
-                      <div className="text-center text-white">
-                        <div className="animate-pulse">
-                          <div className="w-12 h-12 bg-red-500 rounded-full mx-auto mb-3 flex items-center justify-center">
-                            <Camera size={24} className="text-white" />
+                    <div className="relative w-full h-64 bg-gradient-to-br from-gray-900 to-black">
+                      {/* Local Video Container */}
+                      <div 
+                        id="local-video-container"
+                        className="w-full h-full rounded-lg overflow-hidden"
+                        style={{ background: 'linear-gradient(135deg, #1a1a1a, #000)' }}
+                      >
+                        {!localTracks.video && (
+                          <div className="w-full h-full flex items-center justify-center text-white">
+                            <div className="text-center">
+                              <div className="animate-pulse">
+                                <div className="w-12 h-12 bg-red-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                                  <Camera size={24} className="text-white" />
+                                </div>
+                                <p className="text-lg font-bold">🎥 Getting Ready...</p>
+                                <p className="text-sm text-gray-400 mt-1">Camera is starting up</p>
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-lg font-bold">📹 Live Preview</p>
-                          <p className="text-sm text-red-200 mt-1">Your stream is broadcasting</p>
+                        )}
+                      </div>
+                      
+                      {/* Live Indicator */}
+                      <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        <span>LIVE</span>
+                      </div>
+                      
+                      {/* Video Controls Overlay */}
+                      <div className="absolute bottom-4 right-4 flex space-x-2">
+                        <div className={`px-2 py-1 rounded text-xs font-medium ${localTracks.video?.enabled !== false ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+                          {localTracks.video?.enabled !== false ? '📹 ON' : '📹 OFF'}
+                        </div>
+                        <div className={`px-2 py-1 rounded text-xs font-medium ${localTracks.audio?.enabled !== false ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+                          {localTracks.audio?.enabled !== false ? '🎤 ON' : '🎤 OFF'}
                         </div>
                       </div>
                     </div>
