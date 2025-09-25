@@ -193,9 +193,9 @@ const App = () => {
 
   const getColorName = (color, category) => {
     const colorNames = {
-      warm: ['Solar Flare', 'Sunset Burst', 'Flame Dancer', 'Golden Hour', 'Fire Bloom', 'Amber Wave', 'Coral Dream', 'Phoenix Glow'],
-      cool: ['Ocean Depth', 'Mint Breeze', 'Cyber Teal', 'Aurora Green', 'Electric Blue', 'Crystal Lake', 'Neon Rain', 'Cosmic Blue'],
-      neutral: ['Mystic Purple', 'Galaxy Violet', 'Dream Magenta', 'Royal Orchid', 'Cosmic Pink', 'Nebula Purple', 'Electric Plum', 'Stellar Rose']
+      warm: ['Blazing Red', 'Volcano Orange', 'Lightning Gold', 'Solar Flare', 'Inferno Burst', 'Flame Strike', 'Fire Storm', 'Molten Lava'],
+      cool: ['Electric Green', 'Neon Cyan', 'Laser Blue', 'Arctic Glow', 'Plasma Mint', 'Crystal Beam', 'Aqua Shock', 'Cyber Flash'],
+      neutral: ['Neon Magenta', 'Electric Purple', 'Cosmic Violet', 'Plasma Pink', 'Ultra Violet', 'Laser Fuchsia', 'Digital Plum', 'Hyper Rose']
     };
     
     const names = colorNames[category];
