@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the newly implemented Color Pulse analytics APIs to ensure they're working correctly, including Creator Color Pulse Analytics API, Live Stream Color Pulse Analytics API, and data aggregation validation."
+user_problem_statement: "Test the newly implemented ARACOIN payment infrastructure comprehensively. Focus on all the ARACOIN wallet and transaction endpoints including wallet management, earning mechanisms, transaction history, withdrawal system, and global statistics."
 
 backend:
   - task: "Video streaming API endpoints"
