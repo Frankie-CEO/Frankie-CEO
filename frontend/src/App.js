@@ -35,6 +35,21 @@ import './App.css';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const AGORA_APP_ID = process.env.REACT_APP_AGORA_APP_ID;
 
+// Generate user ID
+const USER_ID = `user_${Math.random().toString(36).substr(2, 9)}`;
+
+const App = () => {
+  const [activeTab, setActiveTab] = useState('home');
+  // Loading and error states
+  const [loading, setLoading] = useState({
+    videos: false,
+    liveStreams: false,
+    wallet: false,
+    auth: false,
+    colorPulse: false
+  });
+  const [errors, setErrors] = useState({});
+
   const renderLoading = (text = "Loading...") => (
     <div className="flex flex-col items-center justify-center py-12">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-orange mb-4"></div>
@@ -56,21 +71,6 @@ const AGORA_APP_ID = process.env.REACT_APP_AGORA_APP_ID;
       )}
     </div>
   );
-
-  // Generate user ID
-const USER_ID = `user_${Math.random().toString(36).substr(2, 9)}`;
-
-const App = () => {
-  const [activeTab, setActiveTab] = useState('home');
-  // Loading and error states
-  const [loading, setLoading] = useState({
-    videos: false,
-    liveStreams: false,
-    wallet: false,
-    auth: false,
-    colorPulse: false
-  });
-  const [errors, setErrors] = useState({});
 
   const [user, setUser] = useState(null);
   const [videos, setVideos] = useState([]);
