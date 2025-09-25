@@ -2095,7 +2095,7 @@ const App = () => {
                         {option.category} energy • {option.energy}% intensity
                       </div>
                       <div className="absolute top-2 right-2 text-white/60 text-xs">
-                        +2 tokens
+                        +2 ARACoins
                       </div>
                     </div>
                     
