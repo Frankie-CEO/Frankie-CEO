@@ -1439,6 +1439,287 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
         if user_id in connected_clients:
             del connected_clients[user_id]
 
+# ARACOIN API Endpoints
+
+@app.get("/api/wallet/{user_id}")
+async def get_wallet(user_id: str):
+    """Get user's ARACOIN wallet"""
+    try:
+        wallet = await get_or_create_wallet(user_id)
+        await reset_daily_limits_if_needed(wallet)
+        
+        # Calculate remaining daily earning potential
+        remaining_watch_aracoins = max(0, MAX_DAILY_ARACOINS - wallet.get("daily_earned_today", 0))
+        remaining_color_pulse_aracoins = max(0, MAX_DAILY_COLOR_PULSE_ARACOINS - wallet.get("daily_color_pulse_earned", 0))
+        
+        return {
+            "wallet": serialize_doc(wallet),
+            "conversion_rate": ARACOIN_TO_USD_RATE,
+            "usd_balance": wallet.get("balance", 0) * ARACOIN_TO_USD_RATE,
+            "daily_limits": {
+                "max_daily_aracoins": MAX_DAILY_ARACOINS,
+                "remaining_watch_aracoins": remaining_watch_aracoins,
+                "max_color_pulse_aracoins": MAX_DAILY_COLOR_PULSE_ARACOINS,
+                "remaining_color_pulse_aracoins": remaining_color_pulse_aracoins,
+                "watch_minutes_per_aracoin": WATCH_MINUTES_PER_ARACOIN,
+                "color_pulse_bonus": COLOR_PULSE_BONUS
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error getting wallet: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/wallet/{user_id}/earn-watch-time")
+async def earn_watch_time(user_id: str, watch_data: dict):
+    """Award ARACoins for watch time"""
+    try:
+        watch_minutes = watch_data.get("watch_time_minutes", 0)
+        video_id = watch_data.get("video_id", "")
+        
+        wallet = await get_or_create_wallet(user_id)
+        await reset_daily_limits_if_needed(wallet)
+        
+        # Check daily limit
+        if wallet.get("daily_earned_today", 0) >= MAX_DAILY_ARACOINS:
+            return {
+                "success": False,
+                "message": "Daily ARACOIN limit reached",
+                "aracoins_earned": 0,
+                "daily_limit_reached": True
+            }
+        
+        # Calculate ARACoins earned
+        aracoins_earned = calculate_watch_time_aracoins(watch_minutes)
+        
+        # Apply daily limit
+        remaining_daily = MAX_DAILY_ARACOINS - wallet.get("daily_earned_today", 0)
+        aracoins_earned = min(aracoins_earned, remaining_daily)
+        
+        if aracoins_earned > 0:
+            # Add transaction
+            await add_aracoin_transaction(
+                user_id,
+                "earn_watch",
+                aracoins_earned,
+                f"Watched video for {watch_minutes} minutes",
+                {"watch_minutes": watch_minutes, "video_id": video_id}
+            )
+            
+            # Update daily earned
+            await db.aracoin_wallets.update_one(
+                {"user_id": user_id},
+                {"$inc": {"daily_earned_today": aracoins_earned}}
+            )
+        
+        return {
+            "success": True,
+            "aracoins_earned": aracoins_earned,
+            "watch_minutes": watch_minutes,
+            "conversion_rate": ARACOIN_TO_USD_RATE,
+            "usd_value": aracoins_earned * ARACOIN_TO_USD_RATE,
+            "daily_limit_reached": wallet.get("daily_earned_today", 0) + aracoins_earned >= MAX_DAILY_ARACOINS
+        }
+        
+    except Exception as e:
+        logger.error(f"Error earning watch time: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/wallet/{user_id}/earn-color-pulse")
+async def earn_color_pulse(user_id: str):
+    """Award ARACoins for Color Pulse check-in"""
+    try:
+        wallet = await get_or_create_wallet(user_id)
+        await reset_daily_limits_if_needed(wallet)
+        
+        # Check daily Color Pulse limit
+        if wallet.get("daily_color_pulse_earned", 0) >= MAX_DAILY_COLOR_PULSE_ARACOINS:
+            return {
+                "success": False,
+                "message": "Daily Color Pulse ARACOIN limit reached",
+                "aracoins_earned": 0,
+                "daily_limit_reached": True
+            }
+        
+        # Award Color Pulse bonus
+        aracoins_earned = COLOR_PULSE_BONUS
+        
+        # Add transaction
+        await add_aracoin_transaction(
+            user_id,
+            "earn_color_pulse",
+            aracoins_earned,
+            "Color Pulse check-in bonus",
+            {"color_pulse_bonus": True}
+        )
+        
+        # Update daily Color Pulse earned and count
+        await db.aracoin_wallets.update_one(
+            {"user_id": user_id},
+            {
+                "$inc": {
+                    "daily_color_pulse_earned": aracoins_earned,
+                    "color_pulse_count_today": 1
+                }
+            }
+        )
+        
+        return {
+            "success": True,
+            "aracoins_earned": aracoins_earned,
+            "bonus_type": "color_pulse",
+            "conversion_rate": ARACOIN_TO_USD_RATE,
+            "usd_value": aracoins_earned * ARACOIN_TO_USD_RATE,
+            "daily_limit_reached": wallet.get("daily_color_pulse_earned", 0) + aracoins_earned >= MAX_DAILY_COLOR_PULSE_ARACOINS
+        }
+        
+    except Exception as e:
+        logger.error(f"Error earning color pulse: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/wallet/{user_id}/earn-view")
+async def earn_view(user_id: str, view_data: dict):
+    """Award ARACoins to creator for video view"""
+    try:
+        video_id = view_data.get("video_id", "")
+        viewer_id = view_data.get("viewer_id", "")
+        
+        # Award creator 1 ARACOIN per view
+        aracoins_earned = CREATOR_ARACOIN_PER_VIEW
+        
+        # Add transaction
+        await add_aracoin_transaction(
+            user_id,
+            "earn_view",
+            aracoins_earned,
+            f"Video view from viewer {viewer_id[:8]}",
+            {"video_id": video_id, "viewer_id": viewer_id}
+        )
+        
+        return {
+            "success": True,
+            "aracoins_earned": aracoins_earned,
+            "earning_type": "creator_view",
+            "conversion_rate": ARACOIN_TO_USD_RATE,
+            "usd_value": aracoins_earned * ARACOIN_TO_USD_RATE
+        }
+        
+    except Exception as e:
+        logger.error(f"Error earning view: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/wallet/{user_id}/transactions")
+async def get_transactions(user_id: str, limit: int = 50):
+    """Get user's ARACOIN transaction history"""
+    try:
+        transactions = await db.aracoin_transactions.find({
+            "user_id": user_id
+        }).sort("timestamp", -1).limit(limit).to_list(length=limit)
+        
+        return {
+            "transactions": serialize_doc(transactions),
+            "conversion_rate": ARACOIN_TO_USD_RATE
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting transactions: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/wallet/{user_id}/withdraw")
+async def request_withdrawal(user_id: str, withdrawal: WithdrawalRequest):
+    """Request ARACOIN withdrawal to USD"""
+    try:
+        wallet = await get_or_create_wallet(user_id)
+        
+        # Check if user has enough balance
+        if wallet.get("balance", 0) < withdrawal.aracoin_amount:
+            raise HTTPException(status_code=400, detail="Insufficient ARACOIN balance")
+        
+        # Minimum withdrawal check
+        if withdrawal.aracoin_amount < 100:  # Minimum $1 withdrawal
+            raise HTTPException(status_code=400, detail="Minimum withdrawal is 100 ARACOINS ($1.00)")
+        
+        # Calculate USD amount
+        usd_amount = withdrawal.aracoin_amount * ARACOIN_TO_USD_RATE
+        
+        # Create withdrawal transaction (pending)
+        transaction = {
+            "transaction_id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "type": "withdrawal",
+            "amount": -withdrawal.aracoin_amount,
+            "description": f"Withdrawal request: {withdrawal.aracoin_amount} ARACOINS → ${usd_amount:.2f}",
+            "metadata": {
+                "usd_amount": usd_amount,
+                "payment_method": withdrawal.payment_method,
+                "payment_details": withdrawal.payment_details
+            },
+            "timestamp": datetime.utcnow().isoformat(),
+            "status": "pending"
+        }
+        
+        await db.aracoin_transactions.insert_one(transaction)
+        
+        # Deduct from balance (reserve funds)
+        await db.aracoin_wallets.update_one(
+            {"user_id": user_id},
+            {
+                "$inc": {"balance": -withdrawal.aracoin_amount, "total_spent": withdrawal.aracoin_amount},
+                "$set": {"updated_at": datetime.utcnow().isoformat()}
+            }
+        )
+        
+        return {
+            "success": True,
+            "transaction_id": transaction["transaction_id"],
+            "aracoin_amount": withdrawal.aracoin_amount,
+            "usd_amount": usd_amount,
+            "status": "pending",
+            "message": "Withdrawal request submitted for processing"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error requesting withdrawal: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/aracoin/stats")
+async def get_aracoin_stats():
+    """Get global ARACOIN statistics"""
+    try:
+        # Total ARACoins in circulation
+        total_circulation_result = await db.aracoin_wallets.aggregate([
+            {"$group": {"_id": None, "total_balance": {"$sum": "$balance"}}}
+        ]).to_list(length=1)
+        
+        total_circulation = total_circulation_result[0]["total_balance"] if total_circulation_result else 0
+        
+        # Total transactions today
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        transactions_today = await db.aracoin_transactions.count_documents({
+            "timestamp": {"$gte": today_start.isoformat()}
+        })
+        
+        # Active wallets (with balance > 0)
+        active_wallets = await db.aracoin_wallets.count_documents({"balance": {"$gt": 0}})
+        
+        return {
+            "total_circulation": total_circulation,
+            "total_usd_value": total_circulation * ARACOIN_TO_USD_RATE,
+            "conversion_rate": ARACOIN_TO_USD_RATE,
+            "transactions_today": transactions_today,
+            "active_wallets": active_wallets,
+            "earning_rates": {
+                "watch_minutes_per_aracoin": WATCH_MINUTES_PER_ARACOIN,
+                "max_daily_watch_aracoins": MAX_DAILY_ARACOINS,
+                "color_pulse_bonus": COLOR_PULSE_BONUS,
+                "max_daily_color_pulse_aracoins": MAX_DAILY_COLOR_PULSE_ARACOINS,
+                "creator_aracoins_per_view": CREATOR_ARACOIN_PER_VIEW
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting ARACOIN stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
