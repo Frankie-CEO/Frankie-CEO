@@ -1339,8 +1339,13 @@ const App = () => {
       // Switch to Live tab to show the stream
       setActiveTab('live');
       
+      // Clear loading state
+      setLoading(prev => ({ ...prev, liveStream: false }));
+      
       console.log('🎉 Live stream started successfully with real WebRTC!');
-      alert('🎉 You are now live! Your stream is broadcasting to viewers.');
+      
+      // Show non-blocking toast notification instead of alert
+      addNotification('🎉 Live Stream Started!', 'You are now broadcasting to viewers. Stream away!', 'success');
       
     } catch (error) {
       console.error('❌ Error starting live stream:', error);
