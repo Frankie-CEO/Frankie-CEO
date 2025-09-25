@@ -364,6 +364,22 @@ const App = () => {
     }
   }, [currentTickerIndex, tickerAds, currentVideo, currentStream]);
 
+  // Rotate overlay ads automatically
+  useEffect(() => {
+    if (overlayAds.length > 0 && (currentVideo || currentStream)) {
+      const currentAd = overlayAds[currentOverlayIndex];
+      const duration = currentAd?.duration ? currentAd.duration * 1000 : 15000; // Default 15 seconds
+      
+      const overlayRotation = setTimeout(() => {
+        setCurrentOverlayIndex((prevIndex) => 
+          prevIndex >= overlayAds.length - 1 ? 0 : prevIndex + 1
+        );
+      }, duration);
+
+      return () => clearTimeout(overlayRotation);
+    }
+  }, [currentOverlayIndex, overlayAds, currentVideo, currentStream]);
+
   const initializeApp = async () => {
     try {
       // Load user profile
