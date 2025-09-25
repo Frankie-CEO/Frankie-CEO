@@ -1826,6 +1826,112 @@ const App = () => {
     );
   };
 
+  const renderOverlayBanner = () => {
+    if (!showOverlay || !overlayAds.length || (!currentVideo && !currentStream)) return null;
+
+    const currentAd = overlayAds[currentOverlayIndex];
+    if (!currentAd) return null;
+
+    return (
+      <div className="fixed top-4 left-4 w-80 bg-gradient-to-br from-black/90 to-gray-900/90 rounded-lg overflow-hidden shadow-2xl border border-neon-purple/50 backdrop-blur-sm z-50 animate-fadeIn">
+        {/* Close Button */}
+        <button
+          onClick={() => setShowOverlay(false)}
+          className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs z-60 transition-all"
+          title="Close Ad"
+        >
+          <X size={12} />
+        </button>
+        
+        {/* Progress Bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gray-700 z-55">
+          <div 
+            className="h-full bg-gradient-to-r from-neon-orange to-neon-green transition-all duration-1000"
+            style={{ 
+              width: `${((Date.now() % ((currentAd.duration || 15) * 1000)) / ((currentAd.duration || 15) * 1000)) * 100}%`
+            }}
+          ></div>
+        </div>
+        
+        {/* Ad Content Container */}
+        <div className="relative">
+          {currentAd.format === 'video' ? (
+            /* Video Ad */
+            <div className="relative">
+              <video
+                className="w-full h-32 object-cover"
+                src={currentAd.video_url}
+                autoPlay
+                loop
+                muted={overlayVideoMuted}
+                playsInline
+                onError={(e) => {
+                  console.error('Video ad failed to load:', e);
+                }}
+              />
+              
+              {/* Video Controls Overlay */}
+              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => setOverlayVideoMuted(!overlayVideoMuted)}
+                  className="bg-black/60 hover:bg-black/80 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                  title={overlayVideoMuted ? 'Unmute' : 'Mute'}
+                >
+                  {overlayVideoMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Static Image Ad */
+            <div className="relative">
+              <img
+                src={currentAd.image_url}
+                alt={currentAd.content}
+                className="w-full h-32 object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              
+              {/* Fallback for broken images */}
+              <div className="w-full h-32 bg-gradient-to-br from-neon-purple to-neon-green flex items-center justify-center text-white font-bold text-sm text-center p-4" style={{display: 'none'}}>
+                {currentAd.content}
+              </div>
+            </div>
+          )}
+          
+          {/* Ad Text Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+            <div className="text-white text-sm font-semibold mb-1 line-clamp-2">
+              {currentAd.content}
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-300">Sponsored</span>
+              <a
+                href={currentAd.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-neon-orange hover:bg-neon-orange/80 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Learn More
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        {/* Ad Type Indicator */}
+        <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+          {currentAd.format === 'video' ? '📹 VIDEO AD' : '📷 SPONSORED'}
+        </div>
+        
+        {/* Interactive Hover Effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-neon-purple/20 opacity-0 hover:opacity-100 transition-opacity pointer-events-none"></div>
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'home':
