@@ -805,6 +805,9 @@ const App = () => {
         is_baseline: !hasCompletedBaseline
       });
       
+      // Award ARACOIN bonus for Color Pulse
+      await earnColorPulseAracoin();
+      
       setShowColorPulse(false);
       
       if (!hasCompletedBaseline) {
