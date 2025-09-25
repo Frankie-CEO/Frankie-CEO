@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Add Quickies tab to navigation, then merge it into Explore tab and remove TikTok reference from description."
+user_problem_statement: "Debug the entire work and upgrade UX - comprehensive debugging and UX improvements across the entire Ara streaming application."
 
 backend:
   - task: "Video streaming API endpoints"
