@@ -378,6 +378,29 @@ const App = () => {
     }
   }, [showProfilePicture]);
 
+  // Waitlist modal timing logic
+  useEffect(() => {
+    // Don't show if user is authenticated
+    if (isAuthenticated) return;
+    
+    // Don't show if already submitted
+    if (localStorage.getItem('ara_waitlist_submitted')) return;
+    
+    // Don't show if recently dismissed (within 24 hours)
+    const dismissedTime = localStorage.getItem('ara_waitlist_dismissed');
+    if (dismissedTime) {
+      const daysSinceDismissal = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
+      if (daysSinceDismissal < 1) return;
+    }
+    
+    // Show waitlist modal after 15 seconds on the site
+    const waitlistTimer = setTimeout(() => {
+      setShowWaitlist(true);
+    }, 15000);
+    
+    return () => clearTimeout(waitlistTimer);
+  }, [isAuthenticated]);
+
   // Load ticker ads, overlay ads, and wallet on app start
   useEffect(() => {
     loadTickerAds();
