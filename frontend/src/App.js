@@ -677,6 +677,80 @@ const App = () => {
     }
   };
 
+  // Authentication Functions
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    try {
+      const endpoint = authMode === 'login' ? 'login' : 'register';
+      
+      // Simulate authentication (replace with real API)
+      if (authMode === 'signup') {
+        // Simulate user creation
+        const newUser = {
+          username: authData.username,
+          email: authData.email,
+          user_id: `user_${Date.now()}`,
+          tokens: 0,
+          total_watch_time: 0,
+          neurodiversity_class: 'New User'
+        };
+        setUser(newUser);
+      }
+      
+      setIsAuthenticated(true);
+      setShowAuth(false);
+      
+      // Add welcome notification
+      addNotification('🎉 Welcome to Ara!', 'Your account is ready. Start watching to earn ARACoins!');
+      
+      // Load wallet after authentication
+      loadWallet();
+      
+    } catch (error) {
+      console.error('Authentication error:', error);
+      alert('Authentication failed. Please try again.');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUser(null);
+    setWallet(null);
+    addNotification('👋 Logged out', 'Thanks for using Ara! Come back soon.');
+  };
+
+  // Notification Functions
+  const addNotification = (title, message, type = 'info') => {
+    const notification = {
+      id: Date.now(),
+      title,
+      message,
+      type, // 'info', 'success', 'warning', 'error'
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+    
+    setNotifications(prev => [notification, ...prev]);
+    setUnreadCount(prev => prev + 1);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 5000);
+  };
+
+  const markNotificationRead = (notificationId) => {
+    setNotifications(prev => prev.map(n => 
+      n.id === notificationId ? { ...n, read: true } : n
+    ));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  };
+
+  const markAllNotificationsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setUnreadCount(0);
+  };
+
   const checkOrientation = () => {
     setIsLandscape(window.innerWidth > window.innerHeight);
   };
