@@ -4048,7 +4048,6 @@ const App = () => {
             { id: 'home', icon: Home, label: 'Home' },
             { id: 'live', icon: Radio, label: 'Live' },
             { id: 'explore', icon: Compass, label: 'Explore' },
-            { id: 'quickies', icon: Sparkles, label: 'Quickies' },
             { id: 'profile', icon: User, label: 'Profile' },
             { id: 'creator', icon: BarChart3, label: 'Creator' }
           ].map(({ id, icon: Icon, label }) => (
