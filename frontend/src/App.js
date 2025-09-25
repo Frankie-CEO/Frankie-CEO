@@ -3079,15 +3079,15 @@ const App = () => {
                     </button>
                   </div>
                   
-                  <div className="mt-8 p-4 bg-black/30 rounded-xl border border-neon-purple/20">
-                    <div className="flex items-center justify-center space-x-8 text-sm text-gray-400">
+                  <div className="mt-8 p-4 bg-black/30 rounded-xl border border-neon-purple/20 pointer-events-none">
+                    <div className="flex items-center justify-center space-x-4 md:space-x-8 text-sm text-gray-400 flex-wrap gap-2">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                         <span>💰 1 ARACOIN = $0.01</span>
                       </div>
-                      <div>🎮 Gamified Experience</div>
-                      <div>📱 Mobile Ready</div>
-                      <div>💸 Real Withdrawals</div>
+                      <div className="hidden sm:block">🎮 Gamified Experience</div>
+                      <div className="hidden md:block">📱 Mobile Ready</div>
+                      <div className="hidden lg:block">💸 Real Withdrawals</div>
                     </div>
                   </div>
                 </div>
