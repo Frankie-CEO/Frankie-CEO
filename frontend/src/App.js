@@ -3363,6 +3363,8 @@ const App = () => {
       {renderOverlayBanner()}
       {renderWallet()}
       {renderEarningNotification()}
+      {renderAuthModal()}
+      {renderNotifications()}
     </div>
   );
 };
