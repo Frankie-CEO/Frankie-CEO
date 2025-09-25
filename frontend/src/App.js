@@ -2671,12 +2671,21 @@ const App = () => {
                     </div>
                   </div>
                   
-                  <button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-neon-orange to-neon-purple text-white py-3 rounded-xl font-bold text-lg hover:from-neon-orange/80 hover:to-neon-purple/80 transition-all transform hover:scale-105 shadow-2xl"
-                  >
-                    🎯 Join Waitlist
-                  </button>
+                  <div className="grid grid-cols-3 gap-3">
+                    <button
+                      type="button"
+                      onClick={dismissWaitlist}
+                      className="col-span-1 bg-gray-700 hover:bg-gray-600 text-gray-300 py-3 rounded-xl font-semibold text-sm transition-all border border-gray-600 hover:border-gray-500"
+                    >
+                      Skip
+                    </button>
+                    <button
+                      type="submit"
+                      className="col-span-2 bg-gradient-to-r from-neon-orange to-neon-purple text-white py-3 rounded-xl font-bold text-lg hover:from-neon-orange/80 hover:to-neon-purple/80 transition-all transform hover:scale-105 shadow-2xl"
+                    >
+                      🎯 Join Waitlist
+                    </button>
+                  </div>
                 </form>
 
                 {/* Trust Indicators */}
