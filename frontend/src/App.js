@@ -3963,7 +3963,7 @@ const App = () => {
                   </button>
                   <div className="hidden sm:block">
                     <div className="text-white font-semibold">{user?.username || 'User'}</div>
-                    <div className="text-neon-green text-xs font-medium">{user?.tokens || 0} Legacy Tokens</div>
+                    <div className="text-neon-green text-xs font-medium">{user?.tokens || 0} Legacy ARACoins</div>
                   </div>
                   <button
                     onClick={handleLogout}
