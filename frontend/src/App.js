@@ -365,7 +365,29 @@ const App = () => {
   useEffect(() => {
     loadTickerAds();
     loadOverlayAds();
-    loadWallet();
+    
+    // Check if user is already authenticated (simulate session)
+    const savedUser = localStorage.getItem('ara_user');
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+        setIsAuthenticated(true);
+        loadWallet();
+        
+        // Welcome back notification
+        setTimeout(() => {
+          addNotification('👋 Welcome back!', `Good to see you again, ${userData.username}!`, 'success');
+        }, 1000);
+      } catch (error) {
+        localStorage.removeItem('ara_user');
+      }
+    } else {
+      // Welcome notification for new visitors
+      setTimeout(() => {
+        addNotification('🎉 Welcome to Ara!', 'Join us to start earning ARACoins while watching amazing content!', 'info');
+      }, 2000);
+    }
   }, []);
 
   // Rotate ticker ads automatically
