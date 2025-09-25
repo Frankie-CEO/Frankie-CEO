@@ -3119,7 +3119,7 @@ const App = () => {
                     <div className="text-xs text-gray-400">USD Value</div>
                   </div>
                   <div className="bg-gradient-to-br from-gray-600/20 to-gray-600/10 rounded-xl p-4 border border-gray-600/30 text-center">
-                    <div className="text-2xl font-bold text-white">{tokens}</div>
+                    <div className="text-2xl font-bold text-white">{user?.tokens || 0}</div>
                     <div className="text-xs text-gray-400">Legacy Tokens</div>
                   </div>
                 </div>
