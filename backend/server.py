@@ -264,6 +264,56 @@ async def initialize_sample_data():
                 "content": "⚡ Supercharge Your Setup - Professional Streaming Equipment Sale",
                 "url": "https://example.com/equipment",
                 "duration": 27
+            },
+            {
+                "ad_id": "ad_009",
+                "type": "overlay",
+                "format": "static",
+                "content": "🎮 New Gaming Headset - 50% OFF Today!",
+                "image_url": "https://via.placeholder.com/300x150/FF5733/FFFFFF?text=Gaming+Headset+Sale",
+                "url": "https://example.com/gaming-headset",
+                "duration": 15,
+                "position": "top-left"
+            },
+            {
+                "ad_id": "ad_010", 
+                "type": "overlay",
+                "format": "video",
+                "content": "Stream Like a Pro - Premium Setup",
+                "video_url": "https://sample-videos.com/zip/10/mp4/SampleVideo_360x240_1mb.mp4",
+                "url": "https://example.com/streaming-setup",
+                "duration": 20,
+                "position": "top-left"
+            },
+            {
+                "ad_id": "ad_011",
+                "type": "overlay", 
+                "format": "static",
+                "content": "📱 Mobile App Beta - Join Now!",
+                "image_url": "https://via.placeholder.com/300x150/33FF57/000000?text=Beta+Access",
+                "url": "https://example.com/mobile-beta",
+                "duration": 12,
+                "position": "top-left"
+            },
+            {
+                "ad_id": "ad_012",
+                "type": "overlay",
+                "format": "video", 
+                "content": "Creator Tools Showcase",
+                "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                "url": "https://example.com/creator-tools", 
+                "duration": 25,
+                "position": "top-left"
+            },
+            {
+                "ad_id": "ad_013",
+                "type": "overlay",
+                "format": "static",
+                "content": "🏆 Win $1000 Streaming Contest!",
+                "image_url": "https://via.placeholder.com/300x150/C733FF/FFFFFF?text=Contest+Alert",
+                "url": "https://example.com/contest",
+                "duration": 18,
+                "position": "top-left"
             }
         ]
         
