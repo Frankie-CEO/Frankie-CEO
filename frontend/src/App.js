@@ -1199,6 +1199,9 @@ const App = () => {
     try {
       console.log('Starting live stream with real WebRTC...');
       
+      // Add loading state for responsiveness
+      setLoading(prev => ({ ...prev, liveStream: true }));
+      
       // Check if AgoraRTC is available
       if (typeof AgoraRTC === 'undefined') {
         console.error('AgoraRTC is not loaded');
