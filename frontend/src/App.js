@@ -774,7 +774,7 @@ const App = () => {
           neurodiversity_class: 'New User'
         };
         
-        addNotification('🎉 Account Created!', `Welcome ${userData.username}! You received 10 welcome tokens!`, 'success');
+        addNotification('🎉 Account Created!', `Welcome ${userData.username}! You received 10 welcome ARACoins!`, 'success');
       } else {
         // Simulate login with existing user
         userData = {
