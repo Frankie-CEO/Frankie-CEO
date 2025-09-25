@@ -84,6 +84,12 @@ const App = () => {
   const [currentTickerIndex, setCurrentTickerIndex] = useState(0);
   const [showTicker, setShowTicker] = useState(true);
   
+  // Overlay Banner Ad state
+  const [overlayAds, setOverlayAds] = useState([]);
+  const [currentOverlayIndex, setCurrentOverlayIndex] = useState(0);
+  const [showOverlay, setShowOverlay] = useState(true);
+  const [overlayVideoMuted, setOverlayVideoMuted] = useState(true);
+  
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
