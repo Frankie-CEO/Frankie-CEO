@@ -4023,7 +4023,7 @@ const App = () => {
       </header>
 
       {/* Main Content */}
-      <div className="pt-28 pb-16 p-4">
+      <div className="pt-28 pb-20 px-2 sm:px-4">
         {renderTabContent()}
       </div>
 
