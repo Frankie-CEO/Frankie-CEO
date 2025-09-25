@@ -3278,7 +3278,7 @@ const App = () => {
                 Ara
               </div>
               <div className="text-xs text-gray-400 font-medium tracking-wide">
-                Gen Z Streaming Revolution
+                Next-Gen Streaming Platform
               </div>
             </div>
           </div>
