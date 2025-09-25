@@ -3090,51 +3090,119 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {/* Top Header */}
-      <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-gray-900 to-gray-800 border-b border-neon-purple/30 z-40">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center space-x-3">
-            <div className="text-2xl font-bold bg-gradient-to-r from-neon-orange to-neon-purple bg-clip-text text-transparent">
-              Ara
-            </div>
-            <div className="text-sm text-gray-400 hidden sm:block">
-              Gen Z Streaming Platform
+      {/* Enhanced Top Header */}
+      <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-black via-gray-900 to-black border-b-2 border-neon-purple/50 z-40 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-6 py-4">
+          {/* Logo Section */}
+          <div className="flex items-center space-x-4">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_neonstream-2/artifacts/n574f50k_ARA%20logo.PNG"
+              alt="ARA Logo"
+              className="w-12 h-12 rounded-full border-2 border-neon-purple/50 shadow-lg hover:border-neon-orange/50 transition-all"
+            />
+            <div>
+              <div className="text-3xl font-bold bg-gradient-to-r from-neon-orange via-neon-purple to-neon-green bg-clip-text text-transparent">
+                Ara
+              </div>
+              <div className="text-xs text-gray-400 font-medium tracking-wide">
+                Gen Z Streaming Revolution
+              </div>
             </div>
           </div>
           
+          {/* Right Section */}
           <div className="flex items-center space-x-4">
-            {/* ARACOIN Balance */}
-            <button
-              onClick={() => setShowWallet(true)}
-              className="flex items-center space-x-2 bg-gradient-to-r from-neon-orange/20 to-neon-purple/20 border border-neon-purple/30 rounded-lg px-3 py-2 hover:from-neon-orange/30 hover:to-neon-purple/30 transition-all"
-            >
-              <span className="text-lg">💰</span>
-              <div className="text-left">
-                <div className="text-neon-orange font-bold text-sm">
-                  {wallet?.wallet?.balance?.toFixed(1) || '0.0'} ARACOIN
+            {isAuthenticated ? (
+              <>
+                {/* ARACOIN Balance */}
+                <button
+                  onClick={() => setShowWallet(true)}
+                  className="flex items-center space-x-2 bg-gradient-to-r from-neon-orange/20 to-neon-purple/20 border border-neon-purple/40 rounded-xl px-4 py-2 hover:from-neon-orange/30 hover:to-neon-purple/30 transition-all transform hover:scale-105 shadow-lg"
+                >
+                  <span className="text-lg">💰</span>
+                  <div className="text-left">
+                    <div className="text-neon-orange font-bold text-sm">
+                      {wallet?.wallet?.balance?.toFixed(1) || '0.0'} AC
+                    </div>
+                    <div className="text-gray-400 text-xs">
+                      ${wallet?.usd_balance?.toFixed(3) || '0.000'}
+                    </div>
+                  </div>
+                </button>
+                
+                {/* Notifications */}
+                <button
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="relative p-3 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl border border-gray-600 hover:border-neon-purple/50 transition-all transform hover:scale-105"
+                >
+                  <div className="text-xl">🔔</div>
+                  {unreadCount > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                      {unreadCount}
+                    </div>
+                  )}
+                </button>
+                
+                {/* User Profile */}
+                <div className="flex items-center space-x-3 bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl px-4 py-2 border border-gray-600 hover:border-neon-green/50 transition-all">
+                  <div className="w-10 h-10 bg-gradient-to-r from-neon-green to-neon-purple rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    {user?.username?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <div className="hidden sm:block">
+                    <div className="text-white font-semibold">{user?.username || 'User'}</div>
+                    <div className="text-neon-green text-xs font-medium">{tokens} Legacy Tokens</div>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="text-gray-400 hover:text-red-400 transition-colors ml-2"
+                    title="Logout"
+                  >
+                    <div className="text-sm">🚪</div>
+                  </button>
                 </div>
-                <div className="text-gray-400 text-xs">
-                  ${wallet?.usd_balance?.toFixed(3) || '0.000'}
-                </div>
+              </>
+            ) : (
+              /* Authentication Buttons */
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => { setAuthMode('login'); setShowAuth(true); }}
+                  className="px-6 py-2 bg-gradient-to-r from-gray-800 to-gray-700 text-white rounded-xl border border-gray-600 hover:border-neon-purple/50 hover:from-gray-700 hover:to-gray-600 transition-all transform hover:scale-105 font-semibold"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => { setAuthMode('signup'); setShowAuth(true); }}
+                  className="px-6 py-2 bg-gradient-to-r from-neon-orange to-neon-purple text-white rounded-xl hover:from-neon-orange/80 hover:to-neon-purple/80 transition-all transform hover:scale-105 font-bold shadow-lg"
+                >
+                  Get Started
+                </button>
               </div>
-            </button>
-            
-            {/* User Profile */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-neon-green to-neon-purple rounded-full flex items-center justify-center text-white text-sm font-bold">
-                {user?.username?.[0]?.toUpperCase() || 'U'}
-              </div>
-              <div className="hidden sm:block">
-                <div className="text-white text-sm font-medium">{user?.username || 'User'}</div>
-                <div className="text-gray-400 text-xs">{tokens} Tokens</div>
-              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Status Bar */}
+        <div className="px-6 py-2 bg-gradient-to-r from-neon-purple/10 via-transparent to-neon-orange/10 border-t border-neon-purple/20">
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <div className="flex items-center space-x-4">
+              <span className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span>Live Platform</span>
+              </span>
+              <span>💰 1 ARACOIN = $0.01</span>
+              {aracoinStats && (
+                <span>🏦 {aracoinStats.active_wallets} Active Wallets</span>
+              )}
+            </div>
+            <div className="hidden md:block">
+              <span>🎯 Earn ARACoins while you watch • 🎨 Color Pulse bonuses • 💸 Real money withdrawals</span>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="pt-20 pb-16 p-4">
+      <div className="pt-28 pb-16 p-4">
         {renderTabContent()}
       </div>
 
