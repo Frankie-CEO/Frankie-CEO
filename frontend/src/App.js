@@ -2586,7 +2586,7 @@ const App = () => {
                   </h1>
                   
                   <p className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto">
-                    The revolutionary <span className="text-neon-purple font-bold">Gen Z streaming platform</span> where you earn real money while watching incredible content
+                    The revolutionary <span className="text-neon-purple font-bold">streaming platform</span> where you earn real money while watching incredible content
                   </p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 max-w-4xl mx-auto">
