@@ -1296,6 +1296,108 @@ def get_dominant_mood(moods: list) -> str:
     
     return max(mood_counts.keys(), key=lambda k: mood_counts[k]) if mood_counts else "neutral"
 
+# ARACOIN Utility Functions
+ARACOIN_TO_USD_RATE = 0.01  # 1 ARACOIN = $0.01
+WATCH_MINUTES_PER_ARACOIN = 10  # 10 minutes = 1 ARACOIN
+MAX_DAILY_ARACOINS = 50  # Maximum 50 ARACOINS per day from watching
+COLOR_PULSE_BONUS = 0.5  # 0.5 ARACOIN per Color Pulse check-in
+MAX_DAILY_COLOR_PULSE_ARACOINS = 5  # Maximum 5 ARACOINS per day from Color Pulse
+CREATOR_ARACOIN_PER_VIEW = 1  # 1 ARACOIN per view for creators
+
+async def get_or_create_wallet(user_id: str):
+    """Get existing wallet or create new one for user"""
+    wallet = await db.aracoin_wallets.find_one({"user_id": user_id})
+    
+    if not wallet:
+        today = datetime.utcnow().date().isoformat()
+        new_wallet = {
+            "user_id": user_id,
+            "balance": 0.0,
+            "total_earned": 0.0,
+            "total_spent": 0.0,
+            "daily_earned_today": 0.0,
+            "last_earning_date": today,
+            "daily_color_pulse_earned": 0.0,
+            "color_pulse_count_today": 0,
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        
+        await db.aracoin_wallets.insert_one(new_wallet)
+        wallet = new_wallet
+    
+    return wallet
+
+async def reset_daily_limits_if_needed(wallet: dict):
+    """Reset daily earning limits if it's a new day"""
+    today = datetime.utcnow().date().isoformat()
+    
+    if wallet.get("last_earning_date") != today:
+        await db.aracoin_wallets.update_one(
+            {"user_id": wallet["user_id"]},
+            {
+                "$set": {
+                    "daily_earned_today": 0.0,
+                    "daily_color_pulse_earned": 0.0,
+                    "color_pulse_count_today": 0,
+                    "last_earning_date": today,
+                    "updated_at": datetime.utcnow().isoformat()
+                }
+            }
+        )
+        
+        # Update local wallet object
+        wallet["daily_earned_today"] = 0.0
+        wallet["daily_color_pulse_earned"] = 0.0
+        wallet["color_pulse_count_today"] = 0
+        wallet["last_earning_date"] = today
+
+async def add_aracoin_transaction(user_id: str, transaction_type: str, amount: float, description: str, metadata: dict = None):
+    """Add ARACOIN transaction and update wallet"""
+    transaction_id = str(uuid.uuid4())
+    
+    transaction = {
+        "transaction_id": transaction_id,
+        "user_id": user_id,
+        "type": transaction_type,
+        "amount": amount,
+        "description": description,
+        "metadata": metadata or {},
+        "timestamp": datetime.utcnow().isoformat(),
+        "status": "completed"
+    }
+    
+    # Insert transaction
+    await db.aracoin_transactions.insert_one(transaction)
+    
+    # Update wallet balance
+    wallet = await get_or_create_wallet(user_id)
+    await reset_daily_limits_if_needed(wallet)
+    
+    balance_change = amount
+    total_earned_change = amount if amount > 0 else 0
+    total_spent_change = abs(amount) if amount < 0 else 0
+    
+    await db.aracoin_wallets.update_one(
+        {"user_id": user_id},
+        {
+            "$inc": {
+                "balance": balance_change,
+                "total_earned": total_earned_change,
+                "total_spent": total_spent_change
+            },
+            "$set": {
+                "updated_at": datetime.utcnow().isoformat()
+            }
+        }
+    )
+    
+    return transaction
+
+def calculate_watch_time_aracoins(watch_time_minutes: int) -> float:
+    """Calculate ARACoins earned from watch time"""
+    return float(watch_time_minutes) / WATCH_MINUTES_PER_ARACOIN
+
 # WebSocket for real-time features
 @app.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: str):
