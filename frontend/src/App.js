@@ -3915,7 +3915,7 @@ const App = () => {
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <span>🎯 Earn ARACoins while you watch • 🎨 Color Pulse bonuses • 💸 Real money withdrawals • 🌍 For everyone</span>
-              {!isAuthenticated && !localStorage.getItem('ara_waitlist_submitted') && (
+              {!isAuthenticated && !localStorage.getItem('ara_waitlist_submitted') && !localStorage.getItem('ara_waitlist_declined') && (
                 <button
                   onClick={() => setShowWaitlist(true)}
                   className="text-neon-purple hover:text-neon-orange transition-colors text-xs font-medium px-2 py-1 rounded border border-neon-purple/30 hover:border-neon-orange/50"
