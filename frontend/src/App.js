@@ -3252,6 +3252,109 @@ const App = () => {
           </div>
         );
 
+      case 'quickies':
+        return (
+          <div className="space-y-6">
+            {/* Header Section */}
+            <div className="text-center">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-neon-orange via-neon-purple to-neon-green bg-clip-text text-transparent mb-4">
+                ✨ Quickies
+              </h2>
+              <p className="text-xl text-gray-300 mb-2">
+                Lightning-fast entertainment is coming soon!
+              </p>
+              <p className="text-gray-400 text-sm">
+                Get ready for bite-sized content that packs a punch
+              </p>
+            </div>
+
+            {/* Coming Soon Feature Card */}
+            <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-2xl p-8 border-2 border-neon-purple/30 relative overflow-hidden">
+              {/* Background Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/10 via-neon-orange/10 to-neon-green/10"></div>
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(199,51,255,0.1),transparent_50%)]"></div>
+              
+              <div className="relative z-10 text-center">
+                <div className="text-6xl mb-6">🚀</div>
+                <h3 className="text-3xl font-bold text-white mb-4">Coming Soon</h3>
+                <p className="text-lg text-gray-300 mb-6 max-w-2xl mx-auto">
+                  We're crafting the perfect short-form video experience that will revolutionize how you consume content. 
+                  Think TikTok meets earning rewards - but better!
+                </p>
+                
+                {/* Feature Preview Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
+                  <div className="bg-gradient-to-br from-neon-orange/20 to-neon-orange/10 rounded-xl p-6 border border-neon-orange/30">
+                    <div className="text-3xl mb-3">⚡</div>
+                    <h4 className="text-neon-orange font-bold mb-2">15-60 Second Videos</h4>
+                    <p className="text-gray-400 text-sm">Quick, engaging content optimized for mobile viewing</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-neon-purple/20 to-neon-purple/10 rounded-xl p-6 border border-neon-purple/30">
+                    <div className="text-3xl mb-3">💰</div>
+                    <h4 className="text-neon-purple font-bold mb-2">Enhanced Earning</h4>
+                    <p className="text-gray-400 text-sm">Earn more ARACoins with our new quick-watch bonus system</p>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-neon-green/20 to-neon-green/10 rounded-xl p-6 border border-neon-green/30">
+                    <div className="text-3xl mb-3">🎨</div>
+                    <h4 className="text-neon-green font-bold mb-2">Creative Tools</h4>
+                    <p className="text-gray-400 text-sm">Easy-to-use video creation tools for all creators</p>
+                  </div>
+                </div>
+
+                {/* Notification Signup */}
+                <div className="bg-black/30 rounded-xl p-6 border border-neon-purple/20 max-w-md mx-auto">
+                  <h4 className="text-white font-semibold mb-4 flex items-center justify-center">
+                    <Sparkles className="mr-2" size={18} />
+                    Get Notified First
+                  </h4>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Be among the first to experience Quickies when it launches!
+                  </p>
+                  <button 
+                    onClick={() => setShowWaitlist(true)}
+                    className="w-full bg-gradient-to-r from-neon-purple to-neon-orange text-white py-3 rounded-lg font-semibold hover:from-neon-purple/80 hover:to-neon-orange/80 transition-all transform hover:scale-105"
+                  >
+                    🔔 Notify Me
+                  </button>
+                </div>
+
+                {/* Progress Indicator */}
+                <div className="mt-8">
+                  <div className="flex items-center justify-center space-x-2 text-sm text-gray-400 mb-2">
+                    <span>Development Progress</span>
+                  </div>
+                  <div className="w-full max-w-sm mx-auto bg-gray-700 rounded-full h-2">
+                    <div className="bg-gradient-to-r from-neon-purple to-neon-orange h-2 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">75% Complete - Launch Expected Q1 2026</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Mockups */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-white text-center">Sneak Peek</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { title: "Quick Gaming", category: "Gaming" },
+                  { title: "Mini Cooking", category: "Food" },
+                  { title: "Fast Fashion", category: "Style" },
+                  { title: "Tech Tips", category: "Tech" }
+                ].map((item, i) => (
+                  <div key={i} className="bg-gray-800 rounded-lg aspect-[9/16] flex flex-col items-center justify-center border border-gray-600 hover:border-neon-purple/50 transition-all">
+                    <div className="text-3xl mb-2">📱</div>
+                    <span className="text-white font-semibold text-sm text-center px-2">{item.title}</span>
+                    <span className="text-gray-400 text-xs mt-1">{item.category}</span>
+                    <div className="text-xs text-gray-500 mt-2">Coming Soon</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
       case 'profile':
         return (
           <div className="space-y-6">
