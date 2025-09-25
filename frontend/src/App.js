@@ -2378,6 +2378,118 @@ const App = () => {
     );
   };
 
+  const renderProfilePictureModal = () => {
+    if (!showProfilePicture) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-80 p-4">
+        <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-neon-purple/50 shadow-2xl">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="text-3xl">🖼️</div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">Profile Picture</h2>
+                <p className="text-gray-400 text-sm">Choose your avatar or upload a custom image</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowProfilePicture(false)}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* Current Profile Picture */}
+          <div className="text-center mb-8">
+            <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-4 border-neon-purple/50 mb-4">
+              {getProfilePictureUrl() ? (
+                <img 
+                  src={getProfilePictureUrl()} 
+                  alt="Current Profile" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-r from-neon-green to-neon-purple flex items-center justify-center text-white font-bold text-xl">
+                  {getInitials(user?.username)}
+                </div>
+              )}
+            </div>
+            <p className="text-gray-400 text-sm">Current Profile Picture</p>
+          </div>
+
+          {/* Avatar Gallery */}
+          <div className="mb-8">
+            <h3 className="text-white font-semibold mb-4 flex items-center">
+              <span className="text-lg mr-2">🎭</span>
+              Avatar Gallery
+            </h3>
+            <div className="grid grid-cols-4 md:grid-cols-6 gap-4">
+              {avatarGallery.map((avatar) => (
+                <div
+                  key={avatar.id}
+                  onClick={() => updateProfilePicture(avatar.url, 'avatar')}
+                  className="relative group cursor-pointer"
+                >
+                  <div className={`w-16 h-16 rounded-full overflow-hidden border-2 transition-all ${
+                    selectedAvatar?.id === avatar.id 
+                      ? 'border-neon-orange scale-110' 
+                      : 'border-gray-600 hover:border-neon-purple/50 hover:scale-105'
+                  }`}>
+                    <img 
+                      src={avatar.url} 
+                      alt={avatar.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    {avatar.name}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom Upload Section */}
+          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h3 className="text-white font-semibold mb-4 flex items-center">
+              <span className="text-lg mr-2">📤</span>
+              Upload Custom Image
+            </h3>
+            <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-neon-purple/50 transition-colors">
+              <div className="text-4xl mb-4">📷</div>
+              <p className="text-gray-400 mb-4">Upload feature coming soon!</p>
+              <button
+                disabled
+                className="bg-gray-600 text-gray-400 px-6 py-2 rounded-lg cursor-not-allowed"
+              >
+                Choose File
+              </button>
+              <p className="text-xs text-gray-500 mt-2">Supported: JPG, PNG (max 2MB)</p>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex space-x-4 mt-6">
+            <button
+              onClick={() => updateProfilePicture(`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.username || 'User')}&backgroundColor=c7cedb`, 'default')}
+              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-semibold transition-colors"
+            >
+              🔄 Reset to Default
+            </button>
+            <button
+              onClick={() => setShowProfilePicture(false)}
+              className="flex-1 bg-neon-purple hover:bg-neon-purple/80 text-white py-3 rounded-lg font-semibold transition-colors"
+            >
+              ✅ Done
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderNotifications = () => {
     if (!showNotifications) return null;
 
