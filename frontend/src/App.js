@@ -3494,9 +3494,28 @@ const App = () => {
                 
                 {/* User Profile */}
                 <div className="flex items-center space-x-3 bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl px-4 py-2 border border-gray-600 hover:border-neon-green/50 transition-all">
-                  <div className="w-10 h-10 bg-gradient-to-r from-neon-green to-neon-purple rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                    {user?.username?.[0]?.toUpperCase() || 'U'}
-                  </div>
+                  <button
+                    onClick={() => setShowProfilePicture(true)}
+                    className="relative group"
+                    title="Change Profile Picture"
+                  >
+                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-neon-green/50 hover:border-neon-orange/50 transition-all shadow-lg">
+                      {getProfilePictureUrl() ? (
+                        <img 
+                          src={getProfilePictureUrl()} 
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-r from-neon-green to-neon-purple flex items-center justify-center text-white font-bold text-lg">
+                          {getInitials(user?.username)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 bg-neon-orange text-white rounded-full w-4 h-4 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                      ✏️
+                    </div>
+                  </button>
                   <div className="hidden sm:block">
                     <div className="text-white font-semibold">{user?.username || 'User'}</div>
                     <div className="text-neon-green text-xs font-medium">{tokens} Legacy Tokens</div>
