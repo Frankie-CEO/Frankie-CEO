@@ -6,7 +6,7 @@ import json
 from datetime import datetime
 
 # Backend URL from the frontend .env file
-BACKEND_URL = "https://neonstream-2.preview.emergentagent.com"
+BACKEND_URL = "https://ara-stream-app.preview.emergentagent.com"
 
 class AraStreamingPlatformTest(unittest.TestCase):
     def setUp(self):
