@@ -3382,7 +3382,7 @@ const App = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   <div className="bg-gray-700 rounded-lg p-4 text-center border border-neon-orange/30">
                     <div className="text-2xl font-bold text-neon-orange">{user.tokens}</div>
-                    <div className="text-gray-400 text-sm">Legacy Tokens</div>
+                    <div className="text-gray-400 text-sm">Legacy ARACoins</div>
                   </div>
                   <div className="bg-gray-700 rounded-lg p-4 text-center border border-neon-green/30">
                     <div className="text-2xl font-bold text-neon-green">{Math.floor(user.total_watch_time / 60)}</div>
