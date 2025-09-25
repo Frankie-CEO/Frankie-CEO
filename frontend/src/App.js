@@ -2549,6 +2549,7 @@ const App = () => {
       {renderColorPulse()}
       {renderBottomAd()}
       {renderSideAd()}
+      {renderOverlayBanner()}
     </div>
   );
 };
