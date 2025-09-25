@@ -1683,6 +1683,114 @@ async def request_withdrawal(user_id: str, withdrawal: WithdrawalRequest):
         logger.error(f"Error requesting withdrawal: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/user/{user_id}/profile-picture")
+async def update_profile_picture(user_id: str, picture_data: dict):
+    """Update user profile picture"""
+    try:
+        picture_url = picture_data.get("picture_url", "")
+        picture_type = picture_data.get("picture_type", "default")
+        
+        # Update user profile picture
+        result = await db.users.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "profile_picture": picture_url,
+                    "profile_picture_type": picture_type,
+                    "updated_at": datetime.utcnow().isoformat()
+                }
+            }
+        )
+        
+        if result.modified_count == 0:
+            # Create user if doesn't exist
+            await ensure_user_exists(user_id)
+            await db.users.update_one(
+                {"user_id": user_id},
+                {
+                    "$set": {
+                        "profile_picture": picture_url,
+                        "profile_picture_type": picture_type
+                    }
+                }
+            )
+        
+        return {
+            "success": True,
+            "message": "Profile picture updated successfully",
+            "profile_picture": picture_url,
+            "profile_picture_type": picture_type
+        }
+        
+    except Exception as e:
+        logger.error(f"Error updating profile picture: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/avatars")
+async def get_avatar_gallery():
+    """Get available avatar gallery"""
+    try:
+        # Provide a selection of avatar options
+        avatars = [
+            {
+                "id": "avatar_1",
+                "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=b6e3f4",
+                "name": "Felix",
+                "category": "friendly"
+            },
+            {
+                "id": "avatar_2", 
+                "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka&backgroundColor=c0aede",
+                "name": "Aneka",
+                "category": "creative"
+            },
+            {
+                "id": "avatar_3",
+                "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bella&backgroundColor=ffd93d",
+                "name": "Bella", 
+                "category": "energetic"
+            },
+            {
+                "id": "avatar_4",
+                "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie&backgroundColor=ffb3ba",
+                "name": "Charlie",
+                "category": "cool"
+            },
+            {
+                "id": "avatar_5",
+                "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Dana&backgroundColor=bae1ff",
+                "name": "Dana",
+                "category": "professional"
+            },
+            {
+                "id": "avatar_6",
+                "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Evan&backgroundColor=b5ead7",
+                "name": "Evan", 
+                "category": "artistic"
+            },
+            {
+                "id": "avatar_7",
+                "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Fiona&backgroundColor=ffdfba",
+                "name": "Fiona",
+                "category": "vibrant"
+            },
+            {
+                "id": "avatar_8",
+                "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=George&backgroundColor=c7cedb",
+                "name": "George",
+                "category": "modern"
+            }
+        ]
+        
+        return {
+            "avatars": avatars,
+            "total_count": len(avatars)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting avatar gallery: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/api/aracoin/stats")
 async def get_aracoin_stats():
     """Get global ARACOIN statistics"""
