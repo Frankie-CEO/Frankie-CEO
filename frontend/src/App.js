@@ -10,6 +10,7 @@ import {
   Play,
   Pause,
   Volume2,
+  VolumeX,
   Eye,
   Users,
   Trophy,
