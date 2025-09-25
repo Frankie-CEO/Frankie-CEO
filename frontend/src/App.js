@@ -131,29 +131,29 @@ const App = () => {
   const generateInfiniteColors = () => {
     const colorCategories = {
       warm: {
-        base: ['#FF5733', '#FF6B47', '#FF4500', '#FF7F50', '#FFB347', '#FFA500', '#FF8C69', '#FF6347'],
+        base: ['#FF0000', '#FF4500', '#FF6600', '#FF8800', '#FFAA00', '#FF2200', '#FF1100', '#FF3300'],
         variations: () => {
-          const hue = Math.random() * 60; // 0-60 degrees (reds, oranges, yellows)
-          const saturation = 70 + Math.random() * 30; // 70-100% saturation
-          const lightness = 45 + Math.random() * 30; // 45-75% lightness
+          const hue = Math.random() * 45; // 0-45 degrees (bright reds, oranges)
+          const saturation = 85 + Math.random() * 15; // 85-100% saturation (very vibrant)
+          const lightness = 50 + Math.random() * 25; // 50-75% lightness (bright and bold)
           return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
       },
       cool: {
-        base: ['#33FF57', '#00FF7F', '#40E0D0', '#00CED1', '#1E90FF', '#6495ED', '#7FFFD4', '#98FB98'],
+        base: ['#00FF00', '#00FF7F', '#00FFFF', '#0080FF', '#0040FF', '#00E0FF', '#00C0FF', '#20FF20'],
         variations: () => {
-          const hue = 120 + Math.random() * 120; // 120-240 degrees (greens, cyans, blues)
-          const saturation = 60 + Math.random() * 40; // 60-100% saturation
-          const lightness = 40 + Math.random() * 35; // 40-75% lightness
+          const hue = 120 + Math.random() * 120; // 120-240 degrees (bright greens, cyans, blues)
+          const saturation = 80 + Math.random() * 20; // 80-100% saturation (very vibrant)
+          const lightness = 45 + Math.random() * 30; // 45-75% lightness (bright and bold)
           return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
       },
       neutral: {
-        base: ['#C733FF', '#9966CC', '#8A2BE2', '#DA70D6', '#DDA0DD', '#EE82EE', '#FF69B4', '#FFB6C1'],
+        base: ['#FF00FF', '#8000FF', '#4000FF', '#FF0080', '#FF00C0', '#C000FF', '#E000FF', '#FF4080'],
         variations: () => {
-          const hue = 270 + Math.random() * 60; // 270-330 degrees (purples, magentas)
-          const saturation = 50 + Math.random() * 50; // 50-100% saturation
-          const lightness = 35 + Math.random() * 40; // 35-75% lightness
+          const hue = 270 + Math.random() * 60; // 270-330 degrees (bright purples, magentas)
+          const saturation = 75 + Math.random() * 25; // 75-100% saturation (very vibrant)
+          const lightness = 40 + Math.random() * 35; // 40-75% lightness (bright and bold)
           return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
       }
