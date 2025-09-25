@@ -87,6 +87,8 @@ class User(BaseModel):
     total_watch_time: int = 0
     color_choices: List[str] = []
     neurodiversity_class: str = "Unclassified"
+    profile_picture: str = ""
+    profile_picture_type: str = "default"  # "default", "uploaded", "avatar"
 
 class VideoWatch(BaseModel):
     user_id: str
