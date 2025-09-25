@@ -2181,6 +2181,9 @@ const App = () => {
   };
 
   const renderBottomAd = () => {
+    // Only show bottom ads when watching video or stream
+    if (!currentVideo && !currentStream) return null;
+    
     const bottomAd = ads.find(ad => ad.type === 'bottom_bar');
     if (!bottomAd) return null;
 
