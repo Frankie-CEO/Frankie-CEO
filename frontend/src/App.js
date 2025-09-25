@@ -3897,6 +3897,7 @@ const App = () => {
       {renderAuthModal()}
       {renderNotifications()}
       {renderProfilePictureModal()}
+      {renderWaitlistModal()}
     </div>
   );
 };
