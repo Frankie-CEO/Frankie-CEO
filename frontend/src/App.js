@@ -366,6 +366,13 @@ const App = () => {
     }
   }, [isCreatorLive, currentStream]);
 
+  // Load avatar gallery when profile picture modal opens
+  useEffect(() => {
+    if (showProfilePicture && avatarGallery.length === 0) {
+      loadAvatarGallery();
+    }
+  }, [showProfilePicture]);
+
   // Load ticker ads, overlay ads, and wallet on app start
   useEffect(() => {
     loadTickerAds();
