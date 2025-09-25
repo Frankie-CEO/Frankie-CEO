@@ -942,10 +942,14 @@ const App = () => {
     }
   };
 
-  const dismissWaitlist = () => {
+  const dismissWaitlist = (showMessage = true) => {
     setShowWaitlist(false);
     // Remember dismissal for this session
     localStorage.setItem('ara_waitlist_dismissed', Date.now().toString());
+    
+    if (showMessage) {
+      addNotification('👋 No problem!', 'You can always join the waitlist later from the top menu.', 'info');
+    }
   };
 
   const checkOrientation = () => {
