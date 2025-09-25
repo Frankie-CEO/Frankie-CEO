@@ -876,6 +876,38 @@ const App = () => {
     return username.slice(0, 2).toUpperCase();
   };
 
+  // Waitlist Functions
+  const submitWaitlist = async (e) => {
+    e.preventDefault();
+    
+    if (!waitlistEmail.trim()) return;
+    
+    try {
+      // Simulate waitlist submission (replace with real API)
+      console.log('Waitlist submission:', waitlistEmail);
+      
+      setWaitlistSubmitted(true);
+      addNotification('🎉 Welcome to the waitlist!', `We'll notify you at ${waitlistEmail} when we launch new features!`, 'success');
+      
+      // Save to localStorage to prevent showing again
+      localStorage.setItem('ara_waitlist_submitted', 'true');
+      
+      setTimeout(() => {
+        setShowWaitlist(false);
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Waitlist submission error:', error);
+      addNotification('❌ Submission Failed', 'Please try again later.', 'error');
+    }
+  };
+
+  const dismissWaitlist = () => {
+    setShowWaitlist(false);
+    // Remember dismissal for this session
+    localStorage.setItem('ara_waitlist_dismissed', Date.now().toString());
+  };
+
   const checkOrientation = () => {
     setIsLandscape(window.innerWidth > window.innerHeight);
   };
