@@ -91,6 +91,13 @@ const App = () => {
   const [showOverlay, setShowOverlay] = useState(true);
   const [overlayVideoMuted, setOverlayVideoMuted] = useState(true);
   
+  // ARACOIN Wallet state
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+  const [showWallet, setShowWallet] = useState(false);
+  const [aracoinStats, setAracoinStats] = useState(null);
+  const [earningNotification, setEarningNotification] = useState(null);
+  
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
