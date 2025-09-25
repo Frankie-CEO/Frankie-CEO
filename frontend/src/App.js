@@ -703,34 +703,53 @@ const App = () => {
   const handleAuth = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = authMode === 'login' ? 'login' : 'register';
+      let userData;
       
-      // Simulate authentication (replace with real API)
       if (authMode === 'signup') {
         // Simulate user creation
-        const newUser = {
+        userData = {
           username: authData.username,
           email: authData.email,
           user_id: `user_${Date.now()}`,
-          tokens: 0,
+          tokens: 10, // Welcome bonus tokens
           total_watch_time: 0,
           neurodiversity_class: 'New User'
         };
-        setUser(newUser);
+        
+        addNotification('🎉 Account Created!', `Welcome ${userData.username}! You received 10 welcome tokens!`, 'success');
+      } else {
+        // Simulate login with existing user
+        userData = {
+          username: authData.email.split('@')[0],
+          email: authData.email,
+          user_id: `user_${Math.floor(Math.random() * 10000)}`,
+          tokens: Math.floor(Math.random() * 50) + 20, // Random existing tokens
+          total_watch_time: Math.floor(Math.random() * 1000),
+          neurodiversity_class: 'Returning User'
+        };
+        
+        addNotification('👋 Welcome back!', `Good to see you again, ${userData.username}!`, 'success');
       }
       
+      setUser(userData);
       setIsAuthenticated(true);
       setShowAuth(false);
       
-      // Add welcome notification
-      addNotification('🎉 Welcome to Ara!', 'Your account is ready. Start watching to earn ARACoins!');
+      // Save to localStorage for session persistence
+      localStorage.setItem('ara_user', JSON.stringify(userData));
       
       // Load wallet after authentication
-      loadWallet();
+      setTimeout(() => {
+        loadWallet();
+        addNotification('💰 Wallet Ready', 'Your ARACOIN wallet is active. Start earning now!', 'info');
+      }, 1000);
+      
+      // Clear auth form
+      setAuthData({ username: '', email: '', password: '' });
       
     } catch (error) {
       console.error('Authentication error:', error);
-      alert('Authentication failed. Please try again.');
+      addNotification('❌ Authentication Failed', 'Please check your credentials and try again.', 'error');
     }
   };
 
