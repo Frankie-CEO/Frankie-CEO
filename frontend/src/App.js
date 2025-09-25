@@ -1350,6 +1350,9 @@ const App = () => {
     } catch (error) {
       console.error('❌ Error starting live stream:', error);
       
+      // Clear loading state on error
+      setLoading(prev => ({ ...prev, liveStream: false }));
+      
       // Clean up on error
       if (localTracks.video) {
         localTracks.video.close();
