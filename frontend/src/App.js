@@ -386,6 +386,9 @@ const App = () => {
     // Don't show if already submitted
     if (localStorage.getItem('ara_waitlist_submitted')) return;
     
+    // Don't show if user declined
+    if (localStorage.getItem('ara_waitlist_declined')) return;
+    
     // Don't show if recently dismissed (within 24 hours)
     const dismissedTime = localStorage.getItem('ara_waitlist_dismissed');
     if (dismissedTime) {
@@ -400,6 +403,20 @@ const App = () => {
     
     return () => clearTimeout(waitlistTimer);
   }, [isAuthenticated]);
+
+  // Keyboard escape functionality for waitlist modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && showWaitlist) {
+        dismissWaitlist();
+      }
+    };
+
+    if (showWaitlist) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [showWaitlist]);
 
   // Load ticker ads, overlay ads, and wallet on app start
   useEffect(() => {
