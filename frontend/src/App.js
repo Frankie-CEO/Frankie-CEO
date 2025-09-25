@@ -805,6 +805,65 @@ const App = () => {
     setUnreadCount(0);
   };
 
+  // Profile Picture Functions
+  const loadAvatarGallery = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/avatars`);
+      setAvatarGallery(response.data.avatars);
+    } catch (error) {
+      console.error('Error loading avatar gallery:', error);
+    }
+  };
+
+  const updateProfilePicture = async (pictureUrl, pictureType) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/user/${USER_ID}/profile-picture`, {
+        picture_url: pictureUrl,
+        picture_type: pictureType
+      });
+
+      if (response.data.success) {
+        // Update local user state
+        setUser(prev => ({
+          ...prev,
+          profile_picture: pictureUrl,
+          profile_picture_type: pictureType
+        }));
+
+        // Save to localStorage
+        const updatedUser = { ...user, profile_picture: pictureUrl, profile_picture_type: pictureType };
+        localStorage.setItem('ara_user', JSON.stringify(updatedUser));
+
+        addNotification('✅ Profile Updated', 'Your profile picture has been updated successfully!', 'success');
+        setShowProfilePicture(false);
+      }
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      addNotification('❌ Update Failed', 'Failed to update profile picture. Please try again.', 'error');
+    }
+  };
+
+  const getProfilePictureUrl = (userObj = null) => {
+    const targetUser = userObj || user;
+    if (!targetUser) return null;
+    
+    if (targetUser.profile_picture && targetUser.profile_picture_type !== 'default') {
+      return targetUser.profile_picture;
+    }
+    
+    // Generate default avatar based on username
+    if (targetUser.username) {
+      return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(targetUser.username)}&backgroundColor=c7cedb`;
+    }
+    
+    return null;
+  };
+
+  const getInitials = (username) => {
+    if (!username) return 'U';
+    return username.slice(0, 2).toUpperCase();
+  };
+
   const checkOrientation = () => {
     setIsLandscape(window.innerWidth > window.innerHeight);
   };
