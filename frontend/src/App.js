@@ -1578,7 +1578,7 @@ const App = () => {
             <div className={`flex items-center space-x-4 mt-2`}>
               <div className="flex items-center space-x-2">
                 <Zap className={`text-yellow-500 ${isFullScreen ? 'w-6 h-6' : 'w-4 h-4'}`} />
-                <span className={`text-yellow-500 font-semibold ${isFullScreen ? 'text-xl' : ''}`}>{user.tokens} tokens</span>
+                <span className={`text-yellow-500 font-semibold ${isFullScreen ? 'text-xl' : ''}`}>{user.tokens} ARACoins</span>
               </div>
               <div className={`text-neon-purple ${isFullScreen ? 'text-lg' : 'text-sm'}`}>
                 {user.neurodiversity_class}
