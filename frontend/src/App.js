@@ -114,6 +114,11 @@ const App = () => {
   const [avatarGallery, setAvatarGallery] = useState([]);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   
+  // Waitlist state
+  const [showWaitlist, setShowWaitlist] = useState(false);
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
+  
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
