@@ -2662,6 +2662,8 @@ const App = () => {
       {renderBottomAd()}
       {renderSideAd()}
       {renderOverlayBanner()}
+      {renderWallet()}
+      {renderEarningNotification()}
     </div>
   );
 };
