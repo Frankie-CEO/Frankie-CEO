@@ -2182,6 +2182,14 @@ if __name__ == "__main__":
     test_suite.addTest(AraStreamingPlatformTest("test_36_aracoin_daily_limit_reset"))
     test_suite.addTest(AraStreamingPlatformTest("test_37_aracoin_edge_cases_and_validation"))
     
+    # Enhanced Vibrant Color Pulse tests (PRIORITY TESTING - USER REQUEST)
+    test_suite.addTest(AraStreamingPlatformTest("test_38_enhanced_vibrant_color_pulse_warm_colors"))
+    test_suite.addTest(AraStreamingPlatformTest("test_39_enhanced_vibrant_color_pulse_cool_colors"))
+    test_suite.addTest(AraStreamingPlatformTest("test_40_enhanced_vibrant_color_pulse_neutral_colors"))
+    test_suite.addTest(AraStreamingPlatformTest("test_41_color_pulse_aracoin_earning_verification"))
+    test_suite.addTest(AraStreamingPlatformTest("test_42_vibrant_color_categorization_accuracy"))
+    test_suite.addTest(AraStreamingPlatformTest("test_43_enhanced_color_pulse_analytics_integration"))
+    
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(test_suite)
