@@ -1721,6 +1721,406 @@ class AraStreamingPlatformTest(unittest.TestCase):
         print(f"   Negative/zero values handled appropriately")
         print(f"   Invalid inputs validated correctly")
 
+    def test_38_enhanced_vibrant_color_pulse_warm_colors(self):
+        """Test Color Pulse API with enhanced vibrant warm colors - PRIORITY TESTING"""
+        print("\n🔍 Testing Enhanced Vibrant Color Pulse - Warm Colors...")
+        
+        vibrant_user_id = f"vibrant_warm_{uuid.uuid4().hex[:8]}"
+        
+        # Enhanced vibrant warm colors from frontend update
+        vibrant_warm_colors = [
+            "#FF0000",  # Pure bright red
+            "#FF4500",  # Orange red
+            "#FF6347",  # Tomato
+            "#FF7F50",  # Coral
+            "#FFA500",  # Orange
+            "#FFB347",  # Peach
+            "#FF8C69",  # Salmon
+            "#DC143C"   # Crimson
+        ]
+        
+        successful_submissions = 0
+        
+        for i, color in enumerate(vibrant_warm_colors):
+            pulse_data = {
+                "user_id": f"{vibrant_user_id}_{i}",
+                "video_id": self.video_id,
+                "color_choice": color,
+                "mood": "energetic",
+                "weather": "sunny",
+                "favorite_memory": "summer adventure",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": i % 2 == 0
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            
+            # Validate Color Pulse submission response
+            self.assertTrue(data["success"])
+            self.assertEqual(data["tokens_earned"], 2)  # Should be +2 ARACoins, not tokens
+            self.assertIn("neurodiversity_class", data)
+            
+            # Validate baseline assessment data handling
+            if pulse_data["is_baseline"]:
+                self.assertEqual(data["assessment_type"], "baseline")
+                self.assertIn("baseline_data", data)
+                self.assertEqual(data["baseline_data"]["mood"], "energetic")
+                self.assertEqual(data["baseline_data"]["weather"], "sunny")
+                self.assertEqual(data["baseline_data"]["favorite_memory"], "summer adventure")
+            else:
+                self.assertEqual(data["assessment_type"], "periodic")
+            
+            # Validate neurodiversity classification for warm colors
+            neuro_class = data["neurodiversity_class"]
+            self.assertIn("Warm", neuro_class, f"Color {color} not classified as warm: {neuro_class}")
+            
+            successful_submissions += 1
+            time.sleep(0.3)  # Brief delay between submissions
+        
+        print(f"✅ Enhanced Vibrant Warm Colors test passed")
+        print(f"   Tested {len(vibrant_warm_colors)} vibrant warm colors")
+        print(f"   Successful submissions: {successful_submissions}")
+        print(f"   All warm colors properly classified as 'Warm' neurodiversity types")
+
+    def test_39_enhanced_vibrant_color_pulse_cool_colors(self):
+        """Test Color Pulse API with enhanced vibrant cool colors - PRIORITY TESTING"""
+        print("\n🔍 Testing Enhanced Vibrant Color Pulse - Cool Colors...")
+        
+        vibrant_user_id = f"vibrant_cool_{uuid.uuid4().hex[:8]}"
+        
+        # Enhanced vibrant cool colors from frontend update
+        vibrant_cool_colors = [
+            "#00FF00",  # Pure bright green
+            "#00FFFF",  # Cyan
+            "#00FF7F",  # Spring green
+            "#40E0D0",  # Turquoise
+            "#00CED1",  # Dark turquoise
+            "#1E90FF",  # Dodger blue
+            "#7FFFD4",  # Aquamarine
+            "#98FB98"   # Pale green
+        ]
+        
+        successful_submissions = 0
+        
+        for i, color in enumerate(vibrant_cool_colors):
+            pulse_data = {
+                "user_id": f"{vibrant_user_id}_{i}",
+                "video_id": self.video_id,
+                "color_choice": color,
+                "mood": "calm",
+                "weather": "breezy",
+                "favorite_memory": "ocean view",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": i % 3 == 0
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            
+            # Validate Color Pulse submission response
+            self.assertTrue(data["success"])
+            self.assertEqual(data["tokens_earned"], 2)  # Should be +2 ARACoins
+            self.assertIn("neurodiversity_class", data)
+            
+            # Validate baseline assessment data handling
+            if pulse_data["is_baseline"]:
+                self.assertEqual(data["assessment_type"], "baseline")
+                self.assertIn("baseline_data", data)
+                self.assertEqual(data["baseline_data"]["mood"], "calm")
+                self.assertEqual(data["baseline_data"]["weather"], "breezy")
+                self.assertEqual(data["baseline_data"]["favorite_memory"], "ocean view")
+            
+            # Validate neurodiversity classification for cool colors
+            neuro_class = data["neurodiversity_class"]
+            self.assertIn("Cool", neuro_class, f"Color {color} not classified as cool: {neuro_class}")
+            
+            successful_submissions += 1
+            time.sleep(0.3)
+        
+        print(f"✅ Enhanced Vibrant Cool Colors test passed")
+        print(f"   Tested {len(vibrant_cool_colors)} vibrant cool colors")
+        print(f"   Successful submissions: {successful_submissions}")
+        print(f"   All cool colors properly classified as 'Cool' neurodiversity types")
+
+    def test_40_enhanced_vibrant_color_pulse_neutral_colors(self):
+        """Test Color Pulse API with enhanced vibrant neutral colors - PRIORITY TESTING"""
+        print("\n🔍 Testing Enhanced Vibrant Color Pulse - Neutral Colors...")
+        
+        vibrant_user_id = f"vibrant_neutral_{uuid.uuid4().hex[:8]}"
+        
+        # Enhanced vibrant neutral colors from frontend update
+        vibrant_neutral_colors = [
+            "#FF00FF",  # Neon magenta
+            "#8000FF",  # Electric purple
+            "#C733FF",  # Bright purple
+            "#9966CC",  # Medium slate blue
+            "#8A2BE2",  # Blue violet
+            "#DA70D6",  # Orchid
+            "#DDA0DD",  # Plum
+            "#EE82EE"   # Violet
+        ]
+        
+        successful_submissions = 0
+        
+        for i, color in enumerate(vibrant_neutral_colors):
+            pulse_data = {
+                "user_id": f"{vibrant_user_id}_{i}",
+                "video_id": self.video_id,
+                "color_choice": color,
+                "mood": "contemplative",
+                "weather": "overcast",
+                "favorite_memory": "reading session",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": i % 4 == 0
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            
+            # Validate Color Pulse submission response
+            self.assertTrue(data["success"])
+            self.assertEqual(data["tokens_earned"], 2)  # Should be +2 ARACoins
+            self.assertIn("neurodiversity_class", data)
+            
+            # Validate baseline assessment data handling
+            if pulse_data["is_baseline"]:
+                self.assertEqual(data["assessment_type"], "baseline")
+                self.assertIn("baseline_data", data)
+                self.assertEqual(data["baseline_data"]["mood"], "contemplative")
+                self.assertEqual(data["baseline_data"]["weather"], "overcast")
+                self.assertEqual(data["baseline_data"]["favorite_memory"], "reading session")
+            
+            # Validate neurodiversity classification for neutral colors
+            neuro_class = data["neurodiversity_class"]
+            # Neutral colors should be classified as Mystical, Balanced, or similar neutral types
+            neutral_keywords = ["Mystical", "Balanced", "Rainbow", "Eclectic", "Dynamic"]
+            has_neutral_classification = any(keyword in neuro_class for keyword in neutral_keywords)
+            self.assertTrue(has_neutral_classification, f"Color {color} not classified as neutral type: {neuro_class}")
+            
+            successful_submissions += 1
+            time.sleep(0.3)
+        
+        print(f"✅ Enhanced Vibrant Neutral Colors test passed")
+        print(f"   Tested {len(vibrant_neutral_colors)} vibrant neutral colors")
+        print(f"   Successful submissions: {successful_submissions}")
+        print(f"   All neutral colors properly classified with appropriate neurodiversity types")
+
+    def test_41_color_pulse_aracoin_earning_verification(self):
+        """Test that Color Pulse submissions earn ARACoins (not tokens) - PRIORITY TESTING"""
+        print("\n🔍 Testing Color Pulse ARACOIN earning verification...")
+        
+        aracoin_test_user = f"aracoin_color_{uuid.uuid4().hex[:8]}"
+        
+        # Submit Color Pulse with vibrant color
+        pulse_data = {
+            "user_id": aracoin_test_user,
+            "video_id": self.video_id,
+            "color_choice": "#FF0000",  # Vibrant red
+            "mood": "excited",
+            "weather": "sunny",
+            "favorite_memory": "celebration",
+            "timestamp": datetime.utcnow().isoformat(),
+            "is_baseline": True
+        }
+        
+        # Submit Color Pulse
+        response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate that response mentions tokens (legacy API response)
+        self.assertEqual(data["tokens_earned"], 2)
+        
+        # Wait for processing
+        time.sleep(1)
+        
+        # Check ARACOIN wallet to verify actual ARACOIN earning
+        wallet_response = requests.get(f"{BACKEND_URL}/api/wallet/{aracoin_test_user}")
+        self.assertEqual(wallet_response.status_code, 200)
+        wallet_data = wallet_response.json()
+        
+        # Verify ARACOIN earning through Color Pulse
+        color_pulse_response = requests.post(f"{BACKEND_URL}/api/wallet/{aracoin_test_user}/earn-color-pulse")
+        self.assertEqual(color_pulse_response.status_code, 200)
+        aracoin_data = color_pulse_response.json()
+        
+        # Validate ARACOIN earning
+        self.assertTrue(aracoin_data["success"])
+        self.assertEqual(aracoin_data["aracoins_earned"], 0.5)  # 0.5 ARACOIN per Color Pulse
+        self.assertEqual(aracoin_data["bonus_type"], "color_pulse")
+        self.assertEqual(aracoin_data["usd_value"], 0.005)  # $0.005
+        
+        # Verify wallet balance updated
+        updated_wallet_response = requests.get(f"{BACKEND_URL}/api/wallet/{aracoin_test_user}")
+        self.assertEqual(updated_wallet_response.status_code, 200)
+        updated_wallet_data = updated_wallet_response.json()
+        
+        wallet = updated_wallet_data["wallet"]
+        self.assertEqual(wallet["daily_color_pulse_earned"], 0.5)
+        self.assertEqual(wallet["color_pulse_count_today"], 1)
+        
+        print(f"✅ Color Pulse ARACOIN earning verification test passed")
+        print(f"   Color Pulse submission: +2 tokens (legacy response)")
+        print(f"   ARACOIN earning: +0.5 ARACOIN per Color Pulse check-in")
+        print(f"   USD value: $0.005 per Color Pulse")
+
+    def test_42_vibrant_color_categorization_accuracy(self):
+        """Test accuracy of vibrant color categorization system - PRIORITY TESTING"""
+        print("\n🔍 Testing vibrant color categorization accuracy...")
+        
+        categorization_user = f"categorization_{uuid.uuid4().hex[:8]}"
+        
+        # Test color categorization with known vibrant colors
+        test_color_categories = {
+            # Warm colors (should categorize as warm)
+            "#FF0000": "warm",  # Pure red
+            "#FF4500": "warm",  # Orange red
+            "#FFA500": "warm",  # Orange
+            "#FFB347": "warm",  # Peach
+            
+            # Cool colors (should categorize as cool)
+            "#00FF00": "cool",  # Pure green
+            "#00FFFF": "cool",  # Cyan
+            "#1E90FF": "cool",  # Dodger blue
+            "#40E0D0": "cool",  # Turquoise
+            
+            # Neutral colors (should categorize as neutral)
+            "#FF00FF": "neutral",  # Magenta
+            "#8000FF": "neutral",  # Electric purple
+            "#C733FF": "neutral",  # Bright purple
+            "#9966CC": "neutral"   # Medium slate blue
+        }
+        
+        categorization_results = {"warm": 0, "cool": 0, "neutral": 0}
+        total_tests = len(test_color_categories)
+        correct_categorizations = 0
+        
+        for color, expected_category in test_color_categories.items():
+            pulse_data = {
+                "user_id": f"{categorization_user}_{color.replace('#', '')}",
+                "video_id": self.video_id,
+                "color_choice": color,
+                "mood": "focused",
+                "weather": "clear",
+                "favorite_memory": "color test",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": False
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            
+            # Check neurodiversity classification
+            neuro_class = data["neurodiversity_class"].lower()
+            
+            # Determine actual category from classification
+            if "warm" in neuro_class:
+                actual_category = "warm"
+            elif "cool" in neuro_class:
+                actual_category = "cool"
+            else:
+                actual_category = "neutral"
+            
+            categorization_results[actual_category] += 1
+            
+            if actual_category == expected_category:
+                correct_categorizations += 1
+                print(f"   ✅ {color} → {expected_category} (Classified as: {data['neurodiversity_class']})")
+            else:
+                print(f"   ⚠️  {color} → Expected: {expected_category}, Got: {actual_category} (Classified as: {data['neurodiversity_class']})")
+            
+            time.sleep(0.2)
+        
+        # Calculate accuracy
+        accuracy = (correct_categorizations / total_tests) * 100
+        
+        # Validate that we have reasonable categorization accuracy (at least 75%)
+        self.assertGreaterEqual(accuracy, 75.0, f"Color categorization accuracy too low: {accuracy:.1f}%")
+        
+        print(f"✅ Vibrant color categorization accuracy test passed")
+        print(f"   Total colors tested: {total_tests}")
+        print(f"   Correct categorizations: {correct_categorizations}")
+        print(f"   Accuracy: {accuracy:.1f}%")
+        print(f"   Category distribution: {categorization_results}")
+
+    def test_43_enhanced_color_pulse_analytics_integration(self):
+        """Test enhanced vibrant colors integration with Color Pulse analytics - PRIORITY TESTING"""
+        print("\n🔍 Testing enhanced vibrant colors with Color Pulse analytics...")
+        
+        analytics_user = f"analytics_vibrant_{uuid.uuid4().hex[:8]}"
+        
+        # Submit diverse vibrant colors for analytics testing
+        vibrant_test_colors = [
+            {"color": "#FF0000", "category": "warm", "mood": "energetic"},
+            {"color": "#FF4500", "category": "warm", "mood": "excited"},
+            {"color": "#00FF00", "category": "cool", "mood": "calm"},
+            {"color": "#00FFFF", "category": "cool", "mood": "peaceful"},
+            {"color": "#FF00FF", "category": "neutral", "mood": "contemplative"},
+            {"color": "#8000FF", "category": "neutral", "mood": "curious"}
+        ]
+        
+        # Submit all test colors
+        for i, color_data in enumerate(vibrant_test_colors):
+            pulse_data = {
+                "user_id": f"{analytics_user}_{i}",
+                "video_id": self.video_id,
+                "color_choice": color_data["color"],
+                "mood": color_data["mood"],
+                "weather": "perfect",
+                "favorite_memory": "vibrant moment",
+                "timestamp": datetime.utcnow().isoformat(),
+                "is_baseline": i % 2 == 0
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/color-pulse", json=pulse_data)
+            self.assertEqual(response.status_code, 200)
+        
+        # Wait for data processing
+        time.sleep(3)
+        
+        # Test Creator Color Pulse Analytics with vibrant colors
+        analytics_response = requests.get(f"{BACKEND_URL}/api/creator/{analytics_user}/color-pulse-analytics")
+        self.assertEqual(analytics_response.status_code, 200)
+        analytics_data = analytics_response.json()
+        
+        # Validate color trend analysis with vibrant colors
+        color_trends = analytics_data["real_time_sentiment"]["color_trends"]
+        
+        # Should detect all three categories
+        self.assertGreater(color_trends["warm"], 0, "Vibrant warm colors not detected in analytics")
+        self.assertGreater(color_trends["cool"], 0, "Vibrant cool colors not detected in analytics")
+        self.assertGreater(color_trends["neutral"], 0, "Vibrant neutral colors not detected in analytics")
+        
+        # Validate total interactions
+        total_interactions = analytics_data["real_time_sentiment"]["total_interactions"]
+        self.assertGreaterEqual(total_interactions, len(vibrant_test_colors))
+        
+        # Validate mood distribution includes our test moods
+        mood_distribution = analytics_data["audience_insights"]["mood_distribution"]
+        mood_names = [item["_id"] for item in mood_distribution if "_id" in item]
+        
+        test_moods = ["energetic", "excited", "calm", "peaceful", "contemplative", "curious"]
+        found_moods = [mood for mood in test_moods if mood in mood_names]
+        self.assertGreater(len(found_moods), 0, "Test moods not found in analytics")
+        
+        # Validate recent color choices include vibrant colors
+        recent_choices = analytics_data["engagement_patterns"]["recent_color_choices"]
+        if len(recent_choices) > 0:
+            recent_colors = [choice.get("color") for choice in recent_choices]
+            vibrant_colors_found = [color["color"] for color in vibrant_test_colors if color["color"] in recent_colors]
+            self.assertGreater(len(vibrant_colors_found), 0, "Vibrant colors not found in recent choices")
+        
+        print(f"✅ Enhanced vibrant colors analytics integration test passed")
+        print(f"   Color Trends: Warm={color_trends['warm']}, Cool={color_trends['cool']}, Neutral={color_trends['neutral']}")
+        print(f"   Total Interactions: {total_interactions}")
+        print(f"   Found Moods: {found_moods}")
+        print(f"   Analytics successfully processed vibrant color data")
+
 if __name__ == "__main__":
     # Run the tests in order
     test_suite = unittest.TestSuite()
