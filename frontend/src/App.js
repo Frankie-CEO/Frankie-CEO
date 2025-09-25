@@ -2045,6 +2045,200 @@ const App = () => {
     );
   };
 
+  const renderEarningNotification = () => {
+    if (!earningNotification) return null;
+
+    return (
+      <div className="fixed top-4 right-4 bg-gradient-to-r from-green-600 to-green-700 text-white p-4 rounded-lg shadow-2xl border border-green-500/50 backdrop-blur-sm z-60 animate-fadeIn">
+        <div className="flex items-center space-x-3">
+          <div className="text-2xl">
+            {earningNotification.type === 'watch' ? '⏱️' : 
+             earningNotification.type === 'color_pulse' ? '🎨' : '👀'}
+          </div>
+          <div>
+            <div className="font-bold text-lg">
+              +{earningNotification.aracoins} ARACOIN
+            </div>
+            <div className="text-sm text-green-200">
+              ${earningNotification.usd?.toFixed(4)} USD
+            </div>
+            <div className="text-xs text-green-300 mt-1">
+              {earningNotification.message}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderWallet = () => {
+    if (!showWallet || !wallet) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-70 p-4">
+        <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-neon-purple/50 shadow-2xl">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="text-3xl">💰</div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">ARACOIN Wallet</h2>
+                <p className="text-gray-400 text-sm">Your digital currency balance</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowWallet(false)}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          {/* Balance Display */}
+          <div className="bg-gradient-to-r from-neon-orange/20 to-neon-purple/20 rounded-lg p-6 mb-6 border border-neon-purple/30">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-neon-orange mb-2">
+                {wallet.wallet?.balance?.toFixed(2) || '0.00'} ARACOIN
+              </div>
+              <div className="text-xl text-gray-300 mb-4">
+                ≈ ${wallet.usd_balance?.toFixed(4) || '0.0000'} USD
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="bg-black/30 rounded p-3">
+                  <div className="text-green-400 font-semibold">Total Earned</div>
+                  <div className="text-white">{wallet.wallet?.total_earned?.toFixed(2) || '0.00'}</div>
+                </div>
+                <div className="bg-black/30 rounded p-3">
+                  <div className="text-red-400 font-semibold">Total Spent</div>
+                  <div className="text-white">{wallet.wallet?.total_spent?.toFixed(2) || '0.00'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Daily Limits */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+              <h3 className="text-white font-semibold mb-3 flex items-center">
+                <span className="text-lg mr-2">⏱️</span>
+                Watch Time Rewards
+              </h3>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Today's Progress:</span>
+                  <span className="text-neon-green">
+                    {wallet.wallet?.daily_earned_today?.toFixed(1) || '0.0'} / {wallet.daily_limits?.max_daily_aracoins || 50}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-neon-green h-2 rounded-full transition-all"
+                    style={{ 
+                      width: `${((wallet.wallet?.daily_earned_today || 0) / (wallet.daily_limits?.max_daily_aracoins || 50)) * 100}%` 
+                    }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {wallet.daily_limits?.watch_minutes_per_aracoin || 10} minutes = 1 ARACOIN
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+              <h3 className="text-white font-semibold mb-3 flex items-center">
+                <span className="text-lg mr-2">🎨</span>
+                Color Pulse Bonus
+              </h3>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Today's Bonus:</span>
+                  <span className="text-neon-purple">
+                    {wallet.wallet?.daily_color_pulse_earned?.toFixed(1) || '0.0'} / {wallet.daily_limits?.max_color_pulse_aracoins || 5}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-neon-purple h-2 rounded-full transition-all"
+                    style={{ 
+                      width: `${((wallet.wallet?.daily_color_pulse_earned || 0) / (wallet.daily_limits?.max_color_pulse_aracoins || 5)) * 100}%` 
+                    }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  +{wallet.daily_limits?.color_pulse_bonus || 0.5} ARACOIN per check-in
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex space-x-4 mb-6">
+            <button
+              onClick={loadTransactions}
+              className="flex-1 bg-neon-purple hover:bg-neon-purple/80 text-white py-3 rounded-lg font-semibold transition-colors"
+            >
+              📊 View Transactions
+            </button>
+            <button
+              onClick={() => {
+                if (wallet.wallet?.balance >= 100) {
+                  alert('Withdrawal feature coming soon! Minimum $1.00 (100 ARACOINS)');
+                } else {
+                  alert('Minimum withdrawal: 100 ARACOINS ($1.00)');
+                }
+              }}
+              className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
+                wallet.wallet?.balance >= 100 
+                  ? 'bg-green-600 hover:bg-green-700 text-white' 
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={wallet.wallet?.balance < 100}
+            >
+              💸 Withdraw USD
+            </button>
+          </div>
+
+          {/* Recent Transactions */}
+          {transactions.length > 0 && (
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+              <h3 className="text-white font-semibold mb-4">Recent Transactions</h3>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {transactions.slice(0, 5).map((tx) => (
+                  <div key={tx.transaction_id} className="flex items-center justify-between py-2 px-3 bg-gray-700 rounded">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-lg">
+                        {tx.type === 'earn_watch' ? '⏱️' : 
+                         tx.type === 'earn_color_pulse' ? '🎨' : 
+                         tx.type === 'earn_view' ? '👀' : '💰'}
+                      </div>
+                      <div>
+                        <div className="text-white text-sm font-medium">
+                          {tx.description}
+                        </div>
+                        <div className="text-gray-400 text-xs">
+                          {new Date(tx.timestamp).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`font-semibold ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      {tx.amount > 0 ? '+' : ''}{tx.amount.toFixed(2)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Conversion Info */}
+          <div className="mt-6 text-center text-sm text-gray-400">
+            <p>1 ARACOIN = ${wallet.conversion_rate?.toFixed(4) || '0.0100'} USD</p>
+            <p>Daily limits reset at midnight UTC</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'home':
