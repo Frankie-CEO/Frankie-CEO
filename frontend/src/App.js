@@ -3631,10 +3631,20 @@ const App = () => {
                   </p>
                   <button
                     onClick={startLiveStream}
-                    className="bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 flex items-center space-x-2 mx-auto"
+                    disabled={loading.liveStream}
+                    className={`bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105 flex items-center space-x-2 mx-auto ${loading.liveStream ? 'opacity-75 cursor-not-allowed' : ''}`}
                   >
-                    <Camera size={24} />
-                    <span>Go Live</span>
+                    {loading.liveStream ? (
+                      <>
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                        <span>Starting Stream...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Camera size={24} />
+                        <span>Go Live</span>
+                      </>
+                    )}
                   </button>
                   <div className="text-sm text-gray-400">
                     <p>✓ HD 720p streaming</p>
