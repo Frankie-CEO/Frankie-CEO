@@ -1748,8 +1748,18 @@ const App = () => {
               key={message.message_id || index}
               className="flex items-start space-x-2 text-sm animate-fadeIn"
             >
-              <div className="w-6 h-6 bg-gradient-to-r from-neon-green to-neon-purple rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                {message.username?.[0]?.toUpperCase() || 'A'}
+              <div className="w-6 h-6 rounded-full overflow-hidden border border-neon-green/30 flex-shrink-0">
+                {message.user_id === USER_ID && getProfilePictureUrl() ? (
+                  <img 
+                    src={getProfilePictureUrl()} 
+                    alt={message.username}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-neon-green to-neon-purple flex items-center justify-center text-white text-xs font-bold">
+                    {message.username?.[0]?.toUpperCase() || 'A'}
+                  </div>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <span className="font-semibold text-neon-green">
