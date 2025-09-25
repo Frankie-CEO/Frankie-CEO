@@ -3706,6 +3706,7 @@ const App = () => {
       {renderEarningNotification()}
       {renderAuthModal()}
       {renderNotifications()}
+      {renderProfilePictureModal()}
     </div>
   );
 };
