@@ -2554,6 +2554,152 @@ const App = () => {
     );
   };
 
+  const renderWaitlistModal = () => {
+    if (!showWaitlist) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-90 p-4 animate-fadeIn">
+        <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-2xl p-8 max-w-lg w-full border-2 border-neon-purple/50 shadow-2xl relative overflow-hidden animate-slideUp">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/30 via-neon-orange/30 to-neon-green/30"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-neon-orange/10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-neon-purple/10 rounded-full blur-3xl"></div>
+          </div>
+
+          {/* Close Button */}
+          <button
+            onClick={dismissWaitlist}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10 p-1"
+            title="Close"
+          >
+            <X size={20} />
+          </button>
+
+          <div className="relative z-10">
+            {!waitlistSubmitted ? (
+              <>
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <div className="flex items-center justify-center mb-4">
+                    <img 
+                      src="https://customer-assets.emergentagent.com/job_neonstream-2/artifacts/n574f50k_ARA%20logo.PNG"
+                      alt="ARA Logo"
+                      className="w-16 h-16 rounded-full border-2 border-neon-orange/50 shadow-lg"
+                    />
+                  </div>
+                  <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-neon-orange via-neon-purple to-neon-green bg-clip-text text-transparent">
+                    🚀 Join the Future
+                  </h2>
+                  <p className="text-lg text-gray-300 mb-2">
+                    Be the first to experience <span className="text-neon-purple font-semibold">exclusive features</span>
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Get early access to premium tools and enhanced earning opportunities
+                  </p>
+                </div>
+
+                {/* Feature Highlights */}
+                <div className="grid grid-cols-1 gap-3 mb-8">
+                  <div className="flex items-center space-x-3 bg-gradient-to-r from-neon-orange/10 to-transparent p-3 rounded-lg border border-neon-orange/20">
+                    <div className="text-2xl">💰</div>
+                    <div>
+                      <div className="text-white font-semibold text-sm">Enhanced Earning Rates</div>
+                      <div className="text-gray-400 text-xs">Unlock higher ARACOIN rewards</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3 bg-gradient-to-r from-neon-purple/10 to-transparent p-3 rounded-lg border border-neon-purple/20">
+                    <div className="text-2xl">🎨</div>
+                    <div>
+                      <div className="text-white font-semibold text-sm">Premium Color Pulse Features</div>
+                      <div className="text-gray-400 text-xs">Advanced emotion analytics & bonuses</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3 bg-gradient-to-r from-neon-green/10 to-transparent p-3 rounded-lg border border-neon-green/20">
+                    <div className="text-2xl">🎮</div>
+                    <div>
+                      <div className="text-white font-semibold text-sm">Exclusive Creator Tools</div>
+                      <div className="text-gray-400 text-xs">Professional streaming features</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Waitlist Form */}
+                <form onSubmit={submitWaitlist} className="space-y-4">
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      value={waitlistEmail}
+                      onChange={(e) => setWaitlistEmail(e.target.value)}
+                      placeholder="Enter your email address"
+                      className="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-700 rounded-xl text-white placeholder-gray-400 focus:border-neon-purple focus:outline-none transition-all backdrop-blur-sm"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neon-purple">
+                      📧
+                    </div>
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-neon-orange to-neon-purple text-white py-3 rounded-xl font-bold text-lg hover:from-neon-orange/80 hover:to-neon-purple/80 transition-all transform hover:scale-105 shadow-2xl"
+                  >
+                    🎯 Join Waitlist
+                  </button>
+                </form>
+
+                {/* Trust Indicators */}
+                <div className="mt-6 text-center">
+                  <div className="flex items-center justify-center space-x-6 text-xs text-gray-500">
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span>No spam</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                      <span>Early access</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                      <span>Exclusive perks</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Skip Option */}
+                <div className="text-center mt-4">
+                  <button
+                    onClick={dismissWaitlist}
+                    className="text-gray-400 hover:text-gray-300 text-sm transition-colors underline"
+                  >
+                    Maybe later
+                  </button>
+                </div>
+              </>
+            ) : (
+              /* Success State */
+              <div className="text-center py-4">
+                <div className="text-6xl mb-4 animate-bounce">🎉</div>
+                <h3 className="text-2xl font-bold text-white mb-3">You're on the list!</h3>
+                <p className="text-gray-300 mb-6">
+                  We'll notify you at <span className="text-neon-green font-semibold">{waitlistEmail}</span> when exciting new features are ready.
+                </p>
+                <div className="bg-gradient-to-r from-neon-green/20 to-neon-purple/20 rounded-lg p-4 border border-neon-green/30">
+                  <p className="text-sm text-gray-300">
+                    🚀 Keep earning ARACoins while you wait!<br/>
+                    💰 Waitlist members get exclusive bonuses
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderNotifications = () => {
     if (!showNotifications) return null;
 
