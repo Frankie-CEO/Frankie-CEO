@@ -757,7 +757,15 @@ const App = () => {
     setIsAuthenticated(false);
     setUser(null);
     setWallet(null);
-    addNotification('👋 Logged out', 'Thanks for using Ara! Come back soon.');
+    setTransactions([]);
+    
+    // Clear localStorage
+    localStorage.removeItem('ara_user');
+    
+    addNotification('👋 Logged out', 'Thanks for using Ara! Come back soon.', 'info');
+    
+    // Reset to home tab
+    setActiveTab('home');
   };
 
   // Notification Functions
