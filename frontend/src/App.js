@@ -540,6 +540,17 @@ const App = () => {
     }
   };
 
+  // Load overlay ads
+  const loadOverlayAds = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/ads`);
+      const overlayAdsOnly = response.data.ads.filter(ad => ad.type === 'overlay');
+      setOverlayAds(overlayAdsOnly);
+    } catch (error) {
+      console.error('Error loading overlay ads:', error);
+    }
+  };
+
   const checkOrientation = () => {
     setIsLandscape(window.innerWidth > window.innerHeight);
   };
