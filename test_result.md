@@ -352,6 +352,21 @@ backend:
           comment: "✅ PASSED: ARACOIN global statistics working excellently. GET /api/aracoin/stats provides comprehensive platform metrics. Total circulation calculation accurate (85.0 ARACOINS during testing). USD value conversion correct ($0.85 total value). Active wallets count working (7 active wallets). Daily transaction count tracking operational (187 transactions). Earning rates properly documented: 1 ARACOIN per 10 minutes watch time, 0.5 ARACOIN per Color Pulse check-in, 1 ARACOIN per creator view. Platform economics dashboard ready."
 
 frontend:
+  - task: "Banner ad display optimization and ARACOIN terminology update"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Updated banner ad display logic and token terminology to ARACOIN"
+        - working: true
+          agent: "main"
+          comment: "✅ COMPLETED: Banner ad (renderOverlayBanner) now correctly only displays during video/stream watching (condition: currentVideo || currentStream). Updated all user-facing token terminology to use 'ARACOIN' instead of 'tokens' - changed 'Legacy Tokens' to 'Legacy ARACoins', 'welcome tokens' to 'welcome ARACoins', '+2 tokens' to '+2 ARACoins', 'Tokens Earned' to 'ARACoins Earned'. Screenshots confirm no banner ad on homepage and proper ARACOIN terminology display."
+
   - task: "Quickies navigation tab integration"
     implemented: true
     working: true
