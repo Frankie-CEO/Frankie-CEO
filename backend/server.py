@@ -9,6 +9,7 @@ import json
 import uuid
 import asyncio
 from datetime import datetime, timedelta
+from decimal import Decimal
 from motor.motor_asyncio import AsyncIOMotorClient
 from agora_token_builder import RtcTokenBuilder
 from b2sdk.v1 import B2Api, InMemoryAccountInfo
