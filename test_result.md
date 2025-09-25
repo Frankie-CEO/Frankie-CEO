@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the newly implemented ARACOIN payment infrastructure comprehensively. Focus on all the ARACOIN wallet and transaction endpoints including wallet management, earning mechanisms, transaction history, withdrawal system, and global statistics."
+user_problem_statement: "Add Quickies tab to navigation, then merge it into Explore tab and remove TikTok reference from description."
 
 backend:
   - task: "Video streaming API endpoints"
