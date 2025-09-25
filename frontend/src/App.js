@@ -27,7 +27,8 @@ import {
   Reply,
   Send,
   Heart,
-  Smile
+  Smile,
+  Sparkles
 } from 'lucide-react';
 import './App.css';
 
