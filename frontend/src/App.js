@@ -2697,13 +2697,22 @@ const App = () => {
                   </div>
                 </div>
 
-                {/* Skip Option */}
-                <div className="text-center mt-4">
+                {/* Enhanced Skip Options */}
+                <div className="flex items-center justify-center space-x-6 mt-6">
                   <button
                     onClick={dismissWaitlist}
-                    className="text-gray-400 hover:text-gray-300 text-sm transition-colors underline"
+                    className="text-gray-400 hover:text-gray-300 text-sm transition-colors px-4 py-2 rounded-lg hover:bg-gray-800/50 border border-transparent hover:border-gray-600"
                   >
-                    Maybe later
+                    💭 Maybe later
+                  </button>
+                  <button
+                    onClick={() => {
+                      dismissWaitlist();
+                      localStorage.setItem('ara_waitlist_declined', 'true');
+                    }}
+                    className="text-gray-500 hover:text-gray-400 text-xs transition-colors px-3 py-1 rounded hover:bg-gray-800/30"
+                  >
+                    No thanks
                   </button>
                 </div>
               </>
