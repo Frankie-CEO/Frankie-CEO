@@ -1771,6 +1771,17 @@ if __name__ == "__main__":
     test_suite.addTest(AraStreamingPlatformTest("test_27_real_time_data_freshness"))
     test_suite.addTest(AraStreamingPlatformTest("test_28_performance_with_large_datasets"))
     
+    # ARACOIN Payment Infrastructure tests (HIGH PRIORITY - NEW IMPLEMENTATION)
+    test_suite.addTest(AraStreamingPlatformTest("test_29_aracoin_wallet_creation_and_retrieval"))
+    test_suite.addTest(AraStreamingPlatformTest("test_30_aracoin_watch_time_earning"))
+    test_suite.addTest(AraStreamingPlatformTest("test_31_aracoin_color_pulse_earning"))
+    test_suite.addTest(AraStreamingPlatformTest("test_32_aracoin_creator_view_earning"))
+    test_suite.addTest(AraStreamingPlatformTest("test_33_aracoin_transaction_history"))
+    test_suite.addTest(AraStreamingPlatformTest("test_34_aracoin_withdrawal_system"))
+    test_suite.addTest(AraStreamingPlatformTest("test_35_aracoin_global_statistics"))
+    test_suite.addTest(AraStreamingPlatformTest("test_36_aracoin_daily_limit_reset"))
+    test_suite.addTest(AraStreamingPlatformTest("test_37_aracoin_edge_cases_and_validation"))
+    
     # Run the tests
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(test_suite)
