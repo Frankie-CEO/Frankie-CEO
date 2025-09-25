@@ -770,6 +770,18 @@ const App = () => {
           completed: watchTimeRef.current >= currentVideo.duration * 0.8
         });
         
+        // Award ARACoins for watch time (every 10 minutes)
+        const watchMinutes = Math.floor(watchTimeRef.current / 60);
+        if (watchMinutes > 0 && watchMinutes % 10 === 0) {
+          await earnWatchTimeAracoins(10, currentVideo.video_id);
+        }
+        
+        // Award creator 1 ARACOIN per view (first-time view tracking)
+        if (watchTimeRef.current === 30) { // Award after 30 seconds of watch time
+          const creatorId = currentVideo.creator_id || 'demo_creator';
+          await awardCreatorView(creatorId, currentVideo.video_id);
+        }
+        
         // Refresh user data
         const userResponse = await axios.get(`${BACKEND_URL}/api/user/${USER_ID}/profile`);
         setUser(userResponse.data.user);
