@@ -109,6 +109,11 @@ const App = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   
+  // Profile Picture state
+  const [showProfilePicture, setShowProfilePicture] = useState(false);
+  const [avatarGallery, setAvatarGallery] = useState([]);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
