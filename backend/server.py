@@ -118,6 +118,41 @@ class LiveChatMessage(BaseModel):
     message_type: str = "chat"  # chat, emoji, system
     timestamp: Optional[str] = None
 
+class AracoinWallet(BaseModel):
+    user_id: str
+    balance: float
+    total_earned: float
+    total_spent: float
+    daily_earned_today: float
+    last_earning_date: str
+    daily_color_pulse_earned: float
+    color_pulse_count_today: int
+    created_at: str
+    updated_at: str
+
+class AracoinTransaction(BaseModel):
+    transaction_id: str
+    user_id: str
+    type: str  # "earn_watch", "earn_color_pulse", "earn_view", "spend", "withdrawal"
+    amount: float
+    description: str
+    metadata: dict = {}
+    timestamp: str
+    status: str = "completed"  # "completed", "pending", "failed"
+
+class PaymentRequest(BaseModel):
+    user_id: str
+    amount: float
+    currency: str = "USD"
+    payment_method: str  # "paypal", "stripe", "bank_transfer"
+    
+class WithdrawalRequest(BaseModel):
+    user_id: str
+    aracoin_amount: float
+    usd_amount: float
+    payment_method: str
+    payment_details: dict
+
 class CommentInteraction(BaseModel):
     user_id: str
     comment_id: str
