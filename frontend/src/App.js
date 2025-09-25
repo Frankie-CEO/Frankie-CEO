@@ -350,10 +350,11 @@ const App = () => {
     }
   }, [isCreatorLive, currentStream]);
 
-  // Load ticker ads and overlay ads on app start
+  // Load ticker ads, overlay ads, and wallet on app start
   useEffect(() => {
     loadTickerAds();
     loadOverlayAds();
+    loadWallet();
   }, []);
 
   // Rotate ticker ads automatically
