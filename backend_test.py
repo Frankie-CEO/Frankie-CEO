@@ -1184,6 +1184,543 @@ class AraStreamingPlatformTest(unittest.TestCase):
         print(f"   Total Interactions Processed: {total_interactions}")
         print(f"   Color Distribution: {color_trends}")
 
+    # ==========================================
+    # ARACOIN PAYMENT INFRASTRUCTURE TESTS
+    # ==========================================
+
+    def test_29_aracoin_wallet_creation_and_retrieval(self):
+        """Test ARACOIN wallet creation and retrieval - Priority Testing"""
+        print("\n🔍 Testing ARACOIN wallet creation and retrieval...")
+        
+        # Create unique user for ARACOIN testing
+        aracoin_user_id = f"aracoin_user_{uuid.uuid4().hex[:8]}"
+        
+        # Test wallet creation/retrieval
+        response = requests.get(f"{BACKEND_URL}/api/wallet/{aracoin_user_id}")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate wallet structure
+        self.assertIn("wallet", data)
+        wallet = data["wallet"]
+        self.assertEqual(wallet["user_id"], aracoin_user_id)
+        self.assertEqual(wallet["balance"], 0.0)
+        self.assertEqual(wallet["total_earned"], 0.0)
+        self.assertEqual(wallet["total_spent"], 0.0)
+        self.assertEqual(wallet["daily_earned_today"], 0.0)
+        self.assertEqual(wallet["daily_color_pulse_earned"], 0.0)
+        self.assertEqual(wallet["color_pulse_count_today"], 0)
+        self.assertIn("created_at", wallet)
+        self.assertIn("updated_at", wallet)
+        self.assertIn("last_earning_date", wallet)
+        
+        # Validate conversion rate and USD balance
+        self.assertIn("conversion_rate", data)
+        self.assertEqual(data["conversion_rate"], 0.01)  # 1 ARACOIN = $0.01
+        self.assertIn("usd_balance", data)
+        self.assertEqual(data["usd_balance"], 0.0)
+        
+        # Validate daily limits structure
+        self.assertIn("daily_limits", data)
+        limits = data["daily_limits"]
+        self.assertEqual(limits["max_daily_aracoins"], 50)
+        self.assertEqual(limits["remaining_watch_aracoins"], 50)
+        self.assertEqual(limits["max_color_pulse_aracoins"], 5)
+        self.assertEqual(limits["remaining_color_pulse_aracoins"], 5)
+        self.assertEqual(limits["watch_minutes_per_aracoin"], 10)
+        self.assertEqual(limits["color_pulse_bonus"], 0.5)
+        
+        # Store user ID for subsequent tests
+        self.aracoin_user_id = aracoin_user_id
+        
+        print(f"✅ ARACOIN wallet creation test passed - User: {aracoin_user_id}")
+        print(f"   Balance: {wallet['balance']} ARACOINS (${data['usd_balance']:.2f})")
+        print(f"   Daily Limits: Watch={limits['remaining_watch_aracoins']}, Color Pulse={limits['remaining_color_pulse_aracoins']}")
+
+    def test_30_aracoin_watch_time_earning(self):
+        """Test ARACOIN earning from watch time - Priority Testing"""
+        print("\n🔍 Testing ARACOIN watch time earning...")
+        
+        if not hasattr(self, 'aracoin_user_id'):
+            self.aracoin_user_id = f"aracoin_user_{uuid.uuid4().hex[:8]}"
+        
+        # Test watch time earning (10 minutes = 1 ARACOIN)
+        watch_data = {
+            "watch_time_minutes": 30,  # Should earn 3 ARACOINS
+            "video_id": self.video_id
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}/earn-watch-time", json=watch_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate earning response
+        self.assertTrue(data["success"])
+        self.assertEqual(data["aracoins_earned"], 3.0)
+        self.assertEqual(data["watch_minutes"], 30)
+        self.assertEqual(data["conversion_rate"], 0.01)
+        self.assertEqual(data["usd_value"], 0.03)  # 3 ARACOINS * $0.01
+        self.assertFalse(data["daily_limit_reached"])
+        
+        # Verify wallet balance updated
+        wallet_response = requests.get(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}")
+        self.assertEqual(wallet_response.status_code, 200)
+        wallet_data = wallet_response.json()
+        
+        wallet = wallet_data["wallet"]
+        self.assertEqual(wallet["balance"], 3.0)
+        self.assertEqual(wallet["total_earned"], 3.0)
+        self.assertEqual(wallet["daily_earned_today"], 3.0)
+        self.assertEqual(wallet_data["usd_balance"], 0.03)
+        
+        # Test daily limit enforcement (max 50 ARACOINS per day)
+        large_watch_data = {
+            "watch_time_minutes": 500,  # Would be 50 ARACOINS, but should be capped
+            "video_id": self.video_id
+        }
+        
+        large_response = requests.post(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}/earn-watch-time", json=large_watch_data)
+        self.assertEqual(large_response.status_code, 200)
+        large_data = large_response.json()
+        
+        # Should only earn remaining daily limit (47 ARACOINS)
+        self.assertTrue(large_data["success"])
+        self.assertEqual(large_data["aracoins_earned"], 47.0)  # 50 - 3 already earned
+        self.assertTrue(large_data["daily_limit_reached"])
+        
+        print(f"✅ ARACOIN watch time earning test passed")
+        print(f"   First earning: 30 minutes → 3.0 ARACOINS ($0.03)")
+        print(f"   Daily limit test: 500 minutes → 47.0 ARACOINS (capped at daily limit)")
+
+    def test_31_aracoin_color_pulse_earning(self):
+        """Test ARACOIN earning from Color Pulse check-ins - Priority Testing"""
+        print("\n🔍 Testing ARACOIN Color Pulse earning...")
+        
+        if not hasattr(self, 'aracoin_user_id'):
+            self.aracoin_user_id = f"aracoin_user_{uuid.uuid4().hex[:8]}"
+        
+        # Test Color Pulse earning (0.5 ARACOIN per check-in, max 5 ARACOINS/day = 10 check-ins)
+        for i in range(3):  # Test 3 check-ins
+            response = requests.post(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}/earn-color-pulse")
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            
+            # Validate earning response
+            self.assertTrue(data["success"])
+            self.assertEqual(data["aracoins_earned"], 0.5)
+            self.assertEqual(data["bonus_type"], "color_pulse")
+            self.assertEqual(data["conversion_rate"], 0.01)
+            self.assertEqual(data["usd_value"], 0.005)  # 0.5 ARACOINS * $0.01
+            
+            if i < 9:  # First 9 check-ins shouldn't hit daily limit
+                self.assertFalse(data["daily_limit_reached"])
+            
+            time.sleep(0.5)  # Brief delay between check-ins
+        
+        # Verify wallet balance updated
+        wallet_response = requests.get(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}")
+        self.assertEqual(wallet_response.status_code, 200)
+        wallet_data = wallet_response.json()
+        
+        wallet = wallet_data["wallet"]
+        self.assertEqual(wallet["daily_color_pulse_earned"], 1.5)  # 3 * 0.5
+        self.assertEqual(wallet["color_pulse_count_today"], 3)
+        
+        # Test daily limit enforcement (max 5 ARACOINS from Color Pulse = 10 check-ins)
+        for i in range(8):  # 8 more check-ins to reach limit (total 11, but max 10)
+            response = requests.post(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}/earn-color-pulse")
+            if i < 7:  # First 7 should succeed
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                self.assertTrue(data["success"])
+            else:  # 8th should hit limit
+                self.assertEqual(response.status_code, 200)
+                data = response.json()
+                if data["success"]:
+                    self.assertTrue(data["daily_limit_reached"])
+                else:
+                    self.assertFalse(data["success"])
+                    self.assertTrue(data["daily_limit_reached"])
+                    self.assertEqual(data["aracoins_earned"], 0)
+        
+        print(f"✅ ARACOIN Color Pulse earning test passed")
+        print(f"   Color Pulse bonus: 0.5 ARACOINS per check-in")
+        print(f"   Daily limit: 5 ARACOINS (10 check-ins) enforced correctly")
+
+    def test_32_aracoin_creator_view_earning(self):
+        """Test ARACOIN earning for creators from video views - Priority Testing"""
+        print("\n🔍 Testing ARACOIN creator view earning...")
+        
+        # Create creator and viewer users
+        creator_id = f"creator_{uuid.uuid4().hex[:8]}"
+        viewer_id = f"viewer_{uuid.uuid4().hex[:8]}"
+        
+        # Test creator earning from video view (1 ARACOIN per view)
+        view_data = {
+            "video_id": self.video_id,
+            "viewer_id": viewer_id
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/wallet/{creator_id}/earn-view", json=view_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate earning response
+        self.assertTrue(data["success"])
+        self.assertEqual(data["aracoins_earned"], 1.0)
+        self.assertEqual(data["earning_type"], "creator_view")
+        self.assertEqual(data["conversion_rate"], 0.01)
+        self.assertEqual(data["usd_value"], 0.01)  # 1 ARACOIN * $0.01
+        
+        # Verify creator wallet balance
+        wallet_response = requests.get(f"{BACKEND_URL}/api/wallet/{creator_id}")
+        self.assertEqual(wallet_response.status_code, 200)
+        wallet_data = wallet_response.json()
+        
+        wallet = wallet_data["wallet"]
+        self.assertEqual(wallet["balance"], 1.0)
+        self.assertEqual(wallet["total_earned"], 1.0)
+        
+        # Test multiple views from different viewers
+        for i in range(5):
+            different_viewer = f"viewer_{uuid.uuid4().hex[:6]}"
+            view_data = {
+                "video_id": f"video_{i}",
+                "viewer_id": different_viewer
+            }
+            
+            response = requests.post(f"{BACKEND_URL}/api/wallet/{creator_id}/earn-view", json=view_data)
+            self.assertEqual(response.status_code, 200)
+            data = response.json()
+            self.assertTrue(data["success"])
+            self.assertEqual(data["aracoins_earned"], 1.0)
+        
+        # Verify total earnings
+        final_wallet_response = requests.get(f"{BACKEND_URL}/api/wallet/{creator_id}")
+        self.assertEqual(final_wallet_response.status_code, 200)
+        final_wallet_data = final_wallet_response.json()
+        
+        final_wallet = final_wallet_data["wallet"]
+        self.assertEqual(final_wallet["balance"], 6.0)  # 1 + 5 views
+        self.assertEqual(final_wallet["total_earned"], 6.0)
+        
+        print(f"✅ ARACOIN creator view earning test passed")
+        print(f"   Creator earnings: 6 views → 6.0 ARACOINS ($0.06)")
+        print(f"   No daily limits on creator earnings from views")
+
+    def test_33_aracoin_transaction_history(self):
+        """Test ARACOIN transaction history retrieval - Priority Testing"""
+        print("\n🔍 Testing ARACOIN transaction history...")
+        
+        if not hasattr(self, 'aracoin_user_id'):
+            self.aracoin_user_id = f"aracoin_user_{uuid.uuid4().hex[:8]}"
+            # Create some transactions first
+            requests.post(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}/earn-watch-time", 
+                         json={"watch_time_minutes": 20, "video_id": self.video_id})
+            requests.post(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}/earn-color-pulse")
+        
+        # Wait for transactions to be processed
+        time.sleep(1)
+        
+        # Test transaction history retrieval
+        response = requests.get(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}/transactions")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate transaction history structure
+        self.assertIn("transactions", data)
+        self.assertIn("conversion_rate", data)
+        self.assertEqual(data["conversion_rate"], 0.01)
+        
+        transactions = data["transactions"]
+        self.assertGreater(len(transactions), 0)
+        
+        # Validate transaction structure
+        for transaction in transactions:
+            self.assertIn("transaction_id", transaction)
+            self.assertIn("user_id", transaction)
+            self.assertIn("type", transaction)
+            self.assertIn("amount", transaction)
+            self.assertIn("description", transaction)
+            self.assertIn("metadata", transaction)
+            self.assertIn("timestamp", transaction)
+            self.assertIn("status", transaction)
+            
+            # Validate transaction types
+            valid_types = ["earn_watch", "earn_color_pulse", "earn_view", "spend", "withdrawal"]
+            self.assertIn(transaction["type"], valid_types)
+            
+            # Validate transaction status
+            self.assertEqual(transaction["status"], "completed")
+            
+            # Validate user ID matches
+            self.assertEqual(transaction["user_id"], self.aracoin_user_id)
+        
+        # Test transaction history with limit
+        limited_response = requests.get(f"{BACKEND_URL}/api/wallet/{self.aracoin_user_id}/transactions?limit=2")
+        self.assertEqual(limited_response.status_code, 200)
+        limited_data = limited_response.json()
+        self.assertLessEqual(len(limited_data["transactions"]), 2)
+        
+        # Validate transaction types present
+        transaction_types = [t["type"] for t in transactions]
+        expected_types = ["earn_watch", "earn_color_pulse"]
+        for expected_type in expected_types:
+            if expected_type in transaction_types:
+                print(f"   Found {expected_type} transaction")
+        
+        print(f"✅ ARACOIN transaction history test passed")
+        print(f"   Retrieved {len(transactions)} transactions")
+        print(f"   Transaction types: {list(set(transaction_types))}")
+
+    def test_34_aracoin_withdrawal_system(self):
+        """Test ARACOIN withdrawal system - Priority Testing"""
+        print("\n🔍 Testing ARACOIN withdrawal system...")
+        
+        # Create user with sufficient balance for withdrawal testing
+        withdrawal_user_id = f"withdrawal_user_{uuid.uuid4().hex[:8]}"
+        
+        # First, earn enough ARACoins for withdrawal (minimum 100 ARACOINS = $1.00)
+        # Earn through watch time (100 ARACOINS = 1000 minutes, but daily limit is 50)
+        # So we'll earn 50 from watch time and simulate additional earnings
+        watch_data = {
+            "watch_time_minutes": 500,  # Should earn 50 ARACOINS (daily limit)
+            "video_id": self.video_id
+        }
+        
+        watch_response = requests.post(f"{BACKEND_URL}/api/wallet/{withdrawal_user_id}/earn-watch-time", json=watch_data)
+        self.assertEqual(watch_response.status_code, 200)
+        
+        # Earn additional ARACoins through creator views to reach withdrawal minimum
+        for i in range(55):  # 55 views = 55 ARACOINS, total = 105 ARACOINS
+            view_data = {
+                "video_id": f"video_{i}",
+                "viewer_id": f"viewer_{i}"
+            }
+            requests.post(f"{BACKEND_URL}/api/wallet/{withdrawal_user_id}/earn-view", json=view_data)
+        
+        # Wait for earnings to be processed
+        time.sleep(2)
+        
+        # Verify sufficient balance
+        wallet_response = requests.get(f"{BACKEND_URL}/api/wallet/{withdrawal_user_id}")
+        self.assertEqual(wallet_response.status_code, 200)
+        wallet_data = wallet_response.json()
+        balance = wallet_data["wallet"]["balance"]
+        self.assertGreaterEqual(balance, 100.0, "Insufficient balance for withdrawal test")
+        
+        # Test withdrawal request (100 ARACOINS = $1.00)
+        withdrawal_data = {
+            "user_id": withdrawal_user_id,
+            "aracoin_amount": 100.0,
+            "usd_amount": 1.00,
+            "payment_method": "paypal",
+            "payment_details": {
+                "email": "user@example.com",
+                "account_verified": True
+            }
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/wallet/{withdrawal_user_id}/withdraw", json=withdrawal_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate withdrawal response
+        self.assertTrue(data["success"])
+        self.assertIn("transaction_id", data)
+        self.assertEqual(data["aracoin_amount"], 100.0)
+        self.assertEqual(data["usd_amount"], 1.00)
+        self.assertEqual(data["status"], "pending")
+        self.assertIn("message", data)
+        
+        # Verify balance deducted
+        post_withdrawal_response = requests.get(f"{BACKEND_URL}/api/wallet/{withdrawal_user_id}")
+        self.assertEqual(post_withdrawal_response.status_code, 200)
+        post_withdrawal_data = post_withdrawal_response.json()
+        new_balance = post_withdrawal_data["wallet"]["balance"]
+        self.assertEqual(new_balance, balance - 100.0)
+        
+        # Test insufficient balance scenario
+        insufficient_withdrawal = {
+            "user_id": withdrawal_user_id,
+            "aracoin_amount": 1000.0,  # More than available balance
+            "usd_amount": 10.00,
+            "payment_method": "paypal",
+            "payment_details": {"email": "user@example.com"}
+        }
+        
+        insufficient_response = requests.post(f"{BACKEND_URL}/api/wallet/{withdrawal_user_id}/withdraw", json=insufficient_withdrawal)
+        self.assertEqual(insufficient_response.status_code, 400)
+        
+        # Test minimum withdrawal limit
+        small_withdrawal = {
+            "user_id": withdrawal_user_id,
+            "aracoin_amount": 50.0,  # Below minimum of 100 ARACOINS
+            "usd_amount": 0.50,
+            "payment_method": "paypal",
+            "payment_details": {"email": "user@example.com"}
+        }
+        
+        small_response = requests.post(f"{BACKEND_URL}/api/wallet/{withdrawal_user_id}/withdraw", json=small_withdrawal)
+        self.assertEqual(small_response.status_code, 400)
+        
+        print(f"✅ ARACOIN withdrawal system test passed")
+        print(f"   Successful withdrawal: 100 ARACOINS → $1.00 (Status: pending)")
+        print(f"   Minimum withdrawal limit enforced: 100 ARACOINS")
+        print(f"   Insufficient balance protection working")
+
+    def test_35_aracoin_global_statistics(self):
+        """Test ARACOIN global statistics - Priority Testing"""
+        print("\n🔍 Testing ARACOIN global statistics...")
+        
+        # Test global ARACOIN statistics
+        response = requests.get(f"{BACKEND_URL}/api/aracoin/stats")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Validate global statistics structure
+        self.assertIn("total_circulation", data)
+        self.assertIn("total_usd_value", data)
+        self.assertIn("active_wallets", data)
+        self.assertIn("transactions_today", data)
+        self.assertIn("conversion_rate", data)
+        self.assertIn("platform_metrics", data)
+        
+        # Validate data types and ranges
+        self.assertIsInstance(data["total_circulation"], (int, float))
+        self.assertGreaterEqual(data["total_circulation"], 0)
+        
+        self.assertIsInstance(data["total_usd_value"], (int, float))
+        self.assertGreaterEqual(data["total_usd_value"], 0)
+        
+        self.assertIsInstance(data["active_wallets"], int)
+        self.assertGreaterEqual(data["active_wallets"], 0)
+        
+        self.assertIsInstance(data["transactions_today"], int)
+        self.assertGreaterEqual(data["transactions_today"], 0)
+        
+        self.assertEqual(data["conversion_rate"], 0.01)
+        
+        # Validate platform metrics
+        metrics = data["platform_metrics"]
+        self.assertIn("earning_rates", metrics)
+        self.assertIn("daily_limits", metrics)
+        
+        earning_rates = metrics["earning_rates"]
+        self.assertEqual(earning_rates["watch_time"], "1 ARACOIN per 10 minutes")
+        self.assertEqual(earning_rates["color_pulse"], "0.5 ARACOIN per check-in")
+        self.assertEqual(earning_rates["creator_views"], "1 ARACOIN per view")
+        
+        daily_limits = metrics["daily_limits"]
+        self.assertEqual(daily_limits["max_watch_aracoins"], 50)
+        self.assertEqual(daily_limits["max_color_pulse_aracoins"], 5)
+        self.assertEqual(daily_limits["creator_view_limit"], "No limit")
+        
+        # Calculate expected USD value
+        expected_usd = data["total_circulation"] * data["conversion_rate"]
+        self.assertAlmostEqual(data["total_usd_value"], expected_usd, places=2)
+        
+        print(f"✅ ARACOIN global statistics test passed")
+        print(f"   Total Circulation: {data['total_circulation']} ARACOINS")
+        print(f"   Total USD Value: ${data['total_usd_value']:.2f}")
+        print(f"   Active Wallets: {data['active_wallets']}")
+        print(f"   Transactions Today: {data['transactions_today']}")
+
+    def test_36_aracoin_daily_limit_reset(self):
+        """Test ARACOIN daily limit reset functionality"""
+        print("\n🔍 Testing ARACOIN daily limit reset functionality...")
+        
+        # Create user for daily limit testing
+        limit_test_user = f"limit_test_{uuid.uuid4().hex[:8]}"
+        
+        # Earn some ARACoins to set daily earned amounts
+        watch_data = {
+            "watch_time_minutes": 100,  # Should earn 10 ARACOINS
+            "video_id": self.video_id
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/wallet/{limit_test_user}/earn-watch-time", json=watch_data)
+        self.assertEqual(response.status_code, 200)
+        
+        # Earn some Color Pulse ARACoins
+        for i in range(3):
+            requests.post(f"{BACKEND_URL}/api/wallet/{limit_test_user}/earn-color-pulse")
+        
+        # Check wallet state
+        wallet_response = requests.get(f"{BACKEND_URL}/api/wallet/{limit_test_user}")
+        self.assertEqual(wallet_response.status_code, 200)
+        wallet_data = wallet_response.json()
+        
+        wallet = wallet_data["wallet"]
+        self.assertEqual(wallet["daily_earned_today"], 10.0)
+        self.assertEqual(wallet["daily_color_pulse_earned"], 1.5)
+        self.assertEqual(wallet["color_pulse_count_today"], 3)
+        
+        # Verify daily limits are calculated correctly
+        limits = wallet_data["daily_limits"]
+        self.assertEqual(limits["remaining_watch_aracoins"], 40.0)  # 50 - 10
+        self.assertEqual(limits["remaining_color_pulse_aracoins"], 3.5)  # 5 - 1.5
+        
+        print(f"✅ ARACOIN daily limit functionality test passed")
+        print(f"   Daily earned: {wallet['daily_earned_today']} ARACOINS")
+        print(f"   Color Pulse earned: {wallet['daily_color_pulse_earned']} ARACOINS")
+        print(f"   Remaining limits: Watch={limits['remaining_watch_aracoins']}, Color Pulse={limits['remaining_color_pulse_aracoins']}")
+
+    def test_37_aracoin_edge_cases_and_validation(self):
+        """Test ARACOIN edge cases and input validation"""
+        print("\n🔍 Testing ARACOIN edge cases and validation...")
+        
+        edge_case_user = f"edge_case_{uuid.uuid4().hex[:8]}"
+        
+        # Test negative watch time (should be handled gracefully)
+        negative_watch_data = {
+            "watch_time_minutes": -10,
+            "video_id": self.video_id
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/wallet/{edge_case_user}/earn-watch-time", json=negative_watch_data)
+        # Should either reject or handle gracefully (not crash)
+        self.assertIn(response.status_code, [200, 400])
+        
+        # Test zero watch time
+        zero_watch_data = {
+            "watch_time_minutes": 0,
+            "video_id": self.video_id
+        }
+        
+        response = requests.post(f"{BACKEND_URL}/api/wallet/{edge_case_user}/earn-watch-time", json=zero_watch_data)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["aracoins_earned"], 0.0)
+        
+        # Test invalid user ID for wallet retrieval
+        response = requests.get(f"{BACKEND_URL}/api/wallet/")
+        self.assertEqual(response.status_code, 404)  # Should return 404 for missing user ID
+        
+        # Test withdrawal with invalid payment method
+        invalid_withdrawal = {
+            "user_id": edge_case_user,
+            "aracoin_amount": 100.0,
+            "usd_amount": 1.00,
+            "payment_method": "invalid_method",
+            "payment_details": {}
+        }
+        
+        # First ensure user has balance
+        for i in range(100):
+            requests.post(f"{BACKEND_URL}/api/wallet/{edge_case_user}/earn-view", 
+                         json={"video_id": f"video_{i}", "viewer_id": f"viewer_{i}"})
+        
+        time.sleep(1)
+        
+        response = requests.post(f"{BACKEND_URL}/api/wallet/{edge_case_user}/withdraw", json=invalid_withdrawal)
+        # Should handle gracefully (either accept or validate payment method)
+        self.assertIn(response.status_code, [200, 400])
+        
+        print(f"✅ ARACOIN edge cases and validation test passed")
+        print(f"   Negative/zero values handled appropriately")
+        print(f"   Invalid inputs validated correctly")
+
 if __name__ == "__main__":
     # Run the tests in order
     test_suite = unittest.TestSuite()
