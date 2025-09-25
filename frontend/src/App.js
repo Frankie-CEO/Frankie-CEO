@@ -3000,20 +3000,97 @@ const App = () => {
             
             {user && (
               <div className="bg-gray-800 rounded-lg p-6 border border-neon-orange/30">
-                <h3 className="text-xl font-bold text-white mb-4">{user.username}</h3>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-neon-orange">{user.tokens}</div>
-                    <div className="text-gray-400">Tokens</div>
+                {/* Profile Header */}
+                <div className="text-center mb-6">
+                  <div className="relative inline-block mb-4">
+                    <button
+                      onClick={() => setShowProfilePicture(true)}
+                      className="relative group"
+                      title="Change Profile Picture"
+                    >
+                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-neon-orange/50 hover:border-neon-purple/50 transition-all shadow-xl">
+                        {getProfilePictureUrl() ? (
+                          <img 
+                            src={getProfilePictureUrl()} 
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-r from-neon-green to-neon-purple flex items-center justify-center text-white font-bold text-2xl">
+                            {getInitials(user?.username)}
+                          </div>
+                        )}
+                      </div>
+                      <div className="absolute -bottom-2 -right-2 bg-neon-orange text-white rounded-full w-8 h-8 flex items-center justify-center text-sm opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                        📷
+                      </div>
+                    </button>
                   </div>
-                  <div className="text-center">
+                  <h3 className="text-2xl font-bold text-white mb-2">{user.username}</h3>
+                  <p className="text-gray-400 text-sm">{user.email}</p>
+                </div>
+
+                {/* Profile Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-gray-700 rounded-lg p-4 text-center border border-neon-orange/30">
+                    <div className="text-2xl font-bold text-neon-orange">{user.tokens}</div>
+                    <div className="text-gray-400 text-sm">Legacy Tokens</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-lg p-4 text-center border border-neon-green/30">
                     <div className="text-2xl font-bold text-neon-green">{Math.floor(user.total_watch_time / 60)}</div>
-                    <div className="text-gray-400">Minutes Watched</div>
+                    <div className="text-gray-400 text-sm">Minutes Watched</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-lg p-4 text-center border border-neon-purple/30">
+                    <div className="text-2xl font-bold text-neon-purple">{wallet?.wallet?.balance?.toFixed(1) || '0.0'}</div>
+                    <div className="text-gray-400 text-sm">ARACoins</div>
+                  </div>
+                  <div className="bg-gray-700 rounded-lg p-4 text-center border border-yellow-500/30">
+                    <div className="text-2xl font-bold text-yellow-500">${wallet?.usd_balance?.toFixed(3) || '0.000'}</div>
+                    <div className="text-gray-400 text-sm">USD Value</div>
                   </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-lg font-semibold text-neon-purple">{user.neurodiversity_class}</div>
-                  <div className="text-gray-400">Neurodiversity Class</div>
+                
+                {/* Profile Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-700 rounded-lg p-4 border border-neon-purple/30">
+                    <h4 className="text-white font-semibold mb-3 flex items-center">
+                      <span className="text-lg mr-2">🧠</span>
+                      Neurodiversity Profile
+                    </h4>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-neon-purple">{user.neurodiversity_class}</div>
+                      <div className="text-gray-400 text-sm">Classification</div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-700 rounded-lg p-4 border border-neon-green/30">
+                    <h4 className="text-white font-semibold mb-3 flex items-center">
+                      <span className="text-lg mr-2">🎨</span>
+                      Color Pulse Activity
+                    </h4>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-neon-green">{wallet?.wallet?.color_pulse_count_today || 0}</div>
+                      <div className="text-gray-400 text-sm">Today's Pulses</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Profile Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                  <button
+                    onClick={() => setShowProfilePicture(true)}
+                    className="bg-gradient-to-r from-neon-orange to-neon-purple text-white py-3 rounded-lg font-semibold hover:from-neon-orange/80 hover:to-neon-purple/80 transition-all flex items-center justify-center space-x-2"
+                  >
+                    <span>🖼️</span>
+                    <span>Change Profile Picture</span>
+                  </button>
+                  <button
+                    onClick={() => setShowWallet(true)}
+                    className="bg-gradient-to-r from-neon-green to-neon-purple text-white py-3 rounded-lg font-semibold hover:from-neon-green/80 hover:to-neon-purple/80 transition-all flex items-center justify-center space-x-2"
+                  >
+                    <span>💰</span>
+                    <span>View ARACOIN Wallet</span>
+                  </button>
                 </div>
               </div>
             )}
