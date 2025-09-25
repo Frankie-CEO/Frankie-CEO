@@ -3905,20 +3905,20 @@ const App = () => {
           </div>
           
           {/* Right Section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 lg:space-x-4">
             {isAuthenticated ? (
               <>
                 {/* ARACOIN Balance */}
                 <button
                   onClick={() => setShowWallet(true)}
-                  className="flex items-center space-x-2 bg-gradient-to-r from-neon-orange/20 to-neon-purple/20 border border-neon-purple/40 rounded-xl px-4 py-2 hover:from-neon-orange/30 hover:to-neon-purple/30 transition-all transform hover:scale-105 shadow-lg"
+                  className="flex items-center space-x-1 lg:space-x-2 bg-gradient-to-r from-neon-orange/20 to-neon-purple/20 border border-neon-purple/40 rounded-lg lg:rounded-xl px-2 lg:px-4 py-1.5 lg:py-2 hover:from-neon-orange/30 hover:to-neon-purple/30 transition-all transform hover:scale-105 shadow-lg"
                 >
-                  <span className="text-lg">💰</span>
+                  <span className="text-sm lg:text-lg">💰</span>
                   <div className="text-left">
-                    <div className="text-neon-orange font-bold text-sm">
+                    <div className="text-neon-orange font-bold text-xs lg:text-sm">
                       {wallet?.wallet?.balance?.toFixed(1) || '0.0'} AC
                     </div>
-                    <div className="text-gray-400 text-xs">
+                    <div className="text-gray-400 text-xs hidden lg:block">
                       ${wallet?.usd_balance?.toFixed(3) || '0.000'}
                     </div>
                   </div>
@@ -3927,24 +3927,24 @@ const App = () => {
                 {/* Notifications */}
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-3 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl border border-gray-600 hover:border-neon-purple/50 transition-all transform hover:scale-105"
+                  className="relative p-2 lg:p-3 bg-gray-800/50 hover:bg-gray-700/50 rounded-lg lg:rounded-xl border border-gray-600 hover:border-neon-purple/50 transition-all transform hover:scale-105"
                 >
-                  <div className="text-xl">🔔</div>
+                  <div className="text-lg lg:text-xl">🔔</div>
                   {unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 lg:w-5 lg:h-5 flex items-center justify-center font-bold animate-pulse">
                       {unreadCount}
                     </div>
                   )}
                 </button>
                 
                 {/* User Profile */}
-                <div className="flex items-center space-x-3 bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-xl px-4 py-2 border border-gray-600 hover:border-neon-green/50 transition-all">
+                <div className="flex items-center space-x-2 lg:space-x-3 bg-gradient-to-r from-gray-800/50 to-gray-700/50 rounded-lg lg:rounded-xl px-2 lg:px-4 py-1.5 lg:py-2 border border-gray-600 hover:border-neon-green/50 transition-all">
                   <button
                     onClick={() => setShowProfilePicture(true)}
                     className="relative group"
                     title="Change Profile Picture"
                   >
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-neon-green/50 hover:border-neon-orange/50 transition-all shadow-lg">
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden border-2 border-neon-green/50 hover:border-neon-orange/50 transition-all shadow-lg">
                       {getProfilePictureUrl() ? (
                         <img 
                           src={getProfilePictureUrl()} 
@@ -3952,22 +3952,22 @@ const App = () => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-r from-neon-green to-neon-purple flex items-center justify-center text-white font-bold text-lg">
+                        <div className="w-full h-full bg-gradient-to-r from-neon-green to-neon-purple flex items-center justify-center text-white font-bold text-sm lg:text-lg">
                           {getInitials(user?.username)}
                         </div>
                       )}
                     </div>
-                    <div className="absolute -bottom-1 -right-1 bg-neon-orange text-white rounded-full w-4 h-4 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute -bottom-1 -right-1 bg-neon-orange text-white rounded-full w-3 h-3 lg:w-4 lg:h-4 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                       ✏️
                     </div>
                   </button>
                   <div className="hidden sm:block">
-                    <div className="text-white font-semibold">{user?.username || 'User'}</div>
+                    <div className="text-white font-semibold text-sm">{user?.username || 'User'}</div>
                     <div className="text-neon-green text-xs font-medium">{user?.tokens || 0} Legacy ARACoins</div>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="text-gray-400 hover:text-red-400 transition-colors ml-2"
+                    className="text-gray-400 hover:text-red-400 transition-colors ml-1 lg:ml-2"
                     title="Logout"
                   >
                     <div className="text-sm">🚪</div>
