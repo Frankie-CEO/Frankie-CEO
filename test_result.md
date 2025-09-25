@@ -435,9 +435,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Creator Color Pulse Analytics API"
-    - "Live Stream Color Pulse Analytics API"
-    - "Color Pulse Data Aggregation Functions"
+    - "ARACOIN Wallet Management API"
+    - "ARACOIN Watch Time Earning API"
+    - "ARACOIN Color Pulse Earning API"
+    - "ARACOIN Creator View Earning API"
+    - "ARACOIN Transaction History API"
+    - "ARACOIN Withdrawal System API"
+    - "ARACOIN Global Statistics API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
