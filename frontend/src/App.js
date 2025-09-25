@@ -2513,35 +2513,159 @@ const App = () => {
     switch (activeTab) {
       case 'home':
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">Featured Videos</h2>
-            {renderVideoPlayer()}
-            
-            {/* YouTube-style Comments for Videos */}
-            {currentVideo && renderVideoComments()}
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {videos.map((video) => (
-                <div
-                  key={video.video_id}
-                  onClick={() => playVideo(video)}
-                  className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors border border-neon-purple/30"
-                >
-                  <img
-                    src={video.thumbnail}
-                    alt={video.title}
-                    className="w-full h-32 object-cover rounded mb-3"
-                    onError={(e) => {
-                      e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMzc0MTUxIi8+Cjx0ZXh0IHg9IjE2MCIgeT0iOTAiIGZpbGw9IiM5Q0E0QUYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VmlkZW8gUGxhY2Vob2xkZXI8L3RleHQ+Cjwvc3ZnPgo=';
-                    }}
-                  />
-                  <h3 className="text-white font-semibold mb-2">{video.title}</h3>
-                  <div className="flex items-center justify-between text-sm text-gray-400">
-                    <span>{Math.floor(video.duration / 60)} min</span>
-                    <span>{video.size_mb} MB</span>
+          <div className="space-y-8">
+            {/* Hero Section for Non-Authenticated Users */}
+            {!isAuthenticated && (
+              <div className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-2xl p-8 md:p-12 border-2 border-neon-purple/30">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/20 via-neon-orange/20 to-neon-green/20"></div>
+                  <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(199,51,255,0.1),transparent_50%)]"></div>
+                </div>
+                
+                <div className="relative z-10 text-center">
+                  <div className="flex items-center justify-center mb-6">
+                    <img 
+                      src="https://customer-assets.emergentagent.com/job_neonstream-2/artifacts/n574f50k_ARA%20logo.PNG"
+                      alt="ARA Logo"
+                      className="w-20 h-20 rounded-full border-4 border-neon-purple/50 shadow-2xl"
+                    />
+                  </div>
+                  
+                  <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-neon-orange via-neon-purple to-neon-green bg-clip-text text-transparent">
+                    Welcome to Ara
+                  </h1>
+                  
+                  <p className="text-xl md:text-2xl text-gray-300 mb-6 max-w-3xl mx-auto">
+                    The revolutionary <span className="text-neon-purple font-bold">Gen Z streaming platform</span> where you earn real money while watching incredible content
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8 max-w-4xl mx-auto">
+                    <div className="bg-gradient-to-br from-neon-orange/20 to-neon-orange/10 rounded-xl p-6 border border-neon-orange/30">
+                      <div className="text-4xl mb-4">💰</div>
+                      <h3 className="text-neon-orange font-bold text-lg mb-2">Earn ARACoins</h3>
+                      <p className="text-gray-400 text-sm">Get paid for watching! 1 ARACOIN per 10 minutes = real money</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-neon-purple/20 to-neon-purple/10 rounded-xl p-6 border border-neon-purple/30">
+                      <div className="text-4xl mb-4">🎨</div>
+                      <h3 className="text-neon-purple font-bold text-lg mb-2">Color Pulse Bonuses</h3>
+                      <p className="text-gray-400 text-sm">Express your emotions and earn bonus ARACoins for every check-in</p>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-neon-green/20 to-neon-green/10 rounded-xl p-6 border border-neon-green/30">
+                      <div className="text-4xl mb-4">🚀</div>
+                      <h3 className="text-neon-green font-bold text-lg mb-2">Live Streaming</h3>
+                      <p className="text-gray-400 text-sm">Watch live streams, chat in real-time, and connect with creators</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <button
+                      onClick={() => { setAuthMode('signup'); setShowAuth(true); }}
+                      className="px-8 py-4 bg-gradient-to-r from-neon-orange to-neon-purple text-white rounded-xl font-bold text-lg hover:from-neon-orange/80 hover:to-neon-purple/80 transition-all transform hover:scale-105 shadow-2xl"
+                    >
+                      🎯 Start Earning Now
+                    </button>
+                    <button
+                      onClick={() => { setAuthMode('login'); setShowAuth(true); }}
+                      className="px-8 py-4 bg-gradient-to-r from-gray-800 to-gray-700 text-white rounded-xl font-semibold text-lg border border-gray-600 hover:border-neon-purple/50 hover:from-gray-700 hover:to-gray-600 transition-all transform hover:scale-105"
+                    >
+                      Already a member? Sign In
+                    </button>
+                  </div>
+                  
+                  <div className="mt-8 p-4 bg-black/30 rounded-xl border border-neon-purple/20">
+                    <div className="flex items-center justify-center space-x-8 text-sm text-gray-400">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span>💰 1 ARACOIN = $0.01</span>
+                      </div>
+                      <div>🎮 Gamified Experience</div>
+                      <div>📱 Mobile Ready</div>
+                      <div>💸 Real Withdrawals</div>
+                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            )}
+
+            {/* Main Content Area */}
+            <div className={isAuthenticated ? "space-y-6" : "space-y-8"}>
+              {isAuthenticated && <h2 className="text-3xl font-bold text-white">🔥 Featured Videos</h2>}
+              
+              {renderVideoPlayer()}
+              
+              {/* YouTube-style Comments for Videos */}
+              {currentVideo && renderVideoComments()}
+              
+              {/* Featured Stats for Authenticated Users */}
+              {isAuthenticated && wallet && (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-6">
+                  <div className="bg-gradient-to-br from-neon-orange/20 to-neon-orange/10 rounded-xl p-4 border border-neon-orange/30 text-center">
+                    <div className="text-2xl font-bold text-neon-orange">{wallet.wallet?.balance?.toFixed(1) || '0.0'}</div>
+                    <div className="text-xs text-gray-400">ARACoins Earned</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-neon-purple/20 to-neon-purple/10 rounded-xl p-4 border border-neon-purple/30 text-center">
+                    <div className="text-2xl font-bold text-neon-purple">{wallet.wallet?.color_pulse_count_today || 0}</div>
+                    <div className="text-xs text-gray-400">Color Pulses Today</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-neon-green/20 to-neon-green/10 rounded-xl p-4 border border-neon-green/30 text-center">
+                    <div className="text-2xl font-bold text-neon-green">${wallet.usd_balance?.toFixed(4) || '0.0000'}</div>
+                    <div className="text-xs text-gray-400">USD Value</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-gray-600/20 to-gray-600/10 rounded-xl p-4 border border-gray-600/30 text-center">
+                    <div className="text-2xl font-bold text-white">{tokens}</div>
+                    <div className="text-xs text-gray-400">Legacy Tokens</div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Video Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {videos.map((video) => (
+                  <div
+                    key={video.video_id}
+                    onClick={() => playVideo(video)}
+                    className="group bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden cursor-pointer hover:from-gray-700 hover:to-gray-800 transition-all transform hover:scale-105 border border-neon-purple/20 hover:border-neon-purple/50 shadow-xl"
+                  >
+                    <div className="relative">
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMzc0MTUxIi8+Cjx0ZXh0IHg9IjE2MCIgeT0iOTAiIGZpbGw9IiM5Q0E0QUYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VmlkZW8gUGxhY2Vob2xkZXI8L3RleHQ+Cjwvc3ZnPgo=';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <div className="flex items-center space-x-2 text-white">
+                            <Play size={20} className="text-neon-orange" />
+                            <span className="text-sm font-medium">Watch & Earn</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold">
+                        {Math.floor(video.duration / 60)}:{String(video.duration % 60).padStart(2, '0')}
+                      </div>
+                    </div>
+                    
+                    <div className="p-4">
+                      <h3 className="text-white font-bold text-lg mb-2 line-clamp-2 group-hover:text-neon-orange transition-colors">
+                        {video.title}
+                      </h3>
+                      <div className="flex items-center justify-between text-sm text-gray-400">
+                        <span className="flex items-center space-x-1">
+                          <Eye size={14} />
+                          <span>Earn +{Math.floor(video.duration / 600)} AC</span>
+                        </span>
+                        <span>{video.size_mb} MB</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         );
