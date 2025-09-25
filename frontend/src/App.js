@@ -40,6 +40,16 @@ const USER_ID = `user_${Math.random().toString(36).substr(2, 9)}`;
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('home');
+  // Loading and error states
+  const [loading, setLoading] = useState({
+    videos: false,
+    liveStreams: false,
+    wallet: false,
+    auth: false,
+    colorPulse: false
+  });
+  const [errors, setErrors] = useState({});
+
   const [user, setUser] = useState(null);
   const [videos, setVideos] = useState([]);
   const [liveStreams, setLiveStreams] = useState([]);
