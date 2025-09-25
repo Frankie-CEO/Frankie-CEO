@@ -397,10 +397,10 @@ const App = () => {
       if (daysSinceDismissal < 1) return;
     }
     
-    // Show waitlist modal after 15 seconds on the site
+    // Show waitlist modal after 45 seconds on the site (less aggressive)
     const waitlistTimer = setTimeout(() => {
       setShowWaitlist(true);
-    }, 15000);
+    }, 45000);
     
     return () => clearTimeout(waitlistTimer);
   }, [isAuthenticated]);
