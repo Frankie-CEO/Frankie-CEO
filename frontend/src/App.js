@@ -1653,8 +1653,18 @@ const App = () => {
           {videoComments.map((comment) => (
             <div key={comment.comment_id} className="border-b border-gray-700 pb-4">
               <div className="flex space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-neon-green to-neon-orange rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  {comment.username?.[0]?.toUpperCase() || 'A'}
+                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-neon-green/30 flex-shrink-0">
+                  {comment.user_id === USER_ID && getProfilePictureUrl() ? (
+                    <img 
+                      src={getProfilePictureUrl()} 
+                      alt={comment.username}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-r from-neon-green to-neon-orange flex items-center justify-center text-white text-sm font-bold">
+                      {comment.username?.[0]?.toUpperCase() || 'A'}
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
