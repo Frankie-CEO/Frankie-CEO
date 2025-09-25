@@ -2581,8 +2581,14 @@ const App = () => {
     if (!showWaitlist) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-90 p-4 animate-fadeIn">
-        <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-2xl p-8 max-w-lg w-full border-2 border-neon-purple/50 shadow-2xl relative overflow-hidden animate-slideUp">
+      <div 
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-90 p-4 animate-fadeIn"
+        onClick={dismissWaitlist}
+      >
+        <div 
+          className="bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-2xl p-8 max-w-lg w-full border-2 border-neon-purple/50 shadow-2xl relative overflow-hidden animate-slideUp"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-5">
             <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/30 via-neon-orange/30 to-neon-green/30"></div>
