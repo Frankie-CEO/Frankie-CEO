@@ -98,6 +98,17 @@ const App = () => {
   const [aracoinStats, setAracoinStats] = useState(null);
   const [earningNotification, setEarningNotification] = useState(null);
   
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
+  const [authData, setAuthData] = useState({ username: '', email: '', password: '' });
+  
+  // Notifications state
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
   const wsRef = useRef(null);
