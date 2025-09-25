@@ -3368,7 +3368,7 @@ const App = () => {
               )}
             </div>
             <div className="hidden md:block">
-              <span>🎯 Earn ARACoins while you watch • 🎨 Color Pulse bonuses • 💸 Real money withdrawals</span>
+              <span>🎯 Earn ARACoins while you watch • 🎨 Color Pulse bonuses • 💸 Real money withdrawals • 🌍 For everyone</span>
             </div>
           </div>
         </div>
