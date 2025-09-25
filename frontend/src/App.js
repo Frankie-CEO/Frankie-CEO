@@ -2156,6 +2156,191 @@ const App = () => {
     );
   };
 
+  const renderAuthModal = () => {
+    if (!showAuth) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-80 p-4">
+        <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-8 max-w-md w-full border border-neon-purple/50 shadow-2xl">
+          {/* Header with Logo */}
+          <div className="text-center mb-8">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_neonstream-2/artifacts/n574f50k_ARA%20logo.PNG"
+              alt="ARA Logo"
+              className="w-16 h-16 mx-auto mb-4 rounded-full"
+            />
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-neon-orange to-neon-purple bg-clip-text text-transparent mb-2">
+              {authMode === 'login' ? 'Welcome Back!' : 'Join Ara Today!'}
+            </h2>
+            <p className="text-gray-400 text-sm">
+              {authMode === 'login' 
+                ? 'Sign in to continue earning ARACoins' 
+                : 'Create your account and start earning'}
+            </p>
+          </div>
+
+          {/* Auth Form */}
+          <form onSubmit={handleAuth} className="space-y-6">
+            {authMode === 'signup' && (
+              <div>
+                <label className="block text-white font-semibold mb-2">Username</label>
+                <input
+                  type="text"
+                  required
+                  value={authData.username}
+                  onChange={(e) => setAuthData({...authData, username: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-neon-purple focus:outline-none transition-colors"
+                  placeholder="Enter your username"
+                />
+              </div>
+            )}
+            
+            <div>
+              <label className="block text-white font-semibold mb-2">Email</label>
+              <input
+                type="email"
+                required
+                value={authData.email}
+                onChange={(e) => setAuthData({...authData, email: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-neon-purple focus:outline-none transition-colors"
+                placeholder="Enter your email"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-white font-semibold mb-2">Password</label>
+              <input
+                type="password"
+                required
+                value={authData.password}
+                onChange={(e) => setAuthData({...authData, password: e.target.value})}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-neon-purple focus:outline-none transition-colors"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-neon-orange to-neon-purple text-white py-3 rounded-lg font-bold text-lg hover:from-neon-orange/80 hover:to-neon-purple/80 transition-all transform hover:scale-105"
+            >
+              {authMode === 'login' ? '🚀 Sign In' : '✨ Create Account'}
+            </button>
+          </form>
+
+          {/* Switch Mode */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-400">
+              {authMode === 'login' ? "Don't have an account?" : 'Already have an account?'}
+              <button
+                onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
+                className="text-neon-purple hover:text-neon-orange transition-colors ml-2 font-semibold"
+              >
+                {authMode === 'login' ? 'Sign Up' : 'Sign In'}
+              </button>
+            </p>
+          </div>
+
+          {/* Close Button */}
+          <button
+            onClick={() => setShowAuth(false)}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+          >
+            <X size={24} />
+          </button>
+
+          {/* Features Preview for Signup */}
+          {authMode === 'signup' && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-neon-purple/20 to-neon-orange/20 rounded-lg border border-neon-purple/30">
+              <h4 className="text-white font-semibold mb-2">🎯 What you'll get:</h4>
+              <ul className="text-sm text-gray-300 space-y-1">
+                <li>💰 Earn ARACoins while watching</li>
+                <li>🎨 Color Pulse bonuses</li>
+                <li>📱 Real money withdrawals</li>
+                <li>🎮 Gamified streaming experience</li>
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderNotifications = () => {
+    if (!showNotifications) return null;
+
+    return (
+      <div className="fixed top-20 right-4 w-80 max-h-96 bg-gradient-to-br from-gray-900/95 to-black/95 rounded-xl border border-neon-purple/50 shadow-2xl backdrop-blur-sm z-60 overflow-hidden">
+        {/* Header */}
+        <div className="p-4 border-b border-gray-700">
+          <div className="flex items-center justify-between">
+            <h3 className="text-white font-bold text-lg">🔔 Notifications</h3>
+            <div className="flex items-center space-x-2">
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllNotificationsRead}
+                  className="text-xs text-neon-purple hover:text-neon-orange transition-colors"
+                >
+                  Mark all read
+                </button>
+              )}
+              <button
+                onClick={() => setShowNotifications(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Notifications List */}
+        <div className="max-h-80 overflow-y-auto">
+          {notifications.length === 0 ? (
+            <div className="p-8 text-center text-gray-400">
+              <div className="text-4xl mb-2">🔕</div>
+              <p>No notifications yet</p>
+            </div>
+          ) : (
+            <div className="p-2">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  onClick={() => markNotificationRead(notification.id)}
+                  className={`p-3 rounded-lg mb-2 cursor-pointer transition-all hover:bg-gray-800/50 ${
+                    !notification.read ? 'bg-neon-purple/10 border-l-4 border-neon-purple' : 'bg-gray-800/30'
+                  }`}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0">
+                      {notification.type === 'success' && <span className="text-green-400">✅</span>}
+                      {notification.type === 'warning' && <span className="text-yellow-400">⚠️</span>}
+                      {notification.type === 'error' && <span className="text-red-400">❌</span>}
+                      {notification.type === 'info' && <span className="text-blue-400">ℹ️</span>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-white font-semibold text-sm truncate">
+                        {notification.title}
+                      </div>
+                      <div className="text-gray-400 text-xs mt-1">
+                        {notification.message}
+                      </div>
+                      <div className="text-gray-500 text-xs mt-1">
+                        {new Date(notification.timestamp).toLocaleTimeString()}
+                      </div>
+                    </div>
+                    {!notification.read && (
+                      <div className="w-2 h-2 bg-neon-purple rounded-full flex-shrink-0"></div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderWallet = () => {
     if (!showWallet || !wallet) return null;
 
