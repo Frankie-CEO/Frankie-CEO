@@ -35,7 +35,29 @@ import './App.css';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const AGORA_APP_ID = process.env.REACT_APP_AGORA_APP_ID;
 
-// Generate user ID
+  const renderLoading = (text = "Loading...") => (
+    <div className="flex flex-col items-center justify-center py-12">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-orange mb-4"></div>
+      <p className="text-gray-400 text-sm">{text}</p>
+    </div>
+  );
+
+  const renderError = (error, retryFn) => (
+    <div className="flex flex-col items-center justify-center py-12">
+      <div className="text-red-400 text-4xl mb-4">⚠️</div>
+      <p className="text-red-400 text-sm mb-4">{error}</p>
+      {retryFn && (
+        <button
+          onClick={retryFn}
+          className="px-4 py-2 bg-neon-orange text-white rounded-lg hover:bg-neon-orange/80 transition-colors text-sm"
+        >
+          Try Again
+        </button>
+      )}
+    </div>
+  );
+
+  // Generate user ID
 const USER_ID = `user_${Math.random().toString(36).substr(2, 9)}`;
 
 const App = () => {
