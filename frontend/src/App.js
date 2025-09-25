@@ -2820,8 +2820,51 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
+      {/* Top Header */}
+      <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-gray-900 to-gray-800 border-b border-neon-purple/30 z-40">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center space-x-3">
+            <div className="text-2xl font-bold bg-gradient-to-r from-neon-orange to-neon-purple bg-clip-text text-transparent">
+              Ara
+            </div>
+            <div className="text-sm text-gray-400 hidden sm:block">
+              Gen Z Streaming Platform
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            {/* ARACOIN Balance */}
+            <button
+              onClick={() => setShowWallet(true)}
+              className="flex items-center space-x-2 bg-gradient-to-r from-neon-orange/20 to-neon-purple/20 border border-neon-purple/30 rounded-lg px-3 py-2 hover:from-neon-orange/30 hover:to-neon-purple/30 transition-all"
+            >
+              <span className="text-lg">💰</span>
+              <div className="text-left">
+                <div className="text-neon-orange font-bold text-sm">
+                  {wallet?.wallet?.balance?.toFixed(1) || '0.0'} ARACOIN
+                </div>
+                <div className="text-gray-400 text-xs">
+                  ${wallet?.usd_balance?.toFixed(3) || '0.000'}
+                </div>
+              </div>
+            </button>
+            
+            {/* User Profile */}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-neon-green to-neon-purple rounded-full flex items-center justify-center text-white text-sm font-bold">
+                {user?.username?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <div className="hidden sm:block">
+                <div className="text-white text-sm font-medium">{user?.username || 'User'}</div>
+                <div className="text-gray-400 text-xs">{tokens} Tokens</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Main Content */}
-      <div className="pb-16 p-4">
+      <div className="pt-20 pb-16 p-4">
         {renderTabContent()}
       </div>
 
