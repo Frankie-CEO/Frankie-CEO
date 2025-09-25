@@ -3615,7 +3615,7 @@ const App = () => {
                 </div>
                 <div className="bg-gray-800 rounded-lg p-4 border border-neon-purple/30">
                   <div className="text-2xl font-bold text-neon-purple">{creatorStats.total_tokens_earned}</div>
-                  <div className="text-gray-400">Tokens Earned</div>
+                  <div className="text-gray-400">ARACoins Earned</div>
                 </div>
                 <div className="bg-gray-800 rounded-lg p-4 border border-yellow-500/30">
                   <div className="text-2xl font-bold text-yellow-500">${creatorStats.ad_revenue_share?.toFixed(2) || '0.00'}</div>
