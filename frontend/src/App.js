@@ -2590,13 +2590,13 @@ const App = () => {
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-neon-purple/10 rounded-full blur-3xl"></div>
           </div>
 
-          {/* Close Button */}
+          {/* Close Button - Enhanced */}
           <button
             onClick={dismissWaitlist}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10 p-1"
-            title="Close"
+            className="absolute top-4 right-4 bg-gray-800/50 hover:bg-gray-700/70 text-gray-400 hover:text-white rounded-full w-8 h-8 flex items-center justify-center transition-all z-10 border border-gray-600 hover:border-gray-500"
+            title="Close Waitlist"
           >
-            <X size={20} />
+            <X size={16} />
           </button>
 
           <div className="relative z-10">
