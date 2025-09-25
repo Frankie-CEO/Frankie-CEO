@@ -576,6 +576,95 @@ const App = () => {
     }
   };
 
+  // ARACOIN Functions
+  const loadWallet = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/wallet/${USER_ID}`);
+      setWallet(response.data);
+      
+      // Load ARACOIN stats
+      const statsResponse = await axios.get(`${BACKEND_URL}/api/aracoin/stats`);
+      setAracoinStats(statsResponse.data);
+    } catch (error) {
+      console.error('Error loading wallet:', error);
+    }
+  };
+
+  const loadTransactions = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/api/wallet/${USER_ID}/transactions`);
+      setTransactions(response.data.transactions);
+    } catch (error) {
+      console.error('Error loading transactions:', error);
+    }
+  };
+
+  const earnWatchTimeAracoins = async (watchMinutes, videoId) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/wallet/${USER_ID}/earn-watch-time`, {
+        watch_time_minutes: watchMinutes,
+        video_id: videoId
+      });
+      
+      if (response.data.success) {
+        setEarningNotification({
+          type: 'watch',
+          aracoins: response.data.aracoins_earned,
+          usd: response.data.usd_value,
+          message: `+${response.data.aracoins_earned} ARACOIN for ${watchMinutes} min watch time`
+        });
+        
+        // Refresh wallet
+        loadWallet();
+        
+        // Hide notification after 4 seconds
+        setTimeout(() => setEarningNotification(null), 4000);
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error earning watch time ARACoins:', error);
+    }
+  };
+
+  const earnColorPulseAracoin = async () => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/wallet/${USER_ID}/earn-color-pulse`);
+      
+      if (response.data.success) {
+        setEarningNotification({
+          type: 'color_pulse',
+          aracoins: response.data.aracoins_earned,
+          usd: response.data.usd_value,
+          message: `+${response.data.aracoins_earned} ARACOIN Color Pulse Bonus!`
+        });
+        
+        // Refresh wallet
+        loadWallet();
+        
+        // Hide notification after 4 seconds
+        setTimeout(() => setEarningNotification(null), 4000);
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error earning Color Pulse ARACoins:', error);
+    }
+  };
+
+  const awardCreatorView = async (creatorId, videoId) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/api/wallet/${creatorId}/earn-view`, {
+        video_id: videoId,
+        viewer_id: USER_ID
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error awarding creator view:', error);
+    }
+  };
+
   const checkOrientation = () => {
     setIsLandscape(window.innerWidth > window.innerHeight);
   };
